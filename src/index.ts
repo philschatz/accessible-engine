@@ -571,7 +571,7 @@ class MyGame implements Game {
       [z,z,W,z,z,W,z,z],
     ]))
 
-    images.add('player4', new Image([
+    images.add('playerJump1', new Image([
       [z,z,z,z,z,z,z,z],
       [z,z,z,z,z,z,z,z],
       [z,z,g,r,z,z,z,z],
@@ -591,7 +591,7 @@ class MyGame implements Game {
       [z,z,z,z,z,W,z,z],
     ]))
 
-    images.add('player5', new Image([
+    images.add('playerJump2', new Image([
       [z,z,z,z,z,z,z,z],
       [z,z,g,r,z,z,z,z],
       [z,g,Y,r,z,z,z,z],
@@ -611,7 +611,7 @@ class MyGame implements Game {
       [z,z,z,z,z,z,z,z],
     ]))
 
-    images.add('player6', new Image([
+    images.add('playerJump3', new Image([
       [z,z,z,z,z,z,z,z],
       [z,z,z,z,z,z,z,z],
       [z,g,g,r,z,z,z,z],
@@ -632,7 +632,7 @@ class MyGame implements Game {
     ]))
 
 
-    images.add('player7', new Image([
+    images.add('playerJump4', new Image([ // 038
       [z,z,z,z,z,z,z,z],
       [z,z,z,z,z,z,z,z],
       [z,z,z,z,z,z,z,z],
@@ -652,7 +652,7 @@ class MyGame implements Game {
       [z,z,W,z,z,z,z,z],
     ]))
 
-    images.add('player8', new Image([
+    images.add('playerWalk1', new Image([
       [z,z,z,z,z,z,z,z],
       [z,z,z,z,z,z,z,z],
       [z,z,g,r,z,z,z,z],
@@ -660,7 +660,7 @@ class MyGame implements Game {
       [z,W,w,w,w,w,w,z],
       [W,w,w,w,w,w,w,w],
       [W,w,B,w,w,w,B,w],
-      [W,w,w,w,w,B,w,w],
+      [W,w,w,w,w,w,w,w],
 
       [z,W,w,w,w,w,w,z],
       [z,z,z,W,w,z,z,z],
@@ -672,20 +672,85 @@ class MyGame implements Game {
       [z,z,W,z,z,z,z,z],
     ]))
 
+    images.add('playerWalk2', new Image([
+      [z,z,z,z,z,z,z,z],
+      [z,z,g,r,z,z,z,z],
+      [z,g,Y,r,z,z,z,z],
+      [z,W,w,w,w,w,w,z],
+      [W,w,w,w,w,w,w,w],
+      [W,w,B,w,w,w,B,w],
+      [W,w,w,w,w,w,w,w],
+      [z,W,w,w,w,w,w,z],
+
+      [z,z,z,W,w,z,z,z],
+      [z,z,W,w,w,w,z,z],
+      [z,z,W,w,w,w,z,z],
+      [z,z,w,W,w,w,z,z],
+      [z,z,w,w,w,w,w,z],
+      [z,W,w,z,z,z,W,z],
+      [z,z,z,z,z,z,z,z],
+      [z,z,z,z,z,z,z,z],
+    ]))
+
+
+    images.add('playerWalk3', new Image([
+      [z,z,z,z,z,z,z,z],
+      [z,z,z,z,z,z,z,z],
+      [z,g,g,r,z,z,z,z],
+      [z,z,Y,r,z,z,z,z],
+      [z,W,w,w,w,w,w,z],
+      [W,w,w,w,w,w,w,w],
+      [W,w,B,w,w,w,B,w],
+      [W,w,w,w,w,w,w,w],
+
+      [z,W,w,w,w,w,w,z],
+      [z,z,z,W,w,z,z,z],
+      [z,z,W,w,w,w,z,z],
+      [z,z,w,W,w,w,z,z],
+      [z,z,w,w,w,w,z,z],
+      [z,W,w,w,w,w,z,z],
+      [z,z,z,z,z,W,w,z],
+      [z,z,z,z,z,z,W,z],
+    ]))
+
+    images.add('playerWalk4', new Image([
+      [z,z,z,z,z,z,z,z],
+      [z,z,z,z,z,z,z,z],
+      [z,z,z,z,z,z,z,z],
+      [z,z,g,r,z,z,z,z],
+      [z,g,Y,r,z,z,z,z],
+      [z,W,w,w,w,w,w,z],
+      [W,w,w,w,w,w,w,w],
+      [W,w,B,w,w,w,B,w],
+
+      [W,w,w,w,w,w,w,w],
+      [z,W,w,w,w,w,w,z],
+      [z,z,z,W,w,z,z,z],
+      [z,z,W,w,w,w,z,z],
+      [z,z,w,w,w,w,z,z],
+      [z,z,W,W,w,w,z,z],
+      [z,z,W,w,w,w,z,z],
+      [z,z,z,z,z,w,z,z],
+    ]))
 
     sprites.add('playerJumping', new Sprite(5, [
-      images.get('player1'),
-      images.get('player2'),
-      images.get('player3'),
-      images.get('player4'),
-      images.get('player5'),
-      images.get('player6'),
+      images.get('playerJump1'),
+      images.get('playerJump2'),
+      images.get('playerJump3'),
+      images.get('playerJump4'),
+    ]))
+
+    sprites.add('playerWalking', new Sprite(5, [
+      images.get('playerWalk1'),
+      images.get('playerWalk2'),
+      images.get('playerWalk3'),
+      images.get('playerWalk4'),
     ]))
 
   }
 
   init(sprites: SpriteController, instances: InstanceController) {
-    instances.factory('player', sprites.get('playerJumping')).new({x: 2, y: 2})
+    instances.factory('player', sprites.get('playerWalking')).new({x: 2, y: 2})
   }
 
   update(gamepad: Gamepad, sprites: SpriteController, instances: InstanceController, camera: Camera) {
@@ -699,8 +764,8 @@ class MyGame implements Game {
         p.hFlip = dir === DPAD.LEFT ? true : dir === DPAD.RIGHT ? false : p.hFlip
 
         p.moveTo({
-          x: p.pos.x + (dir === DPAD.RIGHT ? 1 : dir === DPAD.LEFT ? -1 : 0),
-          y: p.pos.y + (dir === DPAD.DOWN  ? 1 : dir === DPAD.UP   ? -1 : 0),
+          x: p.pos.x + (dir === DPAD.RIGHT ? 4 : dir === DPAD.LEFT ? -4 : 0),
+          y: p.pos.y + (dir === DPAD.DOWN  ? 4 : dir === DPAD.UP   ? -4 : 0),
         })
       }
     }
