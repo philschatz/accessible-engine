@@ -319,12 +319,30 @@ interface Gamepad {
   reset(): void
   dpadDir(): number
   isDpadPressed(): boolean
+  listenToDpad()
 }
 
 class KeyboardGamepad implements Gamepad {
+  private isSubscribedToDpad = false
   private zeroToFour: number | undefined
 
-  constructor() {
+  reset() {
+    this.zeroToFour = undefined
+  }
+  dpadDir() {
+    if (!this.isSubscribedToDpad) { throw new Error(`ERROR: remember to call controller.listenToDpad() during loading if your game requires it`)}
+    if (this.zeroToFour === undefined) { throw new Error(`ERROR: Check that one of the dpad directions was pressed`)}
+    return this.zeroToFour
+  }
+
+  isDpadPressed() {
+    if (!this.isSubscribedToDpad) { throw new Error(`ERROR: remember to call controller.listenToDpad() during loading if your game requires it`)}
+    return this.zeroToFour !== undefined
+  }
+
+  listenToDpad() {
+    this.isSubscribedToDpad = true
+
     // Prepare the keyboard handler
     if (process.stdin.setRawMode) {
       process.stdin.setRawMode(true)
@@ -365,19 +383,6 @@ class KeyboardGamepad implements Gamepad {
                 console.log(`Did not understand key pressed: "${key}"`)
         }
     })
-  }
-  reset() {
-    this.zeroToFour = undefined
-  }
-  dpadDir() {
-    if (this.zeroToFour === undefined) { throw new Error(`ERROR: Check that one of the dpad directions was pressed`)}
-    return this.zeroToFour
-  }
-
-  isDpadPressed() { return this.zeroToFour !== undefined }
-
-  setDpad(zeroToFour: number | undefined) {
-    this.zeroToFour = zeroToFour
   }
 }
 
@@ -484,6 +489,8 @@ enum DPAD {
 class MyGame implements Game {
   
   load(gamepad: Gamepad, sprites: SpriteController) {
+    gamepad.listenToDpad()
+
     const images = new DefiniteMap<Image>()
 
     const z = null // transparent
