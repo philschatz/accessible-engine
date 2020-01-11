@@ -51,10 +51,12 @@ class TileObject<P, S> {
 
   public static: Tile<P, S>
   public props: P
+  public hFlip: boolean
 
   constructor(t: Tile<P, S>, pos: IPosition) {
     this.static = t
     this.pos = pos
+    this.hFlip = false
   }
 
   destroy() {
@@ -121,14 +123,12 @@ class Tile<P = {}, S = {}> {
 
 class AnimatedSprite {
   startTick: number = 0
-  readonly loop: boolean
   readonly playbackRate: number // 1 == every tick. 30 = every 30 ticks (1/2 a second)
   sprites: Sprite[]
 
-  constructor(playbackRate: number, loop: boolean, sprites: Sprite[]) {
+  constructor(playbackRate: number, sprites: Sprite[]) {
     this.playbackRate = playbackRate
     this.sprites = sprites
-    this.loop = loop
     // validate the sprites are not null
     for (const s of this.sprites) {
       if (s === null) { throw new Error(`ERROR: sprites need to be non-null`)}
@@ -136,7 +136,7 @@ class AnimatedSprite {
   }
 
   static forSingleSprite(s: Sprite) {
-    return new AnimatedSprite(1, false, [s])
+    return new AnimatedSprite(1, [s])
   }
 
   tick(curTick: number) {
@@ -146,12 +146,7 @@ class AnimatedSprite {
     }
 
     const i = Math.round((curTick - this.startTick) / this.playbackRate)
-    let ret
-    if (this.loop) {
-      ret = this.sprites[i % this.sprites.length]
-    } else {
-      ret = this.sprites[Math.min(i, this.sprites.length - 1)]
-    }
+    const ret = this.sprites[i % this.sprites.length]
     if (!ret) { throw new Error(`BUG: Could not find sprite with index i=${i} . len=${this.sprites.length}`)}
     return ret
   }
@@ -221,18 +216,20 @@ class Engine {
     for (const t of tiles) {
       const sprite = t.static.sprite.tick(this.curTick)
       if (!sprite) { throw new Error(`BUG: Could not find sprite.`)}
-      this.drawPixels(relativeTo(t.pos, this.camera.pos), sprite.pixels)
+      this.drawPixels(relativeTo(t.pos, this.camera.pos), sprite.pixels, t.hFlip, false)
     }
     this.renderer.drawEnd()
   }
 
-  private drawPixels(screenPos: IPosition, pixels: Pixel[][]) {
+  private drawPixels(screenPos: IPosition, pixels: Pixel[][], hFlip: boolean, vFlip: boolean) {
+    const height = pixels.length
     let relY = 0
     for (const row of pixels) {
+      const width = row.length
       let relX = 0
       for (const pixel of row) {
-        const x = screenPos.x + relX
-        const y = screenPos.y + relY
+        const x = screenPos.x + (hFlip ? width - relX: relX)
+        const y = screenPos.y + (vFlip ? height - relY: relY)
         if (pixel !== null && x >= 0 && y >= 0) {
           const pos = {x, y}
           this.renderer.drawPixel(pos, pixel)
@@ -659,7 +656,7 @@ class MyGame implements Game {
     }
 
 
-    this.tileMap.set('playerJumpTop', tm.factory('playerJumpTop', new AnimatedSprite(5, true, [
+    this.tileMap.set('playerJumpTop', tm.factory('playerJumpTop', new AnimatedSprite(5, [
       this.spriteMap.get('playerTop1'),
       this.spriteMap.get('playerTop2'),
       this.spriteMap.get('playerTop3'),
@@ -668,7 +665,7 @@ class MyGame implements Game {
       this.spriteMap.get('playerTop6'),
     ])))
 
-    this.tileMap.set('playerJumpBottom', tm.factory('playerJumpBottom', new AnimatedSprite(5, true, [
+    this.tileMap.set('playerJumpBottom', tm.factory('playerJumpBottom', new AnimatedSprite(5, [
       this.spriteMap.get('playerBottom1'),
       this.spriteMap.get('playerBottom2'),
       this.spriteMap.get('playerBottom3'),
@@ -692,6 +689,10 @@ class MyGame implements Game {
     for (const p of players) {
       if (gamepad.isDpadPressed()) {
         const dir = gamepad.dpadDir()
+
+        // Flip the sprite if we press left/right
+        p.hFlip = dir === 2 ? true : dir === 0 ? false : p.hFlip
+
         p.moveTo({
           x: p.pos.x + (dir === 0 ? 1 : dir === 2 ? -1 : 0),
           y: p.pos.y + (dir === 3 ? 1 : dir === 1 ? -1 : 0),
