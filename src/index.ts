@@ -511,7 +511,7 @@ class MyGame implements Game {
     const p = '#FF77A8' // (light purple)
     const k = '#FFCCAA' // (light brown)
 
-    images.add('playerTop1', new Image([
+    images.add('player1', new Image([
       [z,z,z,z,z,z,z,z],
       [z,z,z,z,z,z,z,z],
       [z,z,z,z,z,z,z,z],
@@ -520,64 +520,7 @@ class MyGame implements Game {
       [z,W,w,w,w,w,w,z],
       [W,w,w,w,w,w,w,w],
       [W,w,B,w,w,w,B,w],
-    ]))
 
-    images.add('playerTop2', new Image([
-      [z,z,z,z,z,z,z,z],
-      [z,z,z,z,z,z,z,z],
-      [z,z,z,z,z,z,z,z],
-      [z,z,g,r,z,z,z,z],
-      [z,g,Y,r,z,z,z,z],
-      [z,W,w,w,w,w,w,z],
-      [W,w,w,w,w,w,w,w],
-      [W,w,W,W,w,W,W,w],
-    ]))
-
-    images.add('playerTop3', new Image([
-      [z,z,z,z,z,z,z,z],
-      [z,z,z,z,z,z,z,z],
-      [z,z,z,z,z,z,z,z],
-      [z,z,g,r,z,z,z,z],
-      [z,g,Y,r,z,z,z,z],
-      [z,W,w,w,w,w,w,z],
-      [W,w,w,w,w,w,w,w],
-      [W,w,p,p,w,p,p,w],
-    ]))
-
-    images.add('playerTop4', new Image([
-      [z,z,z,z,z,z,z,z],
-      [z,z,z,z,z,z,z,z],
-      [z,z,g,r,z,z,z,z],
-      [z,z,g,r,z,z,z,z],
-      [z,W,w,w,w,w,w,z],
-      [W,w,w,w,w,w,w,w],
-      [W,w,B,w,w,w,B,w],
-      [W,w,w,w,B,w,w,w],
-    ]))
-
-    images.add('playerTop5', new Image([
-      [z,z,z,z,z,z,z,z],
-      [z,z,g,r,z,z,z,z],
-      [z,g,Y,r,z,z,z,z],
-      [z,W,w,w,w,w,w,z],
-      [W,w,w,w,w,w,w,w],
-      [W,w,B,w,w,w,B,w],
-      [W,w,w,w,B,B,w,w],
-      [z,W,w,w,w,w,w,z],
-    ]))
-
-    images.add('playerTop6', new Image([
-      [z,z,z,z,z,z,z,z],
-      [z,z,z,z,z,z,z,z],
-      [z,g,g,r,z,z,z,z],
-      [z,z,Y,r,z,z,z,z],
-      [z,W,w,w,w,w,w,z],
-      [W,w,w,w,w,w,w,w],
-      [W,w,B,w,w,w,B,w],
-      [W,w,w,w,B,B,w,w],
-    ]))
-
-    images.add('playerBottom1', new Image([
       [W,w,w,w,w,w,w,w],
       [z,W,w,w,w,w,w,z],
       [z,z,z,W,w,z,z,z],
@@ -588,7 +531,16 @@ class MyGame implements Game {
       [z,z,W,z,z,W,z,z],
     ]))
 
-    images.add('playerBottom2', new Image([
+    images.add('player2', new Image([
+      [z,z,z,z,z,z,z,z],
+      [z,z,z,z,z,z,z,z],
+      [z,z,z,z,z,z,z,z],
+      [z,z,g,r,z,z,z,z],
+      [z,g,Y,r,z,z,z,z],
+      [z,W,w,w,w,w,w,z],
+      [W,w,w,w,w,w,w,w],
+      [W,w,W,W,w,W,W,w],
+
       [W,w,w,w,w,w,w,w],
       [z,W,w,w,w,w,w,z],
       [z,z,z,W,w,z,z,z],
@@ -599,7 +551,16 @@ class MyGame implements Game {
       [z,z,W,z,z,W,z,z],
     ]))
 
-    images.add('playerBottom3', new Image([
+    images.add('player3', new Image([
+      [z,z,z,z,z,z,z,z],
+      [z,z,z,z,z,z,z,z],
+      [z,z,z,z,z,z,z,z],
+      [z,z,g,r,z,z,z,z],
+      [z,g,Y,r,z,z,z,z],
+      [z,W,w,w,w,w,w,z],
+      [W,w,w,w,w,w,w,w],
+      [W,w,p,p,w,p,p,w],
+
       [W,w,w,w,w,w,w,w],
       [z,W,w,w,w,w,w,z],
       [z,z,z,W,w,z,z,z],
@@ -610,7 +571,16 @@ class MyGame implements Game {
       [z,z,W,z,z,W,z,z],
     ]))
 
-    images.add('playerBottom4', new Image([
+    images.add('player4', new Image([
+      [z,z,z,z,z,z,z,z],
+      [z,z,z,z,z,z,z,z],
+      [z,z,g,r,z,z,z,z],
+      [z,z,g,r,z,z,z,z],
+      [z,W,w,w,w,w,w,z],
+      [W,w,w,w,w,w,w,w],
+      [W,w,B,w,w,w,B,w],
+      [W,w,w,w,B,w,w,w],
+
       [z,W,w,w,w,w,w,z],
       [z,z,z,W,w,z,z,z],
       [z,z,w,w,w,w,z,z],
@@ -621,7 +591,16 @@ class MyGame implements Game {
       [z,z,z,z,z,W,z,z],
     ]))
 
-    images.add('playerBottom5', new Image([
+    images.add('player5', new Image([
+      [z,z,z,z,z,z,z,z],
+      [z,z,g,r,z,z,z,z],
+      [z,g,Y,r,z,z,z,z],
+      [z,W,w,w,w,w,w,z],
+      [W,w,w,w,w,w,w,w],
+      [W,w,B,w,w,w,B,w],
+      [W,w,w,w,B,B,w,w],
+      [z,W,w,w,w,w,w,z],
+
       [z,z,z,W,w,z,z,z],
       [z,z,w,w,w,w,z,z],
       [z,w,w,w,w,w,W,z],
@@ -632,7 +611,16 @@ class MyGame implements Game {
       [z,z,z,z,z,z,z,z],
     ]))
 
-    images.add('playerBottom6', new Image([
+    images.add('player6', new Image([
+      [z,z,z,z,z,z,z,z],
+      [z,z,z,z,z,z,z,z],
+      [z,g,g,r,z,z,z,z],
+      [z,z,Y,r,z,z,z,z],
+      [z,W,w,w,w,w,w,z],
+      [W,w,w,w,w,w,w,w],
+      [W,w,B,w,w,w,B,w],
+      [W,w,w,w,B,B,w,w],
+
       [z,W,w,w,w,w,w,z],
       [z,z,z,W,w,z,z,z],
       [z,w,w,w,w,w,W,z],
@@ -643,35 +631,65 @@ class MyGame implements Game {
       [z,z,z,W,z,z,z,z],
     ]))
 
-    sprites.add('playerJumpTop', new Sprite(5, [
-      images.get('playerTop1'),
-      images.get('playerTop2'),
-      images.get('playerTop3'),
-      images.get('playerTop4'),
-      images.get('playerTop5'),
-      images.get('playerTop6'),
+
+    images.add('player7', new Image([
+      [z,z,z,z,z,z,z,z],
+      [z,z,z,z,z,z,z,z],
+      [z,z,z,z,z,z,z,z],
+      [z,z,g,r,z,z,z,z],
+      [z,g,Y,r,z,z,z,z],
+      [z,W,w,w,w,w,w,z],
+      [W,w,w,w,w,w,w,w],
+      [W,w,B,w,w,w,B,w],
+
+      [W,w,w,w,w,B,w,w],
+      [z,W,w,w,w,w,w,z],
+      [z,z,z,W,w,z,z,z],
+      [z,z,w,w,w,w,z,z],
+      [z,w,w,w,w,w,W,z],
+      [z,z,W,w,w,w,z,z],
+      [z,z,w,w,w,W,z,z],
+      [z,z,W,z,z,z,z,z],
     ]))
 
-    sprites.add('playerJumpBottom', new Sprite(5, [
-      images.get('playerBottom1'),
-      images.get('playerBottom2'),
-      images.get('playerBottom3'),
-      images.get('playerBottom4'),
-      images.get('playerBottom5'),
-      images.get('playerBottom6'),
+    images.add('player8', new Image([
+      [z,z,z,z,z,z,z,z],
+      [z,z,z,z,z,z,z,z],
+      [z,z,g,r,z,z,z,z],
+      [z,z,g,r,z,z,z,z],
+      [z,W,w,w,w,w,w,z],
+      [W,w,w,w,w,w,w,w],
+      [W,w,B,w,w,w,B,w],
+      [W,w,w,w,w,B,w,w],
+
+      [z,W,w,w,w,w,w,z],
+      [z,z,z,W,w,z,z,z],
+      [z,z,W,w,w,w,z,z],
+      [z,z,w,w,w,w,z,z],
+      [z,z,w,W,w,w,z,z],
+      [z,z,W,w,w,w,W,z],
+      [z,z,w,z,z,z,z,z],
+      [z,z,W,z,z,z,z,z],
+    ]))
+
+
+    sprites.add('playerJumping', new Sprite(5, [
+      images.get('player1'),
+      images.get('player2'),
+      images.get('player3'),
+      images.get('player4'),
+      images.get('player5'),
+      images.get('player6'),
     ]))
 
   }
 
   init(sprites: SpriteController, instances: InstanceController) {
-    instances.factory('playerTop', sprites.get('playerJumpTop')).new({x: 2, y: 2})
-    instances.factory('playerBottom', sprites.get('playerJumpBottom')).new({x: 2, y: 2 + 8})
+    instances.factory('player', sprites.get('playerJumping')).new({x: 2, y: 2})
   }
 
   update(gamepad: Gamepad, sprites: SpriteController, instances: InstanceController, camera: Camera) {
-    const playerTops = instances.findAll('playerTop')
-    const playerBottoms = instances.findAll('playerBottom')
-    const players = setUnion(playerTops, playerBottoms)
+    const players = instances.findAll('player')
 
     for (const p of players) {
       if (gamepad.isDpadPressed()) {
