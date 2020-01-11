@@ -20,10 +20,10 @@ import ansiStyles from 'ansi-styles'
 import Rbush from 'rbush'
 
 
-class MyRBush extends Rbush<TileObject<any, any>> {
-  toBBox(item: TileObject<any, any>) { return item.toBBox() }
-  compareMinX(a: TileObject<any, any>, b: TileObject<any, any>) { return a.pos.x - b.pos.x }
-  compareMinY(a: TileObject<any, any>, b: TileObject<any, any>) { return a.pos.y - b.pos.y }
+class MyRBush extends Rbush<ObjectInstance<any, any>> {
+  toBBox(item: ObjectInstance<any, any>) { return item.toBBox() }
+  compareMinX(a: ObjectInstance<any, any>, b: ObjectInstance<any, any>) { return a.pos.x - b.pos.x }
+  compareMinY(a: ObjectInstance<any, any>, b: ObjectInstance<any, any>) { return a.pos.y - b.pos.y }
 }
 
 // From https://github.com/mourner/rbush
@@ -46,14 +46,14 @@ interface IPosition {
   readonly y: number
 }
 
-class TileObject<P, S> {
+class ObjectInstance<P, S> {
   public pos: IPosition
 
-  public static: Tile<P, S>
+  public static: GameObject<P, S>
   public props: P
   public hFlip: boolean
 
-  constructor(t: Tile<P, S>, pos: IPosition) {
+  constructor(t: GameObject<P, S>, pos: IPosition) {
     this.static = t
     this.pos = pos
     this.hFlip = false
@@ -64,8 +64,8 @@ class TileObject<P, S> {
   }
 
   moveTo(pos: IPosition) {
+    // delegate
     this.static.moveTo(this, pos)
-    this.pos = pos
   }
 
   toBBox(): BBox {
@@ -73,81 +73,82 @@ class TileObject<P, S> {
   }
 }
 
-class Tile<P = {}, S = {}> {
-  private readonly bush: RBush<TileObject<{},{}>>
-  readonly sprite: AnimatedSprite
-  readonly objects: Set<TileObject<P, S>> = new Set()
+class GameObject<P = {}, S = {}> {
+  private readonly bush: RBush<ObjectInstance<{},{}>>
+  readonly sprite: Sprite
+  readonly instances: Set<ObjectInstance<P, S>> = new Set()
   public props: S
 
-  constructor(bush: RBush<TileObject<{},{}>>, sprite: AnimatedSprite) {
+  constructor(bush: RBush<ObjectInstance<{},{}>>, sprite: Sprite) {
     this.bush = bush
     this.sprite = sprite
   }
 
   public new(pos: IPosition) {
-    const o = new TileObject(this, pos)
-    this.objects.add(o)
+    const o = new ObjectInstance(this, pos)
+    this.instances.add(o)
     this.bush.insert(o)
     return o
   }
 
   public newBulk(positions: IPosition[]) {
-    const objects = positions.map(p => new TileObject(this, p))
-    this.bush.load(objects)
-    for (const o of objects) {
-      this.objects.add(o)
+    const instances = positions.map(p => new ObjectInstance(this, p))
+    this.bush.load(instances)
+    for (const o of instances) {
+      this.instances.add(o)
     }
-    return objects
+    return instances
   }
 
-  moveTo(o: TileObject<P, S>, pos: IPosition) {
-    if (!this.objects.has(o)) { throw new Error('BUG: Trying to move an object that the framework is unaware of')}
+  moveTo(o: ObjectInstance<P, S>, newPos: IPosition) {
+    if (!this.instances.has(o)) { throw new Error('BUG: Trying to move an object that the framework is unaware of')}
     this.bush.remove(o)
+    o.pos = newPos
     this.bush.insert(o)
   }
 
-  delete(o: TileObject<P, S>) {
-    this.objects.delete(o)
+  delete(o: ObjectInstance<P, S>) {
+    this.instances.delete(o)
     this.bush.remove(o)
   }
 
   deleteAll() {
-    for (const o of this.objects) {
+    for (const o of this.instances) {
       this.bush.remove(o)
     }
-    this.objects.clear()
+    this.instances.clear()
   }
 }
 
 
-
-class AnimatedSprite {
+// An animated set of Images
+class Sprite {
   startTick: number = 0
   readonly playbackRate: number // 1 == every tick. 30 = every 30 ticks (1/2 a second)
-  sprites: Sprite[]
+  images: Image[]
 
-  constructor(playbackRate: number, sprites: Sprite[]) {
+  constructor(playbackRate: number, images: Image[]) {
     this.playbackRate = playbackRate
-    this.sprites = sprites
-    // validate the sprites are not null
-    for (const s of this.sprites) {
+    this.images = images
+    // validate the images are not null
+    for (const s of this.images) {
       if (s === null) { throw new Error(`ERROR: sprites need to be non-null`)}
     }
   }
 
-  static forSingleSprite(s: Sprite) {
-    return new AnimatedSprite(1, [s])
+  static forSingleImage(s: Image) {
+    return new Sprite(1, [s])
   }
 
   tick(curTick: number) {
-    if (this.sprites.length === 1) { 
-      if (!this.sprites[0]) { throw new Error(`BUG: Could not find sprite since there should only be one`)}
-      return this.sprites[0]
+    if (this.images.length === 1) { 
+      if (!this.images[0]) { throw new Error(`BUG: Could not find sprite since there should only be one`)}
+      return this.images[0]
     }
 
     const i = Math.round((curTick - this.startTick) / this.playbackRate)
-    const ret = this.sprites[i % this.sprites.length]
-    if (!ret) { throw new Error(`BUG: Could not find sprite with index i=${i} . len=${this.sprites.length}`)}
+    const ret = this.images[i % this.images.length]
+    if (!ret) { throw new Error(`BUG: Could not find sprite with index i=${i} . len=${this.images.length}`)}
     return ret
   }
 }
@@ -158,7 +159,7 @@ type Size = {
   height: number
 }
 
-class Sprite {
+class Image {
   public readonly pixels: Pixel[][]
   constructor(pixels: Pixel[][]) {
     this.pixels = pixels
@@ -184,14 +185,16 @@ class Engine {
   private curTick: number = 0
   private readonly game: Game
   private readonly renderer: Renderer
-  private readonly bush: RBush<TileObject<any, any>>
-  private readonly tm: TileMaker
+  private readonly bush: RBush<ObjectInstance<any, any>>
+  private readonly sprites: SpriteController
+  private readonly instances: InstanceController
   private readonly camera: Camera
   private readonly gamepad: Gamepad
 
   constructor(game: Game, renderer: Renderer) {
     this.bush = new MyRBush()
-    this.tm = new TileMaker(this.bush)
+    this.sprites = new DefiniteMap<Sprite>()
+    this.instances = new InstanceController(this.bush)
     this.camera = new Camera({width: 128, height: 128})
     this.gamepad = new KeyboardGamepad()
     this.renderer = renderer
@@ -200,10 +203,11 @@ class Engine {
 
   tick() {
     if (this.curTick === 0) {
-      this.game.init(this.gamepad, this.tm)
+      this.game.load(this.gamepad, this.sprites)
+      this.game.init(this.sprites, this.instances)
     }
     this.curTick++
-    this.game.update(this.gamepad, this.tm, this.camera)
+    this.game.update(this.gamepad, this.sprites, this.instances, this.camera)
     this.gamepad.reset()
     this.draw()
   }
@@ -214,9 +218,9 @@ class Engine {
 
     this.renderer.drawStart()
     for (const t of tiles) {
-      const sprite = t.static.sprite.tick(this.curTick)
-      if (!sprite) { throw new Error(`BUG: Could not find sprite.`)}
-      this.drawPixels(relativeTo(t.pos, this.camera.pos), sprite.pixels, t.hFlip, false)
+      const image = t.static.sprite.tick(this.curTick)
+      if (!image) { throw new Error(`BUG: Could not find image for the sprite.`)}
+      this.drawPixels(relativeTo(t.pos, this.camera.pos), image.pixels, t.hFlip, false)
     }
     this.renderer.drawEnd()
   }
@@ -250,8 +254,9 @@ function relativeTo(pos1: IPosition, pos2: IPosition): IPosition {
 }
 
 interface Game {
-  init(gamepad: Gamepad, t: TileMaker)
-  update(gamepad: Gamepad, t: TileMaker, camera: Camera): void
+  load(gamepad: Gamepad, sprites: SpriteController)
+  init(sprites: SpriteController, instances: InstanceController)
+  update(gamepad: Gamepad, sprites: SpriteController, instances: InstanceController, camera: Camera)
 }
 
 class Camera {
@@ -264,28 +269,29 @@ class Camera {
   }
 
   public toBBox(): BBox {
+    const {width, height} = this.dim
     return {
       minX: this.pos.x,
-      maxX: this.pos.x + this.dim.width,
+      maxX: this.pos.x + width,
       minY: this.pos.y,
-      maxY: this.pos.y + this.dim.height
+      maxY: this.pos.y + height
     }
   }
 }
 
 
-class TileMaker {
-  private readonly bush: RBush<TileObject<any, any>>
-  private instances: Map<String, Tile> = new Map()
+class InstanceController {
+  private readonly bush: RBush<ObjectInstance<any, any>>
+  private instances: Map<String, GameObject> = new Map()
 
-  constructor(bush: RBush<TileObject<any, any>>) {
+  constructor(bush: RBush<ObjectInstance<any, any>>) {
     this.bush = bush
   }
 
-  factory(name: String, sprite: AnimatedSprite) {
+  factory(name: String, sprite: Sprite) {
     let i = this.instances.get(name)
     if (i === undefined) {
-      i = new Tile(this.bush, sprite)
+      i = new GameObject(this.bush, sprite)
       this.instances.set(name, i)
       return i
     }
@@ -295,7 +301,7 @@ class TileMaker {
   findAll(name: string) {
     const i = this.instances.get(name)
     if (i === undefined) { throw new Error(`BUG: Could not find tile named "${name}". Currently have the following: ${JSON.stringify([...this.instances.keys()])}`)}
-    return [...i.objects]
+    return [...i.instances]
   }
 }
 
@@ -436,55 +442,51 @@ function clearScreen() {
     process.stdout.write(ansiEscapes.clearScreen)
 }
 
-// function filter_in(CAMERA) {
-//   // Maybe use an https://en.wikipedia.org/wiki/R-tree instead
-//   // and JS implementation: https://github.com/mourner/rbush
-//   visible_tiles = {}
-//   for (tile in ALL_TILES_IN_GAME) {
-//     if (CAMERA.x1 <= tile.x && tile.x <= CAMERA.x2 && 
-//         CAMERA.y1 <= tile.y && tile.y <= CAMERA.y2) {
-
-//           visible_tiles.add(tile)
-//     }
-//   }
-//   return visible_tiles
-// }
-
-// function draw(canvas) {
-//   CUR_TICK++
-
-//   tiles_in_view = ALL_TILES_IN_GAME.filter_in(CAMERA).sort_by(z_index)
-  
-//   for (tile in tiles_in_view) {
-//     tile_rel_pos = tile.rel_pos()
-//     for (animated_sprite in tile) {
-//       // each sprite can actually be 1 of many animation variants
-//       (sprite, sprite_rel_pos) = animated_sprite.get_current_sprite(CUR_TICK)
-//       canvas.draw(sprite, camera) // draw the sprite relative to where the camera is
-
-//     }
-//   }
-
-  
-// }
-
-// function update() {
-//   if (btn() != 0) {
-//     _game_specific_update(gamepads)
-//   }
-// }
 
 
-// color_palette: 0123456789abcdef | ghijklmnopqrstuv (for 32 colors per sprite instead of pic8's 16 colors)
+class DefiniteMap<V> {
+  private readonly map: Map<string, V> = new Map()
+
+  add(key: string, value: V) {
+    if (this.map.has(key)) { throw new Error(`BUG: Trying to add item (sprite) when there is another item that already exists with the same name "${key}"`)}
+    this.map.set(key, value)
+  }
+
+  get(key: string) {
+    const value = this.map.get(key)
+    if (value === undefined) { throw new Error(`ERROR: Could not find item (sprite) named ${key}`) }
+    return value
+  }
+}
+
+type SpriteController = DefiniteMap<Sprite>
+
+enum DPAD {
+  RIGHT = 0,
+  UP = 1,
+  LEFT = 2,
+  DOWN = 3,
+}
+
+
+
+
+
+
+// Below is the code for a simple game.
+// It shows how the game code is organized.
+
+
+
+
 
 
 class MyGame implements Game {
   
-  spriteMap: Map<string, Sprite> = new Map()
-  tileMap: Map<string, Tile> = new Map()
+  load(gamepad: Gamepad, sprites: SpriteController) {
+    const images = new DefiniteMap<Image>()
 
-  constructor() {
-    const z = null
+    const z = null // transparent
     const K = '#000000' // (black)
     const B = '#1D2B53' // (dark blue)
     const P = '#7E2553' // (dark purple)
@@ -502,7 +504,7 @@ class MyGame implements Game {
     const p = '#FF77A8' // (light purple)
     const k = '#FFCCAA' // (light brown)
 
-    this.spriteMap.set('playerTop1', new Sprite([
+    images.add('playerTop1', new Image([
       [z,z,z,z,z,z,z,z],
       [z,z,z,z,z,z,z,z],
       [z,z,z,z,z,z,z,z],
@@ -513,7 +515,7 @@ class MyGame implements Game {
       [W,w,B,w,w,w,B,w],
     ]))
 
-    this.spriteMap.set('playerTop2', new Sprite([
+    images.add('playerTop2', new Image([
       [z,z,z,z,z,z,z,z],
       [z,z,z,z,z,z,z,z],
       [z,z,z,z,z,z,z,z],
@@ -524,7 +526,7 @@ class MyGame implements Game {
       [W,w,W,W,w,W,W,w],
     ]))
 
-    this.spriteMap.set('playerTop3', new Sprite([
+    images.add('playerTop3', new Image([
       [z,z,z,z,z,z,z,z],
       [z,z,z,z,z,z,z,z],
       [z,z,z,z,z,z,z,z],
@@ -535,7 +537,7 @@ class MyGame implements Game {
       [W,w,p,p,w,p,p,w],
     ]))
 
-    this.spriteMap.set('playerTop4', new Sprite([
+    images.add('playerTop4', new Image([
       [z,z,z,z,z,z,z,z],
       [z,z,z,z,z,z,z,z],
       [z,z,g,r,z,z,z,z],
@@ -546,17 +548,7 @@ class MyGame implements Game {
       [W,w,w,w,B,w,w,w],
     ]))
 
-    this.spriteMap.set('playerTop5', new Sprite([
-      [z,z,z,z,z,z,z,z],
-      [z,z,g,r,z,z,z,z],
-      [z,g,Y,r,z,z,z,z],
-      [z,W,w,w,w,w,w,z],
-      [W,w,w,w,w,w,w,w],
-      [W,w,B,w,w,w,B,w],
-      [W,w,w,w,B,B,w,w],
-    ]))
-
-    this.spriteMap.set('playerTop5', new Sprite([
+    images.add('playerTop5', new Image([
       [z,z,z,z,z,z,z,z],
       [z,z,g,r,z,z,z,z],
       [z,g,Y,r,z,z,z,z],
@@ -567,7 +559,7 @@ class MyGame implements Game {
       [z,W,w,w,w,w,w,z],
     ]))
 
-    this.spriteMap.set('playerTop6', new Sprite([
+    images.add('playerTop6', new Image([
       [z,z,z,z,z,z,z,z],
       [z,z,z,z,z,z,z,z],
       [z,g,g,r,z,z,z,z],
@@ -578,9 +570,7 @@ class MyGame implements Game {
       [W,w,w,w,B,B,w,w],
     ]))
 
-
-
-    this.spriteMap.set('playerBottom1', new Sprite([
+    images.add('playerBottom1', new Image([
       [W,w,w,w,w,w,w,w],
       [z,W,w,w,w,w,w,z],
       [z,z,z,W,w,z,z,z],
@@ -591,7 +581,7 @@ class MyGame implements Game {
       [z,z,W,z,z,W,z,z],
     ]))
 
-    this.spriteMap.set('playerBottom2', new Sprite([
+    images.add('playerBottom2', new Image([
       [W,w,w,w,w,w,w,w],
       [z,W,w,w,w,w,w,z],
       [z,z,z,W,w,z,z,z],
@@ -602,7 +592,7 @@ class MyGame implements Game {
       [z,z,W,z,z,W,z,z],
     ]))
 
-    this.spriteMap.set('playerBottom3', new Sprite([
+    images.add('playerBottom3', new Image([
       [W,w,w,w,w,w,w,w],
       [z,W,w,w,w,w,w,z],
       [z,z,z,W,w,z,z,z],
@@ -613,7 +603,7 @@ class MyGame implements Game {
       [z,z,W,z,z,W,z,z],
     ]))
 
-    this.spriteMap.set('playerBottom4', new Sprite([
+    images.add('playerBottom4', new Image([
       [z,W,w,w,w,w,w,z],
       [z,z,z,W,w,z,z,z],
       [z,z,w,w,w,w,z,z],
@@ -624,7 +614,7 @@ class MyGame implements Game {
       [z,z,z,z,z,W,z,z],
     ]))
 
-    this.spriteMap.set('playerBottom5', new Sprite([
+    images.add('playerBottom5', new Image([
       [z,z,z,W,w,z,z,z],
       [z,z,w,w,w,w,z,z],
       [z,w,w,w,w,w,W,z],
@@ -635,7 +625,7 @@ class MyGame implements Game {
       [z,z,z,z,z,z,z,z],
     ]))
 
-    this.spriteMap.set('playerBottom6', new Sprite([
+    images.add('playerBottom6', new Image([
       [z,W,w,w,w,w,w,z],
       [z,z,z,W,w,z,z,z],
       [z,w,w,w,w,w,W,z],
@@ -646,44 +636,34 @@ class MyGame implements Game {
       [z,z,z,W,z,z,z,z],
     ]))
 
+    sprites.add('playerJumpTop', new Sprite(5, [
+      images.get('playerTop1'),
+      images.get('playerTop2'),
+      images.get('playerTop3'),
+      images.get('playerTop4'),
+      images.get('playerTop5'),
+      images.get('playerTop6'),
+    ]))
+
+    sprites.add('playerJumpBottom', new Sprite(5, [
+      images.get('playerBottom1'),
+      images.get('playerBottom2'),
+      images.get('playerBottom3'),
+      images.get('playerBottom4'),
+      images.get('playerBottom5'),
+      images.get('playerBottom6'),
+    ]))
+
   }
 
-  init(gamepad: Gamepad, tm: TileMaker) {
-    // console.log('initializing')
-    for (const [key, value] of this.spriteMap.entries()) {
-      // console.log(`Adding "${key}" to the tileMaker`)
-      this.tileMap.set(key, tm.factory(key, AnimatedSprite.forSingleSprite(value)))
-    }
-
-
-    this.tileMap.set('playerJumpTop', tm.factory('playerJumpTop', new AnimatedSprite(5, [
-      this.spriteMap.get('playerTop1'),
-      this.spriteMap.get('playerTop2'),
-      this.spriteMap.get('playerTop3'),
-      this.spriteMap.get('playerTop4'),
-      this.spriteMap.get('playerTop5'),
-      this.spriteMap.get('playerTop6'),
-    ])))
-
-    this.tileMap.set('playerJumpBottom', tm.factory('playerJumpBottom', new AnimatedSprite(5, [
-      this.spriteMap.get('playerBottom1'),
-      this.spriteMap.get('playerBottom2'),
-      this.spriteMap.get('playerBottom3'),
-      this.spriteMap.get('playerBottom4'),
-      this.spriteMap.get('playerBottom5'),
-      this.spriteMap.get('playerBottom6'),
-    ])))
-
-    // console.log("Searching for player")
-    // console.log(tm.findAll('player'))
-
-    this.tileMap.get('playerJumpTop').new({x: 2, y: 2})
-    this.tileMap.get('playerJumpBottom').new({x: 2, y: 2 + 8})
+  init(sprites: SpriteController, instances: InstanceController) {
+    instances.factory('playerTop', sprites.get('playerJumpTop')).new({x: 2, y: 2})
+    instances.factory('playerBottom', sprites.get('playerJumpBottom')).new({x: 2, y: 2 + 8})
   }
 
-  update(gamepad: Gamepad, tm: TileMaker, camera: Camera) {
-    const playerTops = tm.findAll('playerJumpTop')
-    const playerBottoms = tm.findAll('playerJumpBottom')
+  update(gamepad: Gamepad, sprites: SpriteController, instances: InstanceController, camera: Camera) {
+    const playerTops = instances.findAll('playerTop')
+    const playerBottoms = instances.findAll('playerBottom')
     const players = setUnion(playerTops, playerBottoms)
 
     for (const p of players) {
@@ -691,16 +671,31 @@ class MyGame implements Game {
         const dir = gamepad.dpadDir()
 
         // Flip the sprite if we press left/right
-        p.hFlip = dir === 2 ? true : dir === 0 ? false : p.hFlip
+        p.hFlip = dir === DPAD.LEFT ? true : dir === DPAD.RIGHT ? false : p.hFlip
 
         p.moveTo({
-          x: p.pos.x + (dir === 0 ? 1 : dir === 2 ? -1 : 0),
-          y: p.pos.y + (dir === 3 ? 1 : dir === 1 ? -1 : 0),
+          x: p.pos.x + (dir === DPAD.RIGHT ? 1 : dir === DPAD.LEFT ? -1 : 0),
+          y: p.pos.y + (dir === DPAD.DOWN  ? 1 : dir === DPAD.UP   ? -1 : 0),
         })
       }
     }
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 function setUnion<T>(set1: Iterable<T>, set2: Iterable<T>) {
