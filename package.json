@@ -1,0 +1,18 @@
+{
+  "scripts": {
+    "build": "tsc",
+    "test": "npm run-script build && npm start",
+    "start": "node -r source-map-support/register ./src/index.js",
+    "start:debug": "node --inspect-brk -r source-map-support/register ./src/index.js"
+  },
+  "devDependencies": {
+    "@types/ansi-styles": "^3.2.1",
+    "@types/node": "^13.1.6",
+    "@types/rbush": "^3.0.0",
+    "ansi-escapes": "^4.3.0",
+    "ansi-styles": "^4.2.1",
+    "rbush": "^3.0.1",
+    "source-map-support": "^0.5.16",
+    "typescript": "^3.7.4"
+  }
+}
