@@ -459,6 +459,11 @@ class TerminalRenderer implements Renderer {
   }
 
   private _drawSinglePixel(pos: IPosition, hex: string) {
+    const {columns, rows} = getTerminalSize()
+
+    // do not draw past the terminal
+    if (pos.x * 2 + 1 >= columns || pos.y >= rows) { return }  // +1 is just-in-case
+
     process.stdout.write(
       setMoveTo(pos.x * 2, pos.y) +
       setBgColor(hex) +
@@ -475,6 +480,14 @@ class TerminalRenderer implements Renderer {
 }
 
 
+
+// TypeScript does not like that columns and rows might be null
+function getTerminalSize() {
+  return {
+      columns: process.stdout.columns || 80,
+      rows: process.stdout.rows || 25
+  }
+}
 
 // Determine if this
 // 'truecolor' if this terminal supports 16m colors. 256 colors otherwise
