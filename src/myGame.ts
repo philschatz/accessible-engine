@@ -1,4 +1,4 @@
-import {Game, Camera, SpriteController, Gamepad, Image, DefiniteMap, Sprite, InstanceController, DPAD} from './engine'
+import {Game, Camera, SpriteController, Gamepad, Image, DefiniteMap, Sprite, InstanceController, DPAD, ObjectInstance} from './engine'
 
 export class MyGame implements Game {
   
@@ -317,9 +317,10 @@ export class MyGame implements Game {
   }
 
   init(sprites: SpriteController, instances: InstanceController) {
-    instances.factory('player', sprites.get('playerStanding')).new({x: 8, y: 8})
-    const floor1 = instances.factory('floorOrange1', sprites.get('floorOrange1'))
-    const floor2 = instances.factory('floorOrange2', sprites.get('floorOrange2'))
+    const player = instances.factory('player', sprites.get('playerStanding'), playerUpdateFn)
+    player.new({x: 8, y: 8})
+    const floor1 = instances.simple(sprites, 'floorOrange1')
+    const floor2 = instances.simple(sprites, 'floorOrange2')
     floor1.new({x: 0, y: 8 + 16})
     floor2.new({x: 0 + 8, y: 8 + 16})
     floor2.new({x: 0 + 16, y: 8 + 16})
@@ -328,37 +329,34 @@ export class MyGame implements Game {
     floor2.new({x: 0 + 48, y: 8 + 16})
   }
 
-  update(gamepad: Gamepad, sprites: SpriteController, instances: InstanceController, camera: Camera) {
-    const playerJumping = sprites.get('playerJumping')
-    const playerWalking = sprites.get('playerWalking')
-    const playerStanding = sprites.get('playerStanding')
+}
 
-    const players = instances.findAll('player')
 
-    for (const p of players) {
-      if (gamepad.isDpadPressed()) {
-        const dir = gamepad.dpadDir()
+function playerUpdateFn(o: ObjectInstance<{}, {}>, gamepad: Gamepad, sprites: SpriteController, instances: InstanceController, camera: Camera) {
+  const playerJumping = sprites.get('playerJumping')
+  const playerWalking = sprites.get('playerWalking')
+  const playerStanding = sprites.get('playerStanding')
 
-        switch (dir) {
-          case DPAD.LEFT:
-          case DPAD.RIGHT:
-            p.sprite = playerWalking
-            break
-          case DPAD.UP:
-          case DPAD.DOWN:
-            p.sprite = playerJumping
-            break
-        }
+  if (gamepad.isDpadPressed()) {
+    const dir = gamepad.dpadDir()
+    switch (dir) {
+      case DPAD.LEFT:
+      case DPAD.RIGHT:
+        o.sprite = playerWalking
         // Flip the sprite if we press left/right
-        p.hFlip = dir === DPAD.LEFT ? true : dir === DPAD.RIGHT ? false : p.hFlip
-
-        p.moveTo({
-          x: p.pos.x + (dir === DPAD.RIGHT ? 4 : dir === DPAD.LEFT ? -4 : 0),
-          y: p.pos.y + (dir === DPAD.DOWN  ? 8 : dir === DPAD.UP   ? -8 : 0),
-        })
-      } else {
-        p.sprite = playerStanding
-      }
+        o.hFlip = dir === DPAD.LEFT ? true : false
+        break
+      case DPAD.UP:
+      case DPAD.DOWN:
+        o.sprite = playerJumping
+        break
     }
+
+    o.moveTo({
+      x: o.pos.x + (dir === DPAD.RIGHT ? 4 : dir === DPAD.LEFT ? -4 : 0),
+      y: o.pos.y + (dir === DPAD.DOWN  ? 8 : dir === DPAD.UP   ? -8 : 0),
+    })
+  } else {
+    o.sprite = playerStanding
   }
 }

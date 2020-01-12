@@ -15,6 +15,7 @@ interface RBush<I> {
   load(items: I[]): void
   remove(item: I): void
   search(bbox: BBox): I[]
+  all(): I[]
 }
 
 interface BBox {
@@ -29,7 +30,7 @@ interface IPosition {
   readonly y: number
 }
 
-class ObjectInstance<P, S> {
+export class ObjectInstance<P, S> {
   public pos: IPosition
 
   public static: GameObject<P, S>
@@ -62,11 +63,13 @@ class GameObject<P = {}, S = {}> {
   private readonly bush: RBush<ObjectInstance<{},{}>>
   readonly sprite: Sprite
   readonly instances: Set<ObjectInstance<P, S>> = new Set()
+  readonly updateFn: UpdateFn<P, S>
   public props: S
 
-  constructor(bush: RBush<ObjectInstance<{},{}>>, sprite: Sprite) {
+  constructor(bush: RBush<ObjectInstance<{},{}>>, sprite: Sprite, updateFn: UpdateFn<P, S>) {
     this.bush = bush
     this.sprite = sprite
+    this.updateFn = updateFn
   }
 
   public new(pos: IPosition) {
@@ -192,8 +195,11 @@ export class Engine {
       this.game.init(this.sprites, this.instances)
     }
     this.curTick++
-    this.game.update(this.gamepad, this.sprites, this.instances, this.camera)
-    // this.gamepad.reset()
+
+    // Update each object
+    // TODO: Only update objects in view or ones that have an alwaysUpdate=true flag set (TBD)
+    this.bush.all().forEach(i => i.static.updateFn(i, this.gamepad, this.sprites, this.instances, this.camera))
+
     this.draw()
   }
 
@@ -241,7 +247,6 @@ function relativeTo(pos1: IPosition, pos2: IPosition): IPosition {
 export interface Game {
   load(gamepad: Gamepad, sprites: SpriteController)
   init(sprites: SpriteController, instances: InstanceController)
-  update(gamepad: Gamepad, sprites: SpriteController, instances: InstanceController, camera: Camera)
 }
 
 export class Camera {
@@ -264,6 +269,7 @@ export class Camera {
   }
 }
 
+type UpdateFn<P, S> = (o: ObjectInstance<P, S>, gamepad: Gamepad, sprites: SpriteController, instances: InstanceController, camera: Camera) => void
 
 export class InstanceController {
   private readonly bush: RBush<ObjectInstance<any, any>>
@@ -273,10 +279,14 @@ export class InstanceController {
     this.bush = bush
   }
 
-  factory(name: String, sprite: Sprite) {
+  simple(sprites: SpriteController, name: string) {
+    return this.factory(name, sprites.get(name), () => null)
+  }
+
+  factory(name: String, sprite: Sprite, fnUpdate: UpdateFn<any, any>) {
     let i = this.instances.get(name)
     if (i === undefined) {
-      i = new GameObject(this.bush, sprite)
+      i = new GameObject(this.bush, sprite, fnUpdate)
       this.instances.set(name, i)
       return i
     }
