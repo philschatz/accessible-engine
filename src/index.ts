@@ -403,19 +403,74 @@ interface Renderer {
 }
 
 
-class TerminalRenderer implements Renderer {
-  drawStart() {
-    clearScreen()
+
+class DoubleArray<T> {
+  private ary: T[][] = []
+  private maxWidth = 0
+  private maxHeight = 0
+
+  clear() {
+    this.ary = []
   }
-  drawEnd() { }
-  drawPixel(pos: IPosition, hex: string) {
-    if (pos.x < 0 || pos.y < 0) { throw new Error(`BUG: Tried to draw outside of the camera range ${JSON.stringify(pos)}`)}
+  set(pos: IPosition, v: T) {
+    if (!this.ary[pos.y]) { this.ary[pos.y] = [] }
+    this.ary[pos.y][pos.x] = v
+
+    this.maxHeight = Math.max(this.maxHeight, pos.y)
+    this.maxWidth = Math.max(this.maxWidth, pos.x)
+  }
+
+  get(pos: IPosition, def: T): T {
+    if (!this.ary[pos.y]) { return def }
+    return this.ary[pos.y][pos.x] || def
+  }
+
+  dim() {
+    return {
+      width: this.maxWidth,
+      height: this.maxHeight
+    }
+  }
+}
+
+const BLACK = '#000000'
+
+class TerminalRenderer implements Renderer {
+  private pixelsOnScreen = new DoubleArray<Pixel>()
+  private pixelsToDraw = new DoubleArray<Pixel>()
+
+  drawStart() {
+    this.pixelsToDraw.clear()
+  }
+
+  drawEnd() {
+    const {width, height} = this.pixelsToDraw.dim()
+
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const pos = {x, y}
+        const toDraw = this.pixelsToDraw.get(pos, BLACK)
+        if (this.pixelsOnScreen.get(pos, BLACK) !== toDraw) {
+          this._drawSinglePixel(pos, toDraw)
+        }
+      }
+    }
+    
+  }
+
+  private _drawSinglePixel(pos: IPosition, hex: string) {
     process.stdout.write(
       setMoveTo(pos.x * 2, pos.y) +
       setBgColor(hex) +
       '  ' +
-      setBgColor('#000000') // reset back to black
+      setBgColor(BLACK) // reset back to black
     )
+    this.pixelsOnScreen.set(pos, hex)
+  }
+
+  drawPixel(pos: IPosition, hex: string) {
+    if (pos.x < 0 || pos.y < 0) { throw new Error(`BUG: Tried to draw outside of the camera range ${JSON.stringify(pos)}`)}
+    this.pixelsToDraw.set(pos, hex)
   }
 }
 
