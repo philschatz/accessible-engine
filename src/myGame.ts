@@ -264,7 +264,7 @@ export class MyGame implements Game {
     ]))
 
 
-    images.add('landOrange1', new Image([
+    images.add('floorOrange1', new Image([
       [g,g,g,g,g,g,g,g],
       [g,G,g,G,G,g,g,G],
       [G,o,G,o,o,G,G,k],
@@ -275,18 +275,57 @@ export class MyGame implements Game {
       [Y,Y,Y,Y,Y,Y,o,o],
     ]))
 
-    sprites.add('landOrange1', Sprite.forSingleImage(images.get('landOrange1')))
+    images.add('floorOrange2', new Image([
+      [g,g,g,g,g,g,g,g],
+      [g,G,G,g,G,G,g,g],
+      [G,o,o,G,o,o,G,g],
+      [Y,o,o,o,o,o,o,G],
+      [Y,o,o,o,o,o,o,k],
+      [Y,o,o,o,o,o,o,k],
+      [Y,o,o,o,o,o,o,k],
+      [Y,Y,Y,Y,Y,Y,o,o],
+    ]))
+
+
+    images.add('floorWhite1', new Image([
+      [g,g,g,g,g,g,g,g],
+      [g,g,g,G,g,g,G,G],
+      [G,g,G,k,G,G,k,w],
+      [W,G,k,k,k,k,k,w],
+      [W,k,k,k,k,k,k,w],
+      [W,k,k,k,k,k,k,w],
+      [W,k,k,k,k,k,k,w],
+      [W,W,W,W,W,W,k,k],
+    ]))
+
+    images.add('floorWhite2', new Image([
+      [g,g,g,g,g,g,g,g],
+      [g,G,g,g,G,G,g,g],
+      [G,k,G,G,k,k,G,G],
+      [W,k,k,k,k,k,k,w],
+      [W,k,k,k,k,k,k,w],
+      [W,k,k,k,k,k,k,w],
+      [W,k,k,k,k,k,k,w],
+      [W,W,W,W,W,W,k,k],
+    ]))
+
+    sprites.add('floorOrange1', Sprite.forSingleImage(images.get('floorOrange1')))
+    sprites.add('floorOrange2', Sprite.forSingleImage(images.get('floorOrange2')))
+
+    sprites.add('floorWhite1', Sprite.forSingleImage(images.get('floorWhite1')))
+    sprites.add('floorWhite2', Sprite.forSingleImage(images.get('floorWhite2')))
   }
 
   init(sprites: SpriteController, instances: InstanceController) {
     instances.factory('player', sprites.get('playerStanding')).new({x: 8, y: 8})
-    const land = instances.factory('landOrange1', sprites.get('landOrange1'))
-    land.new({x: 0, y: 8 + 16})
-    land.new({x: 0 + 8, y: 8 + 16})
-    land.new({x: 0 + 16, y: 8 + 16})
-    land.new({x: 0 + 24, y: 8 + 16})
-    land.new({x: 0 + 32, y: 8 + 16})
-    land.new({x: 0 + 48, y: 8 + 16})
+    const floor1 = instances.factory('floorOrange1', sprites.get('floorOrange1'))
+    const floor2 = instances.factory('floorOrange2', sprites.get('floorOrange2'))
+    floor1.new({x: 0, y: 8 + 16})
+    floor2.new({x: 0 + 8, y: 8 + 16})
+    floor2.new({x: 0 + 16, y: 8 + 16})
+    floor1.new({x: 0 + 24, y: 8 + 16})
+    floor1.new({x: 0 + 32, y: 8 + 16})
+    floor2.new({x: 0 + 48, y: 8 + 16})
   }
 
   update(gamepad: Gamepad, sprites: SpriteController, instances: InstanceController, camera: Camera) {
@@ -315,7 +354,7 @@ export class MyGame implements Game {
 
         p.moveTo({
           x: p.pos.x + (dir === DPAD.RIGHT ? 4 : dir === DPAD.LEFT ? -4 : 0),
-          y: p.pos.y + (dir === DPAD.DOWN  ? 4 : dir === DPAD.UP   ? -4 : 0),
+          y: p.pos.y + (dir === DPAD.DOWN  ? 8 : dir === DPAD.UP   ? -8 : 0),
         })
       } else {
         p.sprite = playerStanding
