@@ -759,10 +759,30 @@ class MyGame implements Game {
       images.get('playerWalk4'),
     ]))
 
+
+    images.add('landOrange1', new Image([
+      [g,g,g,g,g,g,g,g],
+      [g,G,g,G,G,g,g,G],
+      [G,o,G,o,o,G,G,k],
+      [Y,o,o,o,o,o,o,k],
+      [Y,o,o,o,o,o,o,k],
+      [Y,o,o,o,o,o,o,k],
+      [Y,o,o,o,o,o,o,k],
+      [Y,Y,Y,Y,Y,Y,o,o],
+    ]))
+
+    sprites.add('landOrange1', Sprite.forSingleImage(images.get('landOrange1')))
   }
 
   init(sprites: SpriteController, instances: InstanceController) {
-    instances.factory('player', sprites.get('playerStanding')).new({x: 2, y: 2})
+    instances.factory('player', sprites.get('playerStanding')).new({x: 8, y: 8})
+    const land = instances.factory('landOrange1', sprites.get('landOrange1'))
+    land.new({x: 0, y: 8 + 16})
+    land.new({x: 0 + 8, y: 8 + 16})
+    land.new({x: 0 + 16, y: 8 + 16})
+    land.new({x: 0 + 24, y: 8 + 16})
+    land.new({x: 0 + 32, y: 8 + 16})
+    land.new({x: 0 + 48, y: 8 + 16})
   }
 
   update(gamepad: Gamepad, sprites: SpriteController, instances: InstanceController, camera: Camera) {
