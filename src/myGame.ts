@@ -1,4 +1,4 @@
-import {Game, Camera, SpriteController, Gamepad, Image, DefiniteMap, Sprite, InstanceController, DPAD, ObjectInstance} from './engine'
+import {Game, Camera, SpriteController, Gamepad, Image, DefiniteMap, Sprite, InstanceController, DPAD, ObjectInstance, CollisionChecker} from './engine'
 
 export class MyGame implements Game {
   
@@ -332,7 +332,7 @@ export class MyGame implements Game {
 }
 
 
-function playerUpdateFn(o: ObjectInstance<{}, {}>, gamepad: Gamepad, sprites: SpriteController, instances: InstanceController, camera: Camera) {
+function playerUpdateFn(o: ObjectInstance<any, any>, gamepad: Gamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera) {
   const playerJumping = sprites.get('playerJumping')
   const playerWalking = sprites.get('playerWalking')
   const playerStanding = sprites.get('playerStanding')
@@ -359,4 +359,20 @@ function playerUpdateFn(o: ObjectInstance<{}, {}>, gamepad: Gamepad, sprites: Sp
   } else {
     o.sprite = playerStanding
   }
+
+  const bbox = o.toBBox()
+  const hasAirBelow = collisionChecker.searchBBox({
+    minX: bbox.minX,
+    maxX: bbox.maxX,
+    minY: bbox.maxY + 1,
+    maxY: bbox.maxY + 1,
+  }).length === 0
+
+  if (hasAirBelow) {
+    o.moveTo({
+      x: o.pos.x,
+      y: o.pos.y + 1, // TODO: use gravity
+    })
+  }
+
 }

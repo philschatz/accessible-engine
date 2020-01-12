@@ -169,11 +169,33 @@ export class Image {
   }
 }
 
+export class CollisionChecker {
+  private readonly bush: RBush<ObjectInstance<any, any>>
+  constructor(bush: RBush<ObjectInstance<any, any>>) {
+    this.bush = bush
+  }
+
+  searchBBox(bbox: BBox) {
+    return this.bush.search(bbox)
+  }
+
+  searchPoint(pos: IPosition) {
+    return this.bush.search({
+      minX: pos.x,
+      maxX: pos.x,
+      minY: pos.y,
+      maxY: pos.y,
+    })
+  }
+}
+
+
 export class Engine {
   private curTick: number = 0
   private readonly game: Game
   private readonly renderer: Renderer
   private readonly bush: RBush<ObjectInstance<any, any>>
+  private readonly collisionChecker: CollisionChecker
   private readonly sprites: SpriteController
   private readonly instances: InstanceController
   private readonly camera: Camera
@@ -181,6 +203,7 @@ export class Engine {
 
   constructor(game: Game, renderer: Renderer, gamepad: Gamepad) {
     this.bush = new MyRBush()
+    this.collisionChecker = new CollisionChecker(this.bush)
     this.sprites = new DefiniteMap<Sprite>()
     this.instances = new InstanceController(this.bush)
     this.camera = new Camera({width: 128, height: 128})
@@ -196,9 +219,11 @@ export class Engine {
     }
     this.curTick++
 
-    // Update each object
+        // Update each object
     // TODO: Only update objects in view or ones that have an alwaysUpdate=true flag set (TBD)
-    this.bush.all().forEach(i => i.static.updateFn(i, this.gamepad, this.sprites, this.instances, this.camera))
+    this.bush.all().forEach(i => {
+      i.static.updateFn(i, this.gamepad, this.collisionChecker, this.sprites, this.instances, this.camera)
+    })
 
     this.draw()
   }
@@ -211,7 +236,8 @@ export class Engine {
     for (const t of tiles) {
       const image = t.sprite.tick(this.curTick)
       if (!image) { throw new Error(`BUG: Could not find image for the sprite.`)}
-      this.drawPixels(relativeTo(t.pos, this.camera.pos), image.pixels, t.hFlip, false)
+      const screenPos = relativeTo({x: t.pos.x, y: t.pos.y - image.pixels.length + 1 /* Shift the image up because it might not be a 8x8 sprite, like if it is a tall person */}, this.camera.pos)
+      this.drawPixels(screenPos, image.pixels, t.hFlip, false)
     }
     this.renderer.drawEnd()
   }
@@ -269,7 +295,7 @@ export class Camera {
   }
 }
 
-type UpdateFn<P, S> = (o: ObjectInstance<P, S>, gamepad: Gamepad, sprites: SpriteController, instances: InstanceController, camera: Camera) => void
+type UpdateFn<P, S> = (o: ObjectInstance<P, S>, gamepad: Gamepad, collisionCheker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera) => void
 
 export class InstanceController {
   private readonly bush: RBush<ObjectInstance<any, any>>
