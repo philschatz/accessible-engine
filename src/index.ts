@@ -50,10 +50,12 @@ class ObjectInstance<P, S> {
   public pos: IPosition
 
   public static: GameObject<P, S>
+  public sprite: Sprite
   public props: P
   public hFlip: boolean
 
   constructor(t: GameObject<P, S>, pos: IPosition) {
+    this.sprite = t.sprite
     this.static = t
     this.pos = pos
     this.hFlip = false
@@ -208,7 +210,7 @@ class Engine {
     }
     this.curTick++
     this.game.update(this.gamepad, this.sprites, this.instances, this.camera)
-    this.gamepad.reset()
+    // this.gamepad.reset()
     this.draw()
   }
 
@@ -218,7 +220,7 @@ class Engine {
 
     this.renderer.drawStart()
     for (const t of tiles) {
-      const image = t.static.sprite.tick(this.curTick)
+      const image = t.sprite.tick(this.curTick)
       if (!image) { throw new Error(`BUG: Could not find image for the sprite.`)}
       this.drawPixels(relativeTo(t.pos, this.camera.pos), image.pixels, t.hFlip, false)
     }
@@ -322,9 +324,12 @@ interface Gamepad {
   listenToDpad()
 }
 
+const KEY_REPEAT_WITHIN = 50
+
 class KeyboardGamepad implements Gamepad {
+  private lastSaw = Date.now()
   private isSubscribedToDpad = false
-  private zeroToFour: number | undefined
+  private zeroToFour: number | undefined = undefined
 
   reset() {
     this.zeroToFour = undefined
@@ -337,6 +342,10 @@ class KeyboardGamepad implements Gamepad {
 
   isDpadPressed() {
     if (!this.isSubscribedToDpad) { throw new Error(`ERROR: remember to call controller.listenToDpad() during loading if your game requires it`)}
+    // Node only receives key press events. If we have not seen a key press event recently then they are no longer pressing
+    if (this.lastSaw + KEY_REPEAT_WITHIN < Date.now()) {
+      return false
+    }
     return this.zeroToFour !== undefined
   }
 
@@ -354,6 +363,7 @@ class KeyboardGamepad implements Gamepad {
 
     // https://stackoverflow.com/a/30687420
     process.stdin.on('data', async (key: string) => {
+        this.lastSaw = Date.now()
         switch (key) {
             case 'W':
             case 'w':
@@ -511,7 +521,7 @@ class MyGame implements Game {
     const p = '#FF77A8' // (light purple)
     const k = '#FFCCAA' // (light brown)
 
-    images.add('player1', new Image([
+    images.add('playerStand1', new Image([
       [z,z,z,z,z,z,z,z],
       [z,z,z,z,z,z,z,z],
       [z,z,z,z,z,z,z,z],
@@ -531,7 +541,7 @@ class MyGame implements Game {
       [z,z,W,z,z,W,z,z],
     ]))
 
-    images.add('player2', new Image([
+    images.add('playerStand2', new Image([
       [z,z,z,z,z,z,z,z],
       [z,z,z,z,z,z,z,z],
       [z,z,z,z,z,z,z,z],
@@ -551,7 +561,7 @@ class MyGame implements Game {
       [z,z,W,z,z,W,z,z],
     ]))
 
-    images.add('player3', new Image([
+    images.add('playerStand3', new Image([
       [z,z,z,z,z,z,z,z],
       [z,z,z,z,z,z,z,z],
       [z,z,z,z,z,z,z,z],
@@ -733,6 +743,8 @@ class MyGame implements Game {
       [z,z,z,z,z,w,z,z],
     ]))
 
+    sprites.add('playerStanding', Sprite.forSingleImage(images.get('playerStand1')))
+
     sprites.add('playerJumping', new Sprite(5, [
       images.get('playerJump1'),
       images.get('playerJump2'),
@@ -750,16 +762,30 @@ class MyGame implements Game {
   }
 
   init(sprites: SpriteController, instances: InstanceController) {
-    instances.factory('player', sprites.get('playerWalking')).new({x: 2, y: 2})
+    instances.factory('player', sprites.get('playerStanding')).new({x: 2, y: 2})
   }
 
   update(gamepad: Gamepad, sprites: SpriteController, instances: InstanceController, camera: Camera) {
+    const playerJumping = sprites.get('playerJumping')
+    const playerWalking = sprites.get('playerWalking')
+    const playerStanding = sprites.get('playerStanding')
+
     const players = instances.findAll('player')
 
     for (const p of players) {
       if (gamepad.isDpadPressed()) {
         const dir = gamepad.dpadDir()
 
+        switch (dir) {
+          case DPAD.LEFT:
+          case DPAD.RIGHT:
+            p.sprite = playerWalking
+            break
+          case DPAD.UP:
+          case DPAD.DOWN:
+            p.sprite = playerJumping
+            break
+        }
         // Flip the sprite if we press left/right
         p.hFlip = dir === DPAD.LEFT ? true : dir === DPAD.RIGHT ? false : p.hFlip
 
@@ -767,6 +793,8 @@ class MyGame implements Game {
           x: p.pos.x + (dir === DPAD.RIGHT ? 4 : dir === DPAD.LEFT ? -4 : 0),
           y: p.pos.y + (dir === DPAD.DOWN  ? 4 : dir === DPAD.UP   ? -4 : 0),
         })
+      } else {
+        p.sprite = playerStanding
       }
     }
   }
