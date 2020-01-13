@@ -321,12 +321,12 @@ export class MyGame implements Game {
     player.new({x: 8, y: 8})
     const floor1 = instances.simple(sprites, 'floorOrange1')
     const floor2 = instances.simple(sprites, 'floorOrange2')
-    floor1.new({x: 0, y: 8 + 16})
-    floor2.new({x: 0 + 8, y: 8 + 16})
-    floor2.new({x: 0 + 16, y: 8 + 16})
-    floor1.new({x: 0 + 24, y: 8 + 16})
-    floor1.new({x: 0 + 32, y: 8 + 16})
-    floor2.new({x: 0 + 48, y: 8 + 16})
+    floor1.new({x: 0, y: 8 + 32})
+    floor2.new({x: 0 + 8, y: 8 + 32})
+    floor2.new({x: 0 + 16, y: 8 + 32})
+    floor1.new({x: 0 + 24, y: 8 + 32})
+    floor1.new({x: 0 + 32, y: 8 + 32})
+    floor2.new({x: 0 + 48, y: 8 + 32})
   }
 
 }
@@ -336,6 +336,28 @@ function playerUpdateFn(o: ObjectInstance<any, any>, gamepad: Gamepad, collision
   const playerJumping = sprites.get('playerJumping')
   const playerWalking = sprites.get('playerWalking')
   const playerStanding = sprites.get('playerStanding')
+
+  if (o.props.dy === undefined) { o.props.dy = 0 }
+
+  if (o.props.dy >= -3) o.props.dy -= 1 // terminal velocity so we do not fall through tiles (they are 8px tall)
+
+  let newX = o.pos.x
+  let newY = o.pos.y
+
+  const bbox = o.toBBox()
+  const itemsBelow = collisionChecker.searchBBox({
+    minX: bbox.minX,
+    maxX: bbox.maxX,
+    minY: bbox.maxY + 1,
+    maxY: bbox.maxY + 1,
+  })
+  const hasAirBelow = itemsBelow.length === 0
+
+  if (!hasAirBelow) {
+    o.props.dy = 0
+    newY = itemsBelow[0].pos.y - 8
+  }
+
 
   if (gamepad.isDpadPressed()) {
     const dir = gamepad.dpadDir()
@@ -347,32 +369,29 @@ function playerUpdateFn(o: ObjectInstance<any, any>, gamepad: Gamepad, collision
         o.hFlip = dir === DPAD.LEFT ? true : false
         break
       case DPAD.UP:
+        if (!hasAirBelow) o.props.dy = 13
+        break
       case DPAD.DOWN:
         o.sprite = playerJumping
         break
     }
 
-    o.moveTo({
-      x: o.pos.x + (dir === DPAD.RIGHT ? 4 : dir === DPAD.LEFT ? -4 : 0),
-      y: o.pos.y + (dir === DPAD.DOWN  ? 8 : dir === DPAD.UP   ? -8 : 0),
-    })
+    newX += (dir === DPAD.RIGHT ? 4 : dir === DPAD.LEFT ? -4 : 0)
+    newY += (dir === DPAD.DOWN  ? 8 : 0)
+
   } else {
     o.sprite = playerStanding
   }
 
-  const bbox = o.toBBox()
-  const hasAirBelow = collisionChecker.searchBBox({
-    minX: bbox.minX,
-    maxX: bbox.maxX,
-    minY: bbox.maxY + 1,
-    maxY: bbox.maxY + 1,
-  }).length === 0
 
-  if (hasAirBelow) {
-    o.moveTo({
-      x: o.pos.x,
-      y: o.pos.y + 1, // TODO: use gravity
-    })
+
+  if (o.props.dy !== 0) {
+    newY -= Math.floor(o.props.dy / 3)
   }
+
+  o.moveTo({
+    x: newX,
+    y: newY,
+  })
 
 }

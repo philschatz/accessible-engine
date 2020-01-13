@@ -38,10 +38,11 @@ export class ObjectInstance<P, S> {
   public props: P
   public hFlip: boolean
 
-  constructor(t: GameObject<P, S>, pos: IPosition) {
+  constructor(t: GameObject<P, S>, pos: IPosition, props: P) {
     this.sprite = t.sprite
     this.static = t
     this.pos = pos
+    this.props = props
     this.hFlip = false
   }
 
@@ -73,14 +74,14 @@ class GameObject<P = {}, S = {}> {
   }
 
   public new(pos: IPosition) {
-    const o = new ObjectInstance(this, pos)
+    const o = new ObjectInstance(this, pos, {})
     this.instances.add(o)
     this.bush.insert(o)
     return o
   }
 
   public newBulk(positions: IPosition[]) {
-    const instances = positions.map(p => new ObjectInstance(this, p))
+    const instances = positions.map(p => new ObjectInstance<any, any>(this, p, {}))
     this.bush.load(instances)
     for (const o of instances) {
       this.instances.add(o)
@@ -425,8 +426,8 @@ interface Renderer {
 
 class DoubleArray<T> {
   private ary: T[][] = []
-  private maxWidth = 0
-  private maxHeight = 0
+  private maxX = 0
+  private maxY = 0
 
   clear() {
     this.ary = []
@@ -435,8 +436,8 @@ class DoubleArray<T> {
     if (!this.ary[pos.y]) { this.ary[pos.y] = [] }
     this.ary[pos.y][pos.x] = v
 
-    this.maxHeight = Math.max(this.maxHeight, pos.y)
-    this.maxWidth = Math.max(this.maxWidth, pos.x)
+    this.maxY = Math.max(this.maxY, pos.y)
+    this.maxX = Math.max(this.maxX, pos.x)
   }
 
   get(pos: IPosition, def: T): T {
@@ -446,8 +447,8 @@ class DoubleArray<T> {
 
   dim() {
     return {
-      width: this.maxWidth,
-      height: this.maxHeight
+      width: this.maxX + 1,
+      height: this.maxY + 1
     }
   }
 }
