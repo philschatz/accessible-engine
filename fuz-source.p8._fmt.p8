@@ -118,35 +118,35 @@ end
 
 --basic actor
 function tmake(inp)
-local ii = nsplit(inp)
-local t = {
---level coords
-sx = ii[1],
-sy = ii[2],
---world coords
-rx = ii[3],
-ry = ii[4],
-rz = ii[5],
-scx = 0,
---sprite
-ix = ii[6],
-iy = ii[7],
-f = 0, --frame
-w = ii[8],
-h = ii[9],
-m = false, --does it mirror
-sm = false, --mirrored
-upd = function(t) end,
-draw = function(t)
- if tcurrent(t) then
-  draw_tile(t)
- end
-end,
---front layer draw
-fdraw = function(t) end,
-}
-if ii[10] != 0 then t.m = true end
-return t
+   local ii = nsplit(inp)
+   local t = {
+      --level coords
+      sx = ii[1],
+      sy = ii[2],
+      --world coords
+      rx = ii[3],
+      ry = ii[4],
+      rz = ii[5],
+      scx = 0,
+      --sprite
+      ix = ii[6],
+      iy = ii[7],
+      f = 0, --frame
+      w = ii[8],
+      h = ii[9],
+      m = false, --does it mirror
+      sm = false, --mirrored
+      upd = function(t) end,
+      draw = function(t)
+         if tcurrent(t) then
+            draw_tile(t)
+         end
+      end,
+      --front layer draw
+      fdraw = function(t) end,
+   }
+   if ii[10] != 0 then t.m = true end
+   return t
 end
 
 function checkhid(h,x,y)
@@ -1091,6 +1091,10 @@ for i=1,#nsh do
  local s = sc(nsh[i])
  nsh[i] = s
 end
+
+-- Args1: (Level coords) sx,sy (World Coords) rx,ry,rz (Sprite) ix,iy (size?) w,h (m??) boolean
+-- Args2: t.wd,t.lk,t.lw=20
+-- Args3: Door destination: music,side,p_xreal,p_yreal,p_zreal
 add_door("22,69,-4,4,0,96,80,16,16,0","3,4,0","0,0,48,60,16")
 add_door("18,68,4,-4,0,96,80,16,16,0","1,4,1","6,0,48,60,8")
 add_door("20,70,0,0,0,96,112,8,16,0","0,0,0","2,0,44,52,8")
