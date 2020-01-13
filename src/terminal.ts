@@ -2,6 +2,11 @@ import ansiEscapes from 'ansi-escapes'
 import ansiStyles from 'ansi-styles'
 import { IPosition, IGamepad, IRenderer, IPixel } from './engine'
 
+
+function debug(message?: any, ...optionalParams: any[]) {
+  // console.error(message, ...optionalParams)
+}
+
 // Prepare the keyboard handler
 if (process.stdin.setRawMode) {
   process.stdin.setRawMode(true)
@@ -15,7 +20,7 @@ process.stdin.setEncoding('utf8')
 
 
 
-const KEY_REPEAT_WITHIN = 100
+const KEY_REPEAT_WITHIN = 110 // MacOS seems to repeat at 80ms (up to 102ms)
 
 export class KeyboardGamepad implements IGamepad {
   private lastSaw = Date.now()
@@ -35,6 +40,7 @@ export class KeyboardGamepad implements IGamepad {
     if (!this.isSubscribedToDpad) { throw new Error(`ERROR: remember to call controller.listenToDpad() during loading if your game requires it`)}
     // Node only receives key press events. If we have not seen a key press event recently then they are no longer pressing
     if (this.lastSaw + KEY_REPEAT_WITHIN < Date.now()) {
+      debug('Key seems to be no longer pressed. Took too long', Date.now() - this.lastSaw)
       return false
     }
     return this.zeroToFour !== undefined
@@ -54,6 +60,7 @@ export class KeyboardGamepad implements IGamepad {
 
     // https://stackoverflow.com/a/30687420
     process.stdin.on('data', async (key: string) => {
+      if (this.lastSaw > 0) debug('Time since last keystroke detected:', Date.now() - this.lastSaw)
         this.lastSaw = Date.now()
         switch (key) {
             case 'W':
@@ -82,7 +89,7 @@ export class KeyboardGamepad implements IGamepad {
                 return process.exit(1)
             default:
                 this.zeroToFour = undefined
-                console.error(`Did not understand key pressed: "${key}"`)
+                debug(`Did not understand key pressed: "${key}"`)
         }
     })
   }

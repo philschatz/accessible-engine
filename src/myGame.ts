@@ -1,4 +1,4 @@
-import {Game, Camera, SpriteController, IGamepad, Image, DefiniteMap, Sprite, InstanceController, DPAD, ObjectInstance, CollisionChecker} from './engine'
+import {Game, Camera, SpriteController, IGamepad, Image, DefiniteMap, Sprite, InstanceController, DPAD, ObjectInstance, CollisionChecker, IPosition, GameObject} from './engine'
 
 export class MyGame implements Game {
   
@@ -344,6 +344,140 @@ export class MyGame implements Game {
       [W,W,W,W,W,W,k,k],
     ]))
 
+    images.add('floorLedge', new Image([ // 007
+      [o,o,o,o,o,o,o,o],
+      [R,R,R,R,R,R,R,R],
+      [z,z,z,Y,Y,z,z,z],
+      [z,z,z,Y,Y,z,z,z],
+      [z,z,z,P,P,z,z,z],
+      [z,z,z,P,P,z,z,z],
+      [z,z,z,P,P,z,z,z],
+      [z,z,z,z,z,z,z,z],
+    ]))
+
+
+    images.add('treeBottom', new Image([ // 014
+      [g,g,g,g,g,g,g,g],
+      [g,g,g,g,g,g,g,g],
+      [g,g,g,g,g,g,g,g],
+      [g,g,g,g,g,g,g,g],
+      [g,g,g,g,g,g,g,g],
+      [g,g,g,g,g,g,g,g],
+      [G,G,g,G,G,g,g,G],
+      [G,G,G,G,G,G,G,G],
+    ]))
+
+    images.add('treeTrunkLeft', new Image([ // 016
+      [z,z,R,R,R,R,z,R],
+      [z,z,z,z,z,R,z,R],
+      [z,z,z,z,z,R,R,R],
+      [z,z,z,z,z,z,R,R],
+      [z,z,z,z,z,z,z,z],
+      [z,z,z,z,R,R,R,R],
+      [z,z,z,R,R,R,p,p],
+      [z,z,z,R,R,p,R,p],
+    ]))
+
+    images.add('treeTrunkRight', new Image([ // 017
+      [R,R,R,z,z,z,z,z],
+      [R,z,z,z,z,z,z,z],
+      [R,R,R,R,R,z,z,z],
+      [R,R,R,p,R,R,z,z],
+      [z,z,R,p,R,R,z,z],
+      [R,R,R,p,R,R,z,z],
+      [p,p,p,R,R,z,z,z],
+      [p,R,R,R,z,z,z,z],
+    ]))
+
+    images.add('treeTopLeft', new Image([ // 008
+      [g,g,g,g,g,g,g,g],
+      [g,g,g,g,g,g,g,g],
+      [g,g,g,g,g,g,g,g],
+      [g,g,g,g,g,g,g,g],
+      [g,g,g,G,g,g,g,g],
+      [g,g,g,g,g,g,g,g],
+      [g,g,g,g,g,g,g,g],
+      [g,g,g,g,g,g,g,g],
+    ]))
+
+    images.add('treeTopRight', new Image([ // 009
+      [g,g,g,g,g,g,g,g],
+      [g,g,g,g,g,g,g,g],
+      [g,g,g,g,g,g,g,g],
+      [g,g,g,g,g,g,g,g],
+      [g,g,g,g,g,g,g,g],
+      [g,g,g,G,g,g,g,g],
+      [g,g,G,g,G,g,g,g],
+      [g,g,g,G,g,g,g,g],
+    ]))
+
+    
+
+    images.add('wallOrange', new Image([ // 010
+      [o,k,k,k,k,k,k,k],
+      [R,o,o,o,o,o,o,k],
+      [R,o,o,o,o,o,o,k],
+      [R,o,o,o,o,o,o,k],
+      [R,o,o,o,o,o,o,k],
+      [R,o,o,o,o,o,o,k],
+      [R,o,o,o,o,o,o,k],
+      [R,R,R,R,R,R,o,o],
+    ]))
+
+    images.add('wallWhite', new Image([ // 011
+      [k,w,w,w,w,w,w,w],
+      [W,k,k,k,k,k,k,w],
+      [W,k,k,k,k,k,k,w],
+      [W,k,k,k,k,k,k,w],
+      [W,k,k,k,k,k,k,w],
+      [W,k,k,k,k,k,k,w],
+      [W,k,k,k,k,k,k,w],
+      [W,W,W,W,W,W,k,k],
+    ]))
+
+    images.add('wallCyan', new Image([ // 012
+      [c,W,W,W,W,W,W,W],
+      [P,c,c,c,c,c,c,W],
+      [P,c,c,c,c,c,c,W],
+      [P,c,c,c,c,c,c,W],
+      [P,c,c,c,c,c,c,W],
+      [P,c,c,c,c,c,c,W],
+      [P,c,c,c,c,c,c,W],
+      [P,P,P,P,P,P,c,c],
+    ]))
+
+    images.add('wallBrown', new Image([ // 013
+      [Y,c,c,c,c,c,c,c],
+      [P,Y,Y,Y,Y,Y,Y,c],
+      [P,Y,Y,Y,Y,Y,Y,c],
+      [P,Y,Y,Y,Y,Y,Y,c],
+      [P,Y,Y,Y,Y,Y,Y,c],
+      [P,Y,Y,Y,Y,Y,Y,c],
+      [P,Y,Y,Y,Y,Y,Y,c],
+      [P,P,P,P,P,P,Y,Y],
+    ]))
+
+
+    images.add('door', new Image([ // 236 & 252
+      [K,K,K,K,K,K,K,K],
+      [K,R,R,K,K,R,R,K],
+      [K,R,R,K,K,R,R,K],
+      [p,p,p,p,p,p,p,p],
+      [R,R,R,R,R,R,R,R],
+      [K,Y,Y,K,K,Y,Y,K],
+      [K,R,R,K,K,R,R,K],
+      [K,R,R,K,K,R,R,K],
+
+      [K,R,R,K,K,R,R,K],
+      [K,R,R,K,K,R,R,K],
+      [K,R,R,K,K,R,R,K],
+      [p,p,p,p,p,p,p,p],
+      [R,R,R,R,R,R,R,R],
+      [K,Y,Y,K,K,Y,Y,K],
+      [K,K,Y,K,K,Y,Y,K],
+      [K,K,K,K,K,K,K,K],
+    ]))
+
     // Add all the images as single-image sprites too.
     for (const [name, image] of images.entries()) {
       sprites.add(name, Sprite.forSingleImage(image))
@@ -352,15 +486,78 @@ export class MyGame implements Game {
 
   init(sprites: SpriteController, instances: InstanceController) {
     const player = instances.factory('player', sprites.get('playerStanding'), playerUpdateFn)
-    player.new({x: 8, y: 8})
     const floor1 = instances.simple(sprites, 'floorOrange1')
     const floor2 = instances.simple(sprites, 'floorOrange2')
-    floor1.new({x: 8, y: 24 + 32})
-    floor2.new({x: 8 + 8, y: 24 + 32})
-    floor2.new({x: 8 + 16, y: 24 + 32})
-    floor1.new({x: 8 + 24, y: 24 + 32})
-    floor1.new({x: 8 + 32, y: 24 + 32})
-    floor2.new({x: 8 + 48, y: 24 + 32})
+    const floorLedge = instances.simple(sprites, 'floorLedge')
+    const wallO = instances.simple(sprites, 'wallOrange')
+    const wallC = instances.simple(sprites, 'wallCyan')
+    const wall2 = instances.simple(sprites, 'wallBrown')
+    const door = instances.simple(sprites, 'door')
+
+    const treeTopLeft = instances.simple(sprites, 'treeTopLeft')
+    const treeTopRight = instances.simple(sprites, 'treeTopRight')
+    const treeBottom = instances.simple(sprites, 'treeBottom')
+    const treeTrunkLeft = instances.simple(sprites, 'treeTrunkLeft')
+    const treeTrunkRight = instances.simple(sprites, 'treeTrunkRight')
+
+    function g(item: GameObject<any, any>, pos: IPosition) {
+      // convert from grid coordinates to pixels
+      item.new({
+        x: pos.x * 8,
+        y: pos.y * 8,
+      })
+    }
+
+
+    g(floor1, {x:  5, y:  6})
+    g(floor2, {x:  6, y:  6})
+    g(floor1, {x:  7, y:  7})
+    g(floor1, {x:  8, y:  7})
+    g(floor2, {x:  9, y:  7})
+    g(floor2, {x: 10, y:  7})
+    g(floor1, {x: 11, y:  7})
+
+    g(wallO, {x:  5, y:  7})
+    g(wallO, {x:  6, y:  7})
+    
+    g(wallC, {x:  6, y:  8})
+    g(wallC, {x:  7, y:  8})
+    g(wallC, {x:  9, y:  8})
+    g(wallC, {x: 10, y:  8})
+    g(wallC, {x:  6, y:  9})
+    g(wallC, {x:  7, y:  9})
+    g(wallC, {x:  9, y:  9})
+    g(wallC, {x: 10, y:  9})
+    g(wallC, {x:  6, y: 10})
+    g(wallC, {x:  7, y: 10})
+    g(wallC, {x:  8, y: 10})
+    g(wallC, {x:  9, y: 10})
+    g(wallC, {x: 10, y: 10})
+    g(wall2, {x:  6, y: 11})
+    g(wallC, {x:  7, y: 11})
+    g(wall2, {x:  8, y: 11})
+    g(wallC, {x:  9, y: 11})
+
+    g(door, {x:  8, y:  9})
+
+    // draw these later so they show up on top of wall tiles
+    g(floorLedge, {x:  8, y:  10})
+    g(floorLedge, {x:  5, y:  10})
+    g(floorLedge, {x: 11, y:  10})
+    g(floorLedge, {x:  6, y:   9})
+    g(floorLedge, {x: 10, y:   9})
+
+
+    g(treeTrunkLeft,  {x: 8, y: 6})
+    g(treeTrunkRight, {x: 9, y: 6})
+    g(treeBottom,     {x: 8, y: 5})
+    g(treeBottom,     {x: 9, y: 5})
+    g(treeTopLeft,    {x: 8, y: 4})
+    g(treeTopRight,   {x: 9, y: 4})
+
+
+    g(player, {x:  11, y:  9})
+
   }
 
 }
@@ -371,6 +568,16 @@ function playerUpdateFn(o: ObjectInstance<any, any>, gamepad: IGamepad, collisio
   const playerFalling = sprites.get('playerFalling')
   const playerWalking = sprites.get('playerWalking')
   const playerStanding = sprites.get('playerStanding')
+
+  const floors = [
+    sprites.get('treeTopLeft'),
+    sprites.get('treeTopRight'),
+    sprites.get('floorOrange1'),
+    sprites.get('floorOrange2'),
+    sprites.get('floorWhite1'),
+    sprites.get('floorWhite2'),
+    sprites.get('floorLedge'),
+  ]
 
   if (o.props.dy === undefined) { o.props.dy = 0 }
 
@@ -386,10 +593,12 @@ function playerUpdateFn(o: ObjectInstance<any, any>, gamepad: IGamepad, collisio
     maxX: bbox.maxX,
     minY: bbox.maxY + 1,
     maxY: bbox.maxY + 1,
-  })
-  const hasAirBelow = itemsBelow.length === 0
+  }).filter(item => floors.indexOf(item.sprite) >= 0) // only look at the floors
 
-  if (!hasAirBelow) {
+  const hasAirBelow = itemsBelow.length === 0
+  // Floor sprites are treeTopLeft,treeTopRight,floorOrange1,floorOrange2,floorWhite1,floorWhite2
+
+  if (!hasAirBelow && o.props.dy <= 0) {
     o.props.lastSafePosition = o.pos // save in case player dies
     o.props.dy = 0
     newY = itemsBelow[0].pos.y - 8
@@ -406,7 +615,7 @@ function playerUpdateFn(o: ObjectInstance<any, any>, gamepad: IGamepad, collisio
         o.hFlip = dir === DPAD.LEFT ? true : false
         break
       case DPAD.UP:
-        if (!hasAirBelow) o.props.dy = 13
+        if (!hasAirBelow && o.props.dy <= 0) o.props.dy = 10// 13
         break
       case DPAD.DOWN:
         break
@@ -422,7 +631,7 @@ function playerUpdateFn(o: ObjectInstance<any, any>, gamepad: IGamepad, collisio
 
 
   if (o.props.dy !== 0) {
-    newY -= Math.floor(o.props.dy / 3)
+    newY -= Math.floor(o.props.dy / 3) // the game used '3'
   }
 
   if (o.props.dy > 0) {

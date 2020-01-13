@@ -67,7 +67,7 @@ export class ObjectInstance<P, S> {
   }
 }
 
-class GameObject<P = {}, S = {}> {
+export class GameObject<P = {}, S = {}> {
   private readonly bush: RBush<ObjectInstance<{},{}>>
   readonly sprite: Sprite
   readonly instances: Set<ObjectInstance<P, S>> = new Set()
