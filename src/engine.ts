@@ -454,8 +454,9 @@ class DoubleArray<T> {
 }
 
 const BLACK = '#000000'
+const WHITE = '#ffffff'
 
-export class TerminalRenderer implements Renderer {
+export class DoubleTerminalRenderer implements Renderer {
   private pixelsOnScreen = new DoubleArray<Pixel>()
   private pixelsToDraw = new DoubleArray<Pixel>()
 
@@ -499,6 +500,54 @@ export class TerminalRenderer implements Renderer {
   }
 }
 
+export class TerminalRenderer implements Renderer {
+  private pixelsOnScreen = new DoubleArray<Pixel>()
+  private pixelsToDraw = new DoubleArray<Pixel>()
+
+  drawStart() {
+    this.pixelsToDraw.clear()
+  }
+
+  drawEnd() {
+    const {width, height} = this.pixelsToDraw.dim()
+
+    for (let yDouble = 0; yDouble < height; yDouble+=2) {
+      for (let x = 0; x < width; x++) {
+        const topPos = {x, y: yDouble}
+        const bottomPos = {x, y: yDouble + 1}
+        const topDraw = this.pixelsToDraw.get(topPos, BLACK)
+        const bottomDraw = this.pixelsToDraw.get(bottomPos, BLACK)
+        if (this.pixelsOnScreen.get(topPos, BLACK) !== topDraw || this.pixelsOnScreen.get(bottomPos, BLACK) !== bottomDraw) {
+          this._drawTopBottomPixel({x, y: yDouble / 2}, topDraw, bottomDraw)
+        }
+      }
+    }
+    
+  }
+
+  private _drawTopBottomPixel(pos: IPosition, topHex: string, bottomHex: string) {
+    const {columns, rows} = getTerminalSize()
+
+    // do not draw past the terminal
+    if (pos.x >= columns || pos.y * 2 >= rows) { return }
+
+    process.stdout.write(
+      setMoveTo(pos.x, pos.y) +
+      setFgColor(bottomHex) +
+      setBgColor(topHex) +
+      '▄' +
+      setFgColor(WHITE) + // reset fg to white
+      setBgColor(BLACK) // reset back to black
+    )
+    this.pixelsOnScreen.set({x: pos.x, y: pos.y * 2}, topHex)
+    this.pixelsOnScreen.set({x: pos.x, y: pos.y * 2 + 1}, bottomHex)
+  }
+
+  drawPixel(pos: IPosition, hex: string) {
+    if (pos.x < 0 || pos.y < 0) { throw new Error(`BUG: Tried to draw outside of the camera range ${JSON.stringify(pos)}`)}
+    this.pixelsToDraw.set(pos, hex)
+  }
+}
 
 
 // TypeScript does not like that columns and rows might be null
