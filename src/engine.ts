@@ -410,6 +410,7 @@ export class KeyboardGamepad implements Gamepad {
             case '\u001B': // Escape
                 return process.exit(1)
             default:
+                this.zeroToFour = undefined
                 console.log(`Did not understand key pressed: "${key}"`)
         }
     })

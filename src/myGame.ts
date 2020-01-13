@@ -321,12 +321,12 @@ export class MyGame implements Game {
     player.new({x: 8, y: 8})
     const floor1 = instances.simple(sprites, 'floorOrange1')
     const floor2 = instances.simple(sprites, 'floorOrange2')
-    floor1.new({x: 0, y: 8 + 32})
-    floor2.new({x: 0 + 8, y: 8 + 32})
-    floor2.new({x: 0 + 16, y: 8 + 32})
-    floor1.new({x: 0 + 24, y: 8 + 32})
-    floor1.new({x: 0 + 32, y: 8 + 32})
-    floor2.new({x: 0 + 48, y: 8 + 32})
+    floor1.new({x: 8, y: 8 + 32})
+    floor2.new({x: 8 + 8, y: 8 + 32})
+    floor2.new({x: 8 + 16, y: 8 + 32})
+    floor1.new({x: 8 + 24, y: 8 + 32})
+    floor1.new({x: 8 + 32, y: 8 + 32})
+    floor2.new({x: 8 + 48, y: 8 + 32})
   }
 
 }
