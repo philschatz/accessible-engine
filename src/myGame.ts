@@ -502,7 +502,7 @@ export class MyGame implements Game {
 
     function g(item: GameObject<any, any>, pos: IPosition) {
       // convert from grid coordinates to pixels
-      item.new({
+      return item.new({
         x: pos.x * 8,
         y: pos.y * 8,
       })
@@ -556,7 +556,7 @@ export class MyGame implements Game {
     g(treeTopRight,   {x: 9, y: 4})
 
 
-    g(player, {x:  11, y:  9})
+    g(player, {x:  11, y:  9}).zIndex = 0
 
   }
 

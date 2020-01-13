@@ -30,6 +30,7 @@ export interface IPosition {
 
 export class ObjectInstance<P, S> {
   public pos: IPosition
+  public zIndex: number | undefined // lower is on top
 
   public static: GameObject<P, S>
   sprite: Sprite
@@ -70,7 +71,7 @@ export class ObjectInstance<P, S> {
 export class GameObject<P = {}, S = {}> {
   private readonly bush: RBush<ObjectInstance<{},{}>>
   readonly sprite: Sprite
-  readonly instances: Set<ObjectInstance<P, S>> = new Set()
+  readonly instances: Set<ObjectInstance<any, any>> = new Set()
   readonly updateFn: UpdateFn<P, S>
   public props: S
 
@@ -80,7 +81,7 @@ export class GameObject<P = {}, S = {}> {
     this.updateFn = updateFn
   }
 
-  public new(pos: IPosition) {
+  public new(pos: IPosition): ObjectInstance<any, any> {
     const o = new ObjectInstance(this, pos, {})
     this.instances.add(o)
     this.bush.insert(o)
@@ -238,6 +239,19 @@ export class Engine {
   private draw() {
     // get all the sprites visible to the camera
     const tiles = this.bush.search(this.camera.toBBox())
+
+    // Lower zIndex needs to be drawn later
+    tiles.sort((a, b) => {
+      if (a.zIndex === undefined && b.zIndex === undefined) {
+        return 0
+      } else if (b.zIndex === undefined) {
+        return 1
+      } else if (a.zIndex === undefined) {
+        return -1
+      } else {
+        return b.zIndex - a.zIndex
+      }
+    })
 
     this.renderer.drawStart()
     for (const t of tiles) {
