@@ -15,7 +15,7 @@ process.stdin.setEncoding('utf8')
 
 
 
-const KEY_REPEAT_WITHIN = 50
+const KEY_REPEAT_WITHIN = 100
 
 export class KeyboardGamepad implements IGamepad {
   private lastSaw = Date.now()
@@ -82,7 +82,7 @@ export class KeyboardGamepad implements IGamepad {
                 return process.exit(1)
             default:
                 this.zeroToFour = undefined
-                console.log(`Did not understand key pressed: "${key}"`)
+                console.error(`Did not understand key pressed: "${key}"`)
         }
     })
   }
@@ -199,7 +199,7 @@ export class TerminalRenderer implements IRenderer {
     const {columns, rows} = getTerminalSize()
 
     // do not draw past the terminal
-    if (pos.x >= columns || pos.y * 2 >= rows) { return }
+    if (pos.x >= columns || pos.y >= rows * 2) { return }
 
     process.stdout.write(
       setMoveTo(pos.x, pos.y) +

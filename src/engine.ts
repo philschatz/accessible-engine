@@ -32,7 +32,8 @@ export class ObjectInstance<P, S> {
   public pos: IPosition
 
   public static: GameObject<P, S>
-  public sprite: Sprite
+  sprite: Sprite
+  startTick: number = 0
   public props: P
   public hFlip: boolean
 
@@ -55,6 +56,14 @@ export class ObjectInstance<P, S> {
 
   toBBox(): BBox {
     return {minX: this.pos.x, minY: this.pos.y, maxX: this.pos.x + 8, maxY: this.pos.y + 8}
+  }
+
+  setSprite(sprite: Sprite) {
+    // only change the sprite when it is different
+    if (this.sprite !== sprite) {
+      this.sprite = sprite
+      this.startTick = 0
+    }
   }
 }
 
@@ -110,7 +119,6 @@ class GameObject<P = {}, S = {}> {
 
 // An animated set of Images
 export class Sprite {
-  startTick: number = 0
   readonly playbackRate: number // 1 == every tick. 30 = every 30 ticks (1/2 a second)
   images: Image[]
 
@@ -127,13 +135,13 @@ export class Sprite {
     return new Sprite(1, [s])
   }
 
-  tick(curTick: number) {
+  tick(startTick: number, curTick: number) {
     if (this.images.length === 1) { 
       if (!this.images[0]) { throw new Error(`BUG: Could not find sprite since there should only be one`)}
       return this.images[0]
     }
 
-    const i = Math.round((curTick - this.startTick) / this.playbackRate)
+    const i = Math.round((curTick - startTick) / this.playbackRate)
     const ret = this.images[i % this.images.length]
     if (!ret) { throw new Error(`BUG: Could not find sprite with index i=${i} . len=${this.images.length}`)}
     return ret
@@ -233,7 +241,8 @@ export class Engine {
 
     this.renderer.drawStart()
     for (const t of tiles) {
-      const image = t.sprite.tick(this.curTick)
+      if (t.startTick === 0) { t.startTick = this.curTick }
+      const image = t.sprite.tick(t.startTick, this.curTick)
       if (!image) { throw new Error(`BUG: Could not find image for the sprite.`)}
       const screenPos = relativeTo({x: t.pos.x, y: t.pos.y - image.pixels.length + 1 /* Shift the image up because it might not be a 8x8 sprite, like if it is a tall person */}, this.camera.pos)
       this.drawPixels(screenPos, image.pixels, t.hFlip, false)
@@ -357,6 +366,10 @@ export class DefiniteMap<V> {
     const value = this.map.get(key)
     if (value === undefined) { throw new Error(`ERROR: Could not find item (sprite) named ${key}`) }
     return value
+  }
+
+  entries() {
+    return this.map.entries()
   }
 }
 

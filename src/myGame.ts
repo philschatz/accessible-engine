@@ -25,7 +25,7 @@ export class MyGame implements Game {
     const p = '#FF77A8' // (light purple)
     const k = '#FFCCAA' // (light brown)
 
-    images.add('playerStand1', new Image([
+    images.add('playerStanding', new Image([ // 032 & 048
       [z,z,z,z,z,z,z,z],
       [z,z,z,z,z,z,z,z],
       [z,z,z,z,z,z,z,z],
@@ -45,7 +45,7 @@ export class MyGame implements Game {
       [z,z,W,z,z,W,z,z],
     ]))
 
-    images.add('playerStand2', new Image([
+    images.add('playerIdle1', new Image([ // 033 & 049
       [z,z,z,z,z,z,z,z],
       [z,z,z,z,z,z,z,z],
       [z,z,z,z,z,z,z,z],
@@ -65,7 +65,7 @@ export class MyGame implements Game {
       [z,z,W,z,z,W,z,z],
     ]))
 
-    images.add('playerStand3', new Image([
+    images.add('playerIdle2', new Image([ // 034 & 050
       [z,z,z,z,z,z,z,z],
       [z,z,z,z,z,z,z,z],
       [z,z,z,z,z,z,z,z],
@@ -85,7 +85,7 @@ export class MyGame implements Game {
       [z,z,W,z,z,W,z,z],
     ]))
 
-    images.add('playerJump1', new Image([
+    images.add('playerWalk1', new Image([ // 035 & 051
       [z,z,z,z,z,z,z,z],
       [z,z,z,z,z,z,z,z],
       [z,z,g,r,z,z,z,z],
@@ -105,7 +105,7 @@ export class MyGame implements Game {
       [z,z,z,z,z,W,z,z],
     ]))
 
-    images.add('playerJump2', new Image([
+    images.add('playerWalk2', new Image([ // 036 & 052
       [z,z,z,z,z,z,z,z],
       [z,z,g,r,z,z,z,z],
       [z,g,Y,r,z,z,z,z],
@@ -125,7 +125,7 @@ export class MyGame implements Game {
       [z,z,z,z,z,z,z,z],
     ]))
 
-    images.add('playerJump3', new Image([
+    images.add('playerWalk3', new Image([ // 037 & 053
       [z,z,z,z,z,z,z,z],
       [z,z,z,z,z,z,z,z],
       [z,g,g,r,z,z,z,z],
@@ -146,7 +146,7 @@ export class MyGame implements Game {
     ]))
 
 
-    images.add('playerJump4', new Image([ // 038
+    images.add('playerWalk4', new Image([ // 038 & 054
       [z,z,z,z,z,z,z,z],
       [z,z,z,z,z,z,z,z],
       [z,z,z,z,z,z,z,z],
@@ -166,7 +166,7 @@ export class MyGame implements Game {
       [z,z,W,z,z,z,z,z],
     ]))
 
-    images.add('playerWalk1', new Image([
+    images.add('playerWalk5', new Image([ // 039 & 055
       [z,z,z,z,z,z,z,z],
       [z,z,z,z,z,z,z,z],
       [z,z,g,r,z,z,z,z],
@@ -186,7 +186,7 @@ export class MyGame implements Game {
       [z,z,W,z,z,z,z,z],
     ]))
 
-    images.add('playerWalk2', new Image([
+    images.add('playerWalk6', new Image([ // 040 & 056
       [z,z,z,z,z,z,z,z],
       [z,z,g,r,z,z,z,z],
       [z,g,Y,r,z,z,z,z],
@@ -207,7 +207,7 @@ export class MyGame implements Game {
     ]))
 
 
-    images.add('playerWalk3', new Image([
+    images.add('playerWalk7', new Image([ // 041 & 057
       [z,z,z,z,z,z,z,z],
       [z,z,z,z,z,z,z,z],
       [z,g,g,r,z,z,z,z],
@@ -227,7 +227,7 @@ export class MyGame implements Game {
       [z,z,z,z,z,z,W,z],
     ]))
 
-    images.add('playerWalk4', new Image([
+    images.add('playerWalk8', new Image([ // 042 & 058
       [z,z,z,z,z,z,z,z],
       [z,z,z,z,z,z,z,z],
       [z,z,z,z,z,z,z,z],
@@ -247,24 +247,59 @@ export class MyGame implements Game {
       [z,z,z,z,z,w,z,z],
     ]))
 
-    sprites.add('playerStanding', Sprite.forSingleImage(images.get('playerStand1')))
-
-    sprites.add('playerJumping', new Sprite(5, [
-      images.get('playerJump1'),
-      images.get('playerJump2'),
-      images.get('playerJump3'),
-      images.get('playerJump4'),
-    ]))
-
-    sprites.add('playerWalking', new Sprite(5, [
+    sprites.add('playerWalking', new Sprite(1, [
       images.get('playerWalk1'),
       images.get('playerWalk2'),
       images.get('playerWalk3'),
       images.get('playerWalk4'),
+      images.get('playerWalk5'),
+      images.get('playerWalk6'),
+      images.get('playerWalk7'),
+      images.get('playerWalk8'),
     ]))
 
 
-    images.add('floorOrange1', new Image([
+    images.add('playerJumping', new Image([ // 044 & 060
+      [z,z,z,z,z,z,z,z],
+      [z,z,z,z,z,z,z,z],
+      [z,z,z,z,z,z,z,z],
+      [z,z,g,r,z,z,z,z],
+      [z,g,Y,r,z,z,z,z],
+      [z,W,w,w,w,w,w,z],
+      [W,w,B,w,w,w,B,w],
+      [W,w,w,w,w,w,w,w],
+
+      [W,w,w,w,w,w,w,w],
+      [z,W,w,w,w,w,w,z],
+      [z,z,z,W,w,z,z,z],
+      [z,z,w,w,w,w,z,z],
+      [z,w,w,w,w,w,W,z],
+      [z,z,W,w,w,w,z,z],
+      [z,z,W,w,w,w,z,z],
+      [z,z,W,z,z,W,z,z],
+    ]))
+
+    images.add('playerFalling', new Image([ // 045 & 061
+      [z,z,z,z,z,z,z,z],
+      [z,z,z,z,z,z,z,z],
+      [z,z,g,z,z,z,z,z],
+      [z,z,g,r,z,z,z,z],
+      [z,z,Y,r,z,z,z,z],
+      [z,W,w,w,w,w,w,z],
+      [W,w,B,w,w,w,B,w],
+      [W,w,w,w,B,B,w,w],
+
+      [W,w,w,w,p,B,w,w],
+      [z,W,w,w,w,w,w,z],
+      [z,z,z,W,w,z,z,z],
+      [z,w,w,w,w,w,W,z],
+      [z,z,w,w,w,w,z,z],
+      [z,z,W,w,w,w,z,z],
+      [z,W,W,w,w,w,W,z],
+      [z,z,z,z,z,z,z,z],
+    ]))
+
+    images.add('floorOrange1', new Image([ // 001
       [g,g,g,g,g,g,g,g],
       [g,G,g,G,G,g,g,G],
       [G,o,G,o,o,G,G,k],
@@ -275,7 +310,7 @@ export class MyGame implements Game {
       [Y,Y,Y,Y,Y,Y,o,o],
     ]))
 
-    images.add('floorOrange2', new Image([
+    images.add('floorOrange2', new Image([ // 002
       [g,g,g,g,g,g,g,g],
       [g,G,G,g,G,G,g,g],
       [G,o,o,G,o,o,G,g],
@@ -287,7 +322,7 @@ export class MyGame implements Game {
     ]))
 
 
-    images.add('floorWhite1', new Image([
+    images.add('floorWhite1', new Image([ // 003
       [g,g,g,g,g,g,g,g],
       [g,g,g,G,g,g,G,G],
       [G,g,G,k,G,G,k,w],
@@ -298,7 +333,7 @@ export class MyGame implements Game {
       [W,W,W,W,W,W,k,k],
     ]))
 
-    images.add('floorWhite2', new Image([
+    images.add('floorWhite2', new Image([ // 004
       [g,g,g,g,g,g,g,g],
       [g,G,g,g,G,G,g,g],
       [G,k,G,G,k,k,G,G],
@@ -309,11 +344,10 @@ export class MyGame implements Game {
       [W,W,W,W,W,W,k,k],
     ]))
 
-    sprites.add('floorOrange1', Sprite.forSingleImage(images.get('floorOrange1')))
-    sprites.add('floorOrange2', Sprite.forSingleImage(images.get('floorOrange2')))
-
-    sprites.add('floorWhite1', Sprite.forSingleImage(images.get('floorWhite1')))
-    sprites.add('floorWhite2', Sprite.forSingleImage(images.get('floorWhite2')))
+    // Add all the images as single-image sprites too.
+    for (const [name, image] of images.entries()) {
+      sprites.add(name, Sprite.forSingleImage(image))
+    }
   }
 
   init(sprites: SpriteController, instances: InstanceController) {
@@ -321,12 +355,12 @@ export class MyGame implements Game {
     player.new({x: 8, y: 8})
     const floor1 = instances.simple(sprites, 'floorOrange1')
     const floor2 = instances.simple(sprites, 'floorOrange2')
-    floor1.new({x: 8, y: 8 + 32})
-    floor2.new({x: 8 + 8, y: 8 + 32})
-    floor2.new({x: 8 + 16, y: 8 + 32})
-    floor1.new({x: 8 + 24, y: 8 + 32})
-    floor1.new({x: 8 + 32, y: 8 + 32})
-    floor2.new({x: 8 + 48, y: 8 + 32})
+    floor1.new({x: 8, y: 24 + 32})
+    floor2.new({x: 8 + 8, y: 24 + 32})
+    floor2.new({x: 8 + 16, y: 24 + 32})
+    floor1.new({x: 8 + 24, y: 24 + 32})
+    floor1.new({x: 8 + 32, y: 24 + 32})
+    floor2.new({x: 8 + 48, y: 24 + 32})
   }
 
 }
@@ -334,6 +368,7 @@ export class MyGame implements Game {
 
 function playerUpdateFn(o: ObjectInstance<any, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera) {
   const playerJumping = sprites.get('playerJumping')
+  const playerFalling = sprites.get('playerFalling')
   const playerWalking = sprites.get('playerWalking')
   const playerStanding = sprites.get('playerStanding')
 
@@ -341,6 +376,7 @@ function playerUpdateFn(o: ObjectInstance<any, any>, gamepad: IGamepad, collisio
 
   if (o.props.dy >= -3) o.props.dy -= 1 // terminal velocity so we do not fall through tiles (they are 8px tall)
 
+  let newSprite = null
   let newX = o.pos.x
   let newY = o.pos.y
 
@@ -354,6 +390,7 @@ function playerUpdateFn(o: ObjectInstance<any, any>, gamepad: IGamepad, collisio
   const hasAirBelow = itemsBelow.length === 0
 
   if (!hasAirBelow) {
+    o.props.lastSafePosition = o.pos // save in case player dies
     o.props.dy = 0
     newY = itemsBelow[0].pos.y - 8
   }
@@ -364,7 +401,7 @@ function playerUpdateFn(o: ObjectInstance<any, any>, gamepad: IGamepad, collisio
     switch (dir) {
       case DPAD.LEFT:
       case DPAD.RIGHT:
-        o.sprite = playerWalking
+        newSprite = playerWalking
         // Flip the sprite if we press left/right
         o.hFlip = dir === DPAD.LEFT ? true : false
         break
@@ -372,15 +409,14 @@ function playerUpdateFn(o: ObjectInstance<any, any>, gamepad: IGamepad, collisio
         if (!hasAirBelow) o.props.dy = 13
         break
       case DPAD.DOWN:
-        o.sprite = playerJumping
         break
     }
 
-    newX += (dir === DPAD.RIGHT ? 4 : dir === DPAD.LEFT ? -4 : 0)
+    newX += (dir === DPAD.RIGHT ? 1 : dir === DPAD.LEFT ? -1 : 0)
     newY += (dir === DPAD.DOWN  ? 8 : 0)
 
   } else {
-    o.sprite = playerStanding
+    newSprite = playerStanding
   }
 
 
@@ -389,9 +425,24 @@ function playerUpdateFn(o: ObjectInstance<any, any>, gamepad: IGamepad, collisio
     newY -= Math.floor(o.props.dy / 3)
   }
 
-  o.moveTo({
-    x: newX,
-    y: newY,
-  })
+  if (o.props.dy > 0) {
+    newSprite = playerJumping
+  } else if (o.props.dy < 0) {
+    newSprite = playerFalling
+  }
+
+  if (newSprite !== null) {
+    o.setSprite(newSprite)
+  }
+
+  if (o.pos.y > 100) { 
+    // restore the user from the last safe ground they stood on
+    o.moveTo(o.props.lastSafePosition)
+  } else {
+    o.moveTo({
+      x: newX,
+      y: newY,
+    })
+  }
 
 }
