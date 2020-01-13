@@ -1,20 +1,12 @@
 import ansiEscapes from 'ansi-escapes'
 import ansiStyles from 'ansi-styles'
-import { IPosition, IGamepad, IRenderer, IPixel } from './engine'
+import gamepad from 'gamepad'
+import { IPosition, IGamepad, IRenderer, IPixel, DPAD } from './engine'
 
 
 function debug(message?: any, ...optionalParams: any[]) {
   // console.error(message, ...optionalParams)
 }
-
-// Prepare the keyboard handler
-if (process.stdin.setRawMode) {
-  process.stdin.setRawMode(true)
-} else {
-  throw new Error(`ERROR: stdin does not allow setting setRawMode (we need that for keyboard input`)
-}
-process.stdin.resume()
-process.stdin.setEncoding('utf8')
 
 
 
@@ -26,6 +18,17 @@ export class KeyboardGamepad implements IGamepad {
   private lastSaw = Date.now()
   private isSubscribedToDpad = false
   private zeroToFour: number | undefined = undefined
+
+  constructor() {
+    // Prepare the keyboard handler
+    if (process.stdin.setRawMode) {
+      process.stdin.setRawMode(true)
+    } else {
+      throw new Error(`ERROR: stdin does not allow setting setRawMode (we need that for keyboard input`)
+    }
+    process.stdin.resume()
+    process.stdin.setEncoding('utf8')
+  }
 
   reset() {
     this.zeroToFour = undefined
@@ -96,6 +99,78 @@ export class KeyboardGamepad implements IGamepad {
 }
 
 
+export class ActualGamepad implements IGamepad {
+  private deviceProductIds: number[] = []
+  private pressedButtons: number[] = []
+  private pressedAxes: number[] = []
+
+  constructor() {
+    gamepad.init()
+
+    // Create a game loop and poll for events
+    setInterval(gamepad.processEvents, 16)
+    // Scan for new gamepads as a slower rate
+    setInterval(gamepad.detectDevices, 500)
+
+    // Listen for button up events on all gamepads
+    gamepad.on('attach', (id, device) => {
+      debug('gamepad attached. Desc, vendor, product: ', device.description, device.vendorID, device.productID)
+      this.deviceProductIds[id] = device.productID
+    })
+
+    gamepad.on('up',   (id, num) => {
+      // debug('gamepad up', id, num)
+      this.pressedButtons[num] = 0
+    })
+    gamepad.on('down', (id, num) => this.pressedButtons[num] = 1)
+    gamepad.on('move', (id, axis, value) => {
+      // if ([17, 19, 15, 12, 22, 20, 16, 6, 11, 18, 14, /*accellerometers*/ 21, 25, 24].indexOf(axis) >= 0) {
+      //   return // ignore
+      // }
+      // if (Math.abs(value) > .999) {
+      //   debug('gamepad move', id, axis, value)
+      // }
+
+      // PS4
+      // if (this.deviceProductIds[id] === 2508) {
+      //   if      (axis === 5 && value <= -0.5) { this.dir = DPAD.UP }
+      //   else if (axis === 5 && value >=  0.5) { this.dir = DPAD.DOWN }
+      //   else if (axis === 4 && value <= -0.5) { this.dir = DPAD.LEFT }
+      //   else if (axis === 4 && value >=  0.5) { this.dir = DPAD.RIGHT }
+      //   else if (axis === 4 && value === 0) { this.dir = undefined }
+      //   else if (axis === 5 && value === 0) { this.dir = undefined }
+      // }
+      this.pressedAxes[axis] = value
+    })
+  }
+  reset() {
+
+  }
+  dpadDir() {
+    if (this.deviceProductIds[0] === 2508) {
+      if (this.pressedButtons[1] > 0) { return 1 }
+      if (this.pressedAxes[4] < -0.5) { return 2 }
+      if (this.pressedAxes[4] >  0.5) { return 0 }
+      if (this.pressedAxes[4] < -0.5) { return 1 }
+      if (this.pressedAxes[4] >  0.5) { return 3 }
+    }
+  }
+  isDpadPressed() {
+    if (this.deviceProductIds[0] === 2508) {
+      const isPressed = !!(
+             this.pressedButtons[1] // "X"
+          || this.pressedAxes[4] // DPad Left/Right
+          || this.pressedAxes[5] // DPad Up/Down
+      )
+      if (isPressed) debug('Something is pressed on the game controller', this.pressedButtons, 'andThenTheAxesVButtons', this.pressedAxes)
+      return isPressed
+    }
+    return false
+  }
+  listenToDpad() {
+
+  }
+}
 
 
 

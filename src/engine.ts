@@ -395,3 +395,27 @@ export enum DPAD {
   LEFT = 2,
   DOWN = 3,
 }
+
+
+export class OrGamepad implements IGamepad {
+  private pads: IGamepad[]
+  constructor(pads: IGamepad[]) {
+    this.pads = pads
+  }
+
+  reset() {
+    this.pads.forEach(p => p.reset())
+  }
+
+  dpadDir() {
+    const p = this.pads.find(p => p.isDpadPressed())
+    return p ? p.dpadDir() : undefined
+  }
+  isDpadPressed() {
+    return !!this.pads.find(p => p.isDpadPressed())
+  }
+  listenToDpad() {
+    this.pads.forEach(p => p.listenToDpad())
+  }
+ 
+}

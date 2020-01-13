@@ -15,8 +15,8 @@
 
 // ---------
 
-import {Engine} from './engine'
-import {TerminalRenderer, KeyboardGamepad} from './terminal'
+import {Engine, OrGamepad} from './engine'
+import {TerminalRenderer, KeyboardGamepad, ActualGamepad} from './terminal'
 import {MyGame} from './myGame'
 
 
@@ -33,7 +33,7 @@ function setUnion<T>(set1: Iterable<T>, set2: Iterable<T>) {
   return s
 }
 
-const engine = new Engine(new MyGame(), new TerminalRenderer(), new KeyboardGamepad())
+const engine = new Engine(new MyGame(), new TerminalRenderer(), new OrGamepad([new KeyboardGamepad(), new ActualGamepad()]))
 
 
 
