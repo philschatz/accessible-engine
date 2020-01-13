@@ -15,7 +15,8 @@
 
 // ---------
 
-import {Engine, TerminalRenderer, KeyboardGamepad} from './engine'
+import {Engine} from './engine'
+import {TerminalRenderer, KeyboardGamepad} from './terminal'
 import {MyGame} from './myGame'
 
 

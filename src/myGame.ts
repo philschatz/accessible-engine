@@ -1,8 +1,8 @@
-import {Game, Camera, SpriteController, Gamepad, Image, DefiniteMap, Sprite, InstanceController, DPAD, ObjectInstance, CollisionChecker} from './engine'
+import {Game, Camera, SpriteController, IGamepad, Image, DefiniteMap, Sprite, InstanceController, DPAD, ObjectInstance, CollisionChecker} from './engine'
 
 export class MyGame implements Game {
   
-  load(gamepad: Gamepad, sprites: SpriteController) {
+  load(gamepad: IGamepad, sprites: SpriteController) {
     gamepad.listenToDpad()
 
     const images = new DefiniteMap<Image>()
@@ -332,7 +332,7 @@ export class MyGame implements Game {
 }
 
 
-function playerUpdateFn(o: ObjectInstance<any, any>, gamepad: Gamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera) {
+function playerUpdateFn(o: ObjectInstance<any, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera) {
   const playerJumping = sprites.get('playerJumping')
   const playerWalking = sprites.get('playerWalking')
   const playerStanding = sprites.get('playerStanding')
