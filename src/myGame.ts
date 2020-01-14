@@ -588,15 +588,13 @@ function playerUpdateFn(o: ObjectInstance<any, any>, gamepad: IGamepad, collisio
   let newY = o.pos.y
 
   const bbox = o.toBBox()
-  const itemsBelow = collisionChecker.searchBBox({
-    minX: bbox.minX,
-    maxX: bbox.maxX,
-    minY: bbox.maxY + 1,
-    maxY: bbox.maxY + 1,
-  }).filter(item => floors.indexOf(item.sprite) >= 0) // only look at the floors
+  const itemsBelow = collisionChecker.searchPoint({
+    x: Math.round((bbox.maxX + bbox.minX) / 2),
+    y: bbox.maxY + 1,
+  })
+  .filter(item => floors.indexOf(item.sprite) >= 0) // only look at the floors
 
   const hasAirBelow = itemsBelow.length === 0
-  // Floor sprites are treeTopLeft,treeTopRight,floorOrange1,floorOrange2,floorWhite1,floorWhite2
 
   if (!hasAirBelow && o.props.dy <= 0) {
     o.props.lastSafePosition = o.pos // save in case player dies
@@ -615,7 +613,7 @@ function playerUpdateFn(o: ObjectInstance<any, any>, gamepad: IGamepad, collisio
         o.hFlip = dir === DPAD.LEFT ? true : false
         break
       case DPAD.UP:
-        if (!hasAirBelow && o.props.dy <= 0) o.props.dy = 10// 13
+        if (!hasAirBelow && o.props.dy <= 0) o.props.dy = 10 // 13
         break
       case DPAD.DOWN:
         break
