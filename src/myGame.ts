@@ -718,7 +718,7 @@ function move_player(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, col
    // actions
    if (p.lwait > 0) { p.lwait -= 1 }
    if (intro >= 85) {
-      if (gamepad.isButtonPressed(BUTTON_TYPE.BUMPER_TOP_LEFT)) { rotate_world(-2, o, collisionChecker) }
+      if (gamepad.isButtonPressed(BUTTON_TYPE.BUMPER_TOP_LEFT))  { rotate_world(-1, o, collisionChecker) }
       if (gamepad.isButtonPressed(BUTTON_TYPE.BUMPER_TOP_RIGHT)) { rotate_world(+1, o, collisionChecker) }
       let count = Date.now()
       // HACK loop until user stopped pressing the button
@@ -975,29 +975,29 @@ function draw_player_head(front: boolean, o: ObjectInstance<any, any>) {
   const cur_y = 0
   const cur_z = 0
   const r_factor = 0
-  const sleft = false
-  const sright = false
-  const sback = false
+  const sleft = false // o.props.side === 3
+  const sright = false // o.props.side === 1
+  const sback = false // o.props.side === 2
 
   if (front || (p.x == cur_x && p.y == cur_y && p.z+1 == cur_z)) {
-  let zz = 112-p.zreal
-  let xx = 12+p.xreal+r_factor*(p.yreal/8-4)
-  if (p.usewait <= 0 &&
-    !istalk() &&
-    (p.lwait > 0 || p.dropwait > 0)) {
-    zz += 1
-  }
-  if (sleft) {
-    xx = 28+p.yreal-r_factor*(p.xreal/8-6)
-  } else if (sback) {
-    xx = 108-p.xreal-r_factor*(p.yreal/8-4)
-  } else if (sright) {
-    xx = 92-p.yreal+r_factor*(p.xreal/8-6)
-  }
+    let zz = 112-p.zreal
+    let xx = 12+p.xreal+r_factor*(p.yreal/8-4)
+    if (p.usewait <= 0 &&
+      !istalk() &&
+      (p.lwait > 0 || p.dropwait > 0)) {
+      zz += 1
+    }
+    if (sleft) {
+      xx = 28+p.yreal-r_factor*(p.xreal/8-6)
+    } else if (sback) {
+      xx = 108-p.xreal-r_factor*(p.yreal/8-4)
+    } else if (sright) {
+      xx = 92-p.yreal+r_factor*(p.xreal/8-6)
+    }
 
-  o.hFlip = p.mir
-  o.moveTo({x: xx, y: zz})
-  //  sspr(8*flr(sp-32),16,8,10,xx,zz,8,10,p.mir,false)
+    o.hFlip = p.mir
+    o.moveTo({x: xx, y: zz})
+    //  sspr(8*flr(sp-32),16,8,10,xx,zz,8,10,p.mir,false)
   }
 }
 
