@@ -313,10 +313,10 @@ export class Camera {
   public toBBox(): BBox {
     const {width, height} = this.dim
     return {
-      minX: this.pos.x - width / 2,
-      maxX: this.pos.x + width / 2,
-      minY: this.pos.y - height / 2,
-      maxY: this.pos.y + height / 2
+      minX: this.pos.x,
+      maxX: this.pos.x + width,
+      minY: this.pos.y,
+      maxY: this.pos.y + height
     }
   }
 }

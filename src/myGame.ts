@@ -504,7 +504,7 @@ export class MyGame implements Game {
     function g(item: GameObject<any, any>, pos: IPosition, zIndex: number) {
       // convert from grid coordinates to pixels
       const o = item.new({
-        x: (pos.x - 6) * 8, // subtract 6 so that the rotation point is the center of the island
+        x: pos.x * 8,
         y: pos.y * 8,
       })
       if (zIndex === 0) { throw new Error('BUG: zIndex is only set to zero for the player')}
@@ -576,14 +576,24 @@ export class MyGame implements Game {
 
     g(door,   {x: 10, y:  9}, 3)
     g(door,   {x: 10, y:  9}, 4)
-
     g(wallC,  {x: 10, y:  8}, 5)
     g(wallC,  {x: 10, y:  9}, 5)
-
     // g(wallC,  {x:  9, y: 10}, 4)
     g(ledge,  {x: 10, y: 10}, 4)
 
-    g(player, {x: 6, y:  0}, 1).props.id = 'player'
+
+    // back side
+    g(wall2, {x:  8, y:  8}, 3)
+    g(wall2, {x:  8, y:  9}, 3)
+    g(ledge, {x:  8, y: 10}, 3)
+    g(wallC, {x:  8, y: 11}, 2)
+    g(wallC, {x:  7, y: 11}, 3)
+    g(wallC, {x:  6, y: 11}, 2)
+
+
+    
+
+    g(player, {x: 11, y:  9}, 1)
 
   }
 
@@ -648,9 +658,9 @@ function playerUpdateFn(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, 
 
   // initialize the props
   if (o.props.zreal === undefined) {
-    o.props.xreal = to_real(o.pos.x)
-    o.props.yreal = to_real(o.pos.y)
-    o.props.zreal = to_real(o.zIndex)
+    o.props.xreal = 40
+    o.props.yreal = 30
+    o.props.zreal = 100
     o.props.still = 0
     o.props.dz = -3 // since we start out mid-air
     o.props.maxfall = -9
@@ -689,11 +699,6 @@ function playerUpdateFn(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, 
   move_player(o, gamepad, collisionChecker, sprites, instances, camera, floors)
   draw_player(true, o, sprites)
 
-  camera.pos = {
-    x: o.pos.x,
-    y: camera.pos.y
-  }
-  
 }
 
 
@@ -713,8 +718,13 @@ function move_player(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, col
    // actions
    if (p.lwait > 0) { p.lwait -= 1 }
    if (intro >= 85) {
-      if (gamepad.isButtonPressed(BUTTON_TYPE.BUMPER_TOP_LEFT)) { rotate_world(-1, o, collisionChecker) }
+      if (gamepad.isButtonPressed(BUTTON_TYPE.BUMPER_TOP_LEFT)) { rotate_world(-2, o, collisionChecker) }
       if (gamepad.isButtonPressed(BUTTON_TYPE.BUMPER_TOP_RIGHT)) { rotate_world(+1, o, collisionChecker) }
+      let count = Date.now()
+      // HACK loop until user stopped pressing the button
+      while (gamepad.isButtonPressed(BUTTON_TYPE.BUMPER_TOP_LEFT) || gamepad.isButtonPressed(BUTTON_TYPE.BUMPER_TOP_RIGHT)) {
+        if (count + 1000 > Date.now()) { break }
+      }
       // rotate right
       if (gamepad.isButtonPressed(BUTTON_TYPE.CLUSTER_BOTTOM) && p.landed) {
          r_dir = n1
@@ -1020,12 +1030,12 @@ function rotate_world(dir: number, o: ObjectInstance<PlayerProps, any>, collisio
         z = ob.props.x
         break
       case 2: // back
-        x = -ob.props.x
+        x = 12-ob.props.x
         y = ob.props.y
         z = 1000 - ob.props.z // since zIndex needs to be positive
         break
       case 3: // left
-        x = -ob.props.z
+        x = 12-ob.props.z
         y = ob.props.y
         z = 1000 - ob.props.x
         break
@@ -1038,5 +1048,5 @@ function rotate_world(dir: number, o: ObjectInstance<PlayerProps, any>, collisio
     if (z <= 0) { throw new Error(`BUG: zIndex should always be > 0 but it was "${z}"`)}
     ob.zIndex = z
   })
-
+  o.zIndex = 0 // player is always on top
 }
