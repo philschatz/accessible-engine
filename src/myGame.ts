@@ -707,10 +707,10 @@ function move_player(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, col
 
   const n1 = -1 // negativeOne just to reduce tokens
   // only 1 of these is true
-  const sfront = true
-  const sleft = false
-  const sright = false
-  const sback = false
+  const sfront = o.props.side === 0 
+  const sleft = o.props.side === 1
+  const sback = o.props.side === 2
+  const sright = o.props.side === 3
   const intro = 85
   let r_dir = 0
   let r_wait = 0
@@ -834,10 +834,10 @@ function pzmove(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisio
 
   const n1 = -1 // negativeOne just to reduce tokens
   // only 1 of these is true
-  const sfront = true
-  const sleft = false
-  const sright = false
-  const sback = false
+  const sfront = o.props.side === 0 
+  const sleft = o.props.side === 1
+  const sback = o.props.side === 2
+  const sright = o.props.side === 3
   const intro = 85
   let r_dir = 0
   let r_wait = 0
@@ -975,9 +975,10 @@ function draw_player_head(front: boolean, o: ObjectInstance<any, any>) {
   const cur_y = 0
   const cur_z = 0
   const r_factor = 0
-  const sleft = false // o.props.side === 3
-  const sright = false // o.props.side === 1
-  const sback = false // o.props.side === 2
+  const sfront = o.props.side === 0
+  const sleft = o.props.side === 1
+  const sback = o.props.side === 2
+  const sright = o.props.side === 3
 
   if (front || (p.x == cur_x && p.y == cur_y && p.z+1 == cur_z)) {
     let zz = 112-p.zreal
