@@ -1,7 +1,7 @@
 import ansiEscapes from 'ansi-escapes'
 import ansiStyles from 'ansi-styles'
 import gamepad from 'gamepad'
-import { IPosition, IGamepad, IRenderer, IPixel, DPAD } from './engine'
+import { IPosition, IGamepad, IRenderer, IPixel, DPAD, BUTTON_TYPE } from './engine'
 
 
 function debug(message?: any, ...optionalParams: any[]) {
@@ -96,6 +96,32 @@ export class KeyboardGamepad implements IGamepad {
         }
     })
   }
+
+
+  isSomethingPressed() { return this.isDpadPressed() }
+  listenTo(btns: BUTTON_TYPE[]) {  }
+  isButtonPressed(btn: BUTTON_TYPE) {
+    if (this.lastSaw + KEY_REPEAT_WITHIN < Date.now()) {
+      this.zeroToFour = undefined
+    }
+
+    switch(btn) {
+      case BUTTON_TYPE.ARROW_UP:
+        return this.zeroToFour === 1
+      case BUTTON_TYPE.ARROW_DOWN:
+        return this.zeroToFour === 3
+      case BUTTON_TYPE.ARROW_LEFT:
+        return this.zeroToFour === 2
+      case BUTTON_TYPE.ARROW_RIGHT:
+        return this.zeroToFour === 0
+      case BUTTON_TYPE.CLUSTER_BOTTOM:
+      case BUTTON_TYPE.CLUSTER_LEFT:
+        return false
+      default:
+        throw new Error(`Did not understand button yet. ${btn}`)
+    } 
+  }
+
 }
 
 
@@ -151,8 +177,8 @@ export class ActualGamepad implements IGamepad {
       if (this.pressedButtons[1] > 0) { return 1 }
       if (this.pressedAxes[4] < -0.5) { return 2 }
       if (this.pressedAxes[4] >  0.5) { return 0 }
-      if (this.pressedAxes[4] < -0.5) { return 1 }
-      if (this.pressedAxes[4] >  0.5) { return 3 }
+      if (this.pressedAxes[5] < -0.5) { return 1 }
+      if (this.pressedAxes[5] >  0.5) { return 3 }
     }
   }
   isDpadPressed() {
@@ -164,12 +190,44 @@ export class ActualGamepad implements IGamepad {
       )
       if (isPressed) debug('Something is pressed on the game controller', this.pressedButtons, 'andThenTheAxesVButtons', this.pressedAxes)
       return isPressed
+    } else { 
+      //debug('Unsupported Gamepad')
     }
     return false
   }
   listenToDpad() {
 
   }
+
+  isSomethingPressed() { return this.isDpadPressed() }
+  listenTo(btns: BUTTON_TYPE[]) {  }
+  isButtonPressed(btn: BUTTON_TYPE) {
+    if (this.deviceProductIds[0] === 2508) {
+      switch(btn) {
+        case BUTTON_TYPE.ARROW_UP:
+          return this.pressedAxes[5] < -0.5
+        case BUTTON_TYPE.ARROW_DOWN:
+          return this.pressedAxes[5] > 0.5
+        case BUTTON_TYPE.ARROW_LEFT:
+          return this.pressedAxes[4] < -0.5
+        case BUTTON_TYPE.ARROW_RIGHT:
+          return this.pressedAxes[4] > 0.5
+        case BUTTON_TYPE.CLUSTER_BOTTOM:
+          return this.pressedButtons[1] > 0.5
+        case BUTTON_TYPE.CLUSTER_TOP:
+
+        case BUTTON_TYPE.CLUSTER_LEFT:
+          return false
+        case BUTTON_TYPE.CLUSTER_RIGHT:
+        default:
+          throw new Error(`Did not understand button yet. ${btn}`)
+      } 
+    } else {
+      //throw new Error('Unsupported Gamepad')
+      return false
+    }
+  }
+
 }
 
 

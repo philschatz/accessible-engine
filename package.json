@@ -1,7 +1,8 @@
 {
   "scripts": {
     "build": "tsc",
-    "test": "npm run-script build && npm start",
+    "test": "npm run-script build && npm run-script start",
+    "test:debug": "npm run-script build && npm run-script start:debug",
     "start": "node -r source-map-support/register ./src/index.js",
     "start:debug": "node --inspect-brk -r source-map-support/register ./src/index.js"
   },

@@ -99,6 +99,10 @@ export class GameObject<P = {}, S = {}> {
 
   moveTo(o: ObjectInstance<P, S>, newPos: IPosition) {
     if (!this.instances.has(o)) { throw new Error('BUG: Trying to move an object that the framework is unaware of')}
+    if (Number.isNaN(newPos.x) || Number.isNaN(newPos.y)) {
+      debugger
+      throw new Error(`Position neeeds to have numbers as their coordinates. At least one of them was not a number. (${newPos.x}, ${newPos.y})`)
+    }
     this.bush.remove(o)
     o.pos = newPos
     this.bush.insert(o)
@@ -348,12 +352,51 @@ export class InstanceController {
   }
 }
 
+export enum BUTTON_TYPE {
+  ARROW_UP = 'ARROW_UP',
+  ARROW_DOWN = 'ARROW_DOWN',
+  ARROW_LEFT = 'ARROW_LEFT',
+  ARROW_RIGHT = 'ARROW_RIGHT',
+  HOME = 'HOME',
+  START = 'START',
+  SELECT = 'SELECT',
+  CLUSTER_TOP = 'CLUSTER_TOP',
+  CLUSTER_LEFT = 'CLUSTER_LEFT',
+  CLUSTER_RIGHT = 'CLUSTER_RIGHT',
+  CLUSTER_BOTTOM = 'CLUSTER_BOTTOM',
+  BUMPER_TOP_LEFT = 'BUMPER_TOP_LEFT',
+  BUMPER_BOTTOM_LEFT = 'BUMPER_BOTTOM_LEFT',
+  BUMPER_TOP_RIGHT = 'BUMPER_TOP_RIGHT',
+  BUMPER_BOTTOM_RIGHT = 'BUMPER_BOTTOM_RIGHT',
+  STICK_PRESS_LEFT = 'STICK_PRESS_LEFT',
+  STICK_PRESS_RIGHT = 'STICK_PRESS_RIGHT',
+  TOUCHSCREEN = 'TOUCHSCREEN'
+}
+export enum STICK_TYPE {
+  LEFT = 'LEFT',
+  RIGHT = 'RIGHT'
+}
+export enum ANALOG_TYPE {
+  BUMPER_LEFT = 'BUMPER_LEFT',
+  BUMPER_RIGHT = 'BUMPER_RIGHT'
+}
+
+export enum DIRECTION {
+  UP = 'UP',
+  DOWN = 'DOWN',
+  LEFT = 'LEFT',
+  RIGHT = 'RIGHT'
+}
 
 export interface IGamepad {
   reset(): void
   dpadDir(): number
   isDpadPressed(): boolean
   listenToDpad()
+
+  isSomethingPressed(): boolean
+  listenTo(btns: BUTTON_TYPE[])
+  isButtonPressed(btn: BUTTON_TYPE): boolean
 }
 
 
@@ -418,4 +461,8 @@ export class OrGamepad implements IGamepad {
     this.pads.forEach(p => p.listenToDpad())
   }
  
+
+  isSomethingPressed() { for (const pad of this.pads) { if (pad.isSomethingPressed()) { return true } } return false }
+  listenTo(btns: BUTTON_TYPE[]) { for (const pad of this.pads) { pad.listenTo(btns) } }
+  isButtonPressed(btn: BUTTON_TYPE) { for (const pad of this.pads) { if (pad.isButtonPressed(btn)) { return true } } return false }
 }

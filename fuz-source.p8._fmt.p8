@@ -720,127 +720,129 @@ foreach(a_sky,sky_shift)
 end
 
 function pzmove()
-pgetpos()
---vertical movement
-p_floor = find_floor(p_z)
--- if in the air
-if not p_floor or p_dz > 0 then
- p_landed = false
-end
--- if falling
-if p_dz <= 0 then
- -- if floor approaching
- if p_floor then
-  local znext = from_real(p_zreal+flr(p_dz/3))
-  if znext < p_z then
-   --land
-   p_zreal = p_z*8
-   if p_zreal%8 == 0 and not p_landed then
-    p_landed,p_lwait,p_dz,p_coyote = true,3,0,p_coyotemax
-    sfx(23)
+   pgetpos()
+   --vertical movement
+   p_floor = find_floor(p_z)
+   -- if in the air
+   if not p_floor or p_dz > 0 then
+      p_landed = false
    end
-  end
- end
-end
---jump/drop if landed
-if intro >= 85 and talkline == 0 and (p_landed or p_coyote > 0) then
- if p_lwait <= 0 then
-  --drop down
-  if btn(3) and p_usewait <= 0 then
-   p_dropwait += 1
-  else
-   p_dropwait = 0
-  end
-  --execute jump/drop
-  if btn(2) or p_dropwait >= p_dwaitmax then
-   if p_dropwait >= 5 then
-    p_dz = -2
-   else
-    p_dz = p_jump
-    sfx(8)
+   -- if falling
+   if p_dz <= 0 then
+      -- if floor approaching
+      if p_floor then
+         local znext = from_real(p_zreal+flr(p_dz/3))
+         if znext < p_z then
+            --land
+            p_zreal = p_z*8
+            if p_zreal%8 == 0 and not p_landed then
+               p_landed,p_lwait,p_dz,p_coyote = true,3,0,p_coyotemax
+               sfx(23)
+            end
+         end
+      end
    end
-   p_dropwait,p_floor,p_landed,p_coyote = 0,false,false,0
-  else p_dz = 0
-  end
- end
-end
---gravity/coyote time
-if not p_landed and p_dz > p_maxfall then
- if p_coyote > 0 then
-  p_coyote -= 1
- else
-  p_dz -= 1
- end
-end
---save last safe position
-if p_coyote >= p_coyotemax then
- savelast()
-end
---update position
-p_zreal += flr(p_dz/3)
---respawn
-if p_zreal < 0 then
- if p_reswait <= 0 then
-    sfx(9)
-    p_reswait = 30
- else
-    p_reswait -= 1
-    if p_reswait <= 0 then
-       p_xreal,p_yreal,p_zreal,side,p_open,p_landed,p_dz,p_coyote = p_xlast,p_ylast,p_zlast,p_slast,p_olast,true,0,p_coyotemax
-    end
- end
-end
+   --jump/drop if landed
+   if intro >= 85 and talkline == 0 and (p_landed or p_coyote > 0) then
+      if p_lwait <= 0 then
+         --drop down
+         if btn(3) and p_usewait <= 0 then
+            p_dropwait += 1
+         else
+            p_dropwait = 0
+         end
+         --execute jump/drop
+         if btn(2) or p_dropwait >= p_dwaitmax then
+            if p_dropwait >= 5 then
+               p_dz = -2
+            else
+               p_dz = p_jump
+               sfx(8)
+            end
+            p_dropwait,p_floor,p_landed,p_coyote = 0,false,false,0
+         else p_dz = 0
+         end
+      end
+   end
+   --gravity/coyote time
+   if not p_landed and p_dz > p_maxfall then
+      if p_coyote > 0 then
+         p_coyote -= 1
+      else
+         p_dz -= 1
+      end
+   end
+   --save last safe position
+   if p_coyote >= p_coyotemax then
+      savelast()
+   end
+   --update position
+   p_zreal += flr(p_dz/3)
+   --respawn
+   if p_zreal < 0 then
+      if p_reswait <= 0 then
+         sfx(9)
+         p_reswait = 30
+      else
+         p_reswait -= 1
+         if p_reswait <= 0 then
+            p_xreal,p_yreal,p_zreal,side,p_open,p_landed,p_dz,p_coyote = p_xlast,p_ylast,p_zlast,p_slast,p_olast,true,0,p_coyotemax
+         end
+      end
+   end
 end
 
 function move_player()
---actions
-if p_lwait > 0 then p_lwait -= 1 end
-if intro >= 85 then
- --rotate right
- if btn(5) and p_landed then
-  r_dir,r_wait = n1,0
-  sfx(11)
- --rotate left
- elseif btn(4) and p_landed then
-  r_dir,r_wait = 1,0
-  sfx(10)
- else
-  --move
-  local dp = 0
-  if btn(0) then dp -= 1 end
-  if btn(1) then dp += 1 end
-  if dp < 0 then p_mir = true
-  elseif dp > 0 then p_mir = false end
-  p_dpos = dp
-  if sfront then
-   p_xreal += p_dpos
-  elseif sleft then
-   p_yreal += p_dpos
-  elseif sback then
-   p_xreal -= p_dpos
-  elseif sright then
-   p_yreal -= p_dpos
-  end
- end
-end
---animate
-if p_dpos == 0 then
- if p_still == 0 then
-  p_frame = 0
- elseif p_still > 200 then
-  p_frame += 1
-  if p_frame > 5 then
-   p_still,p_frame = 0,0
-  end
- end
- p_still += 1
-else
- if p_still > 0 then
-  p_still,p_frame = 0,0
- end
- p_frame = incmod(p_frame,24)
-end
-pzmove()
+   --actions
+   if p_lwait > 0 then p_lwait -= 1 end
+   if intro >= 85 then
+      --rotate right
+      if btn(5) and p_landed then
+         r_dir,r_wait = n1,0
+         sfx(11)
+      --rotate left
+      elseif btn(4) and p_landed then
+         r_dir,r_wait = 1,0
+         sfx(10)
+      else
+         --move
+         local dp = 0
+         if btn(0) then dp -= 1 end
+         if btn(1) then dp += 1 end
+         if dp < 0 then p_mir = true
+         elseif dp > 0 then p_mir = false end
+         
+         p_dpos = dp
+         
+         if sfront then
+            p_xreal += p_dpos
+         elseif sleft then
+            p_yreal += p_dpos
+         elseif sback then
+            p_xreal -= p_dpos
+         elseif sright then
+            p_yreal -= p_dpos
+         end
+      end
+   end
+   --animate
+   if p_dpos == 0 then
+      if p_still == 0 then
+         p_frame = 0
+      elseif p_still > 200 then
+         p_frame += 1
+         if p_frame > 5 then
+            p_still,p_frame = 0,0
+         end
+      end
+      p_still += 1
+   else
+      if p_still > 0 then
+         p_still,p_frame = 0,0
+      end
+      p_frame = incmod(p_frame,24)
+   end
+   pzmove()
 end
 
 function find_floor(layer)

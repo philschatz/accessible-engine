@@ -1,4 +1,4 @@
-import {Game, Camera, SpriteController, IGamepad, Image, DefiniteMap, Sprite, InstanceController, DPAD, ObjectInstance, CollisionChecker, IPosition, GameObject} from './engine'
+import {Game, Camera, SpriteController, IGamepad, Image, DefiniteMap, Sprite, InstanceController, DPAD, ObjectInstance, CollisionChecker, IPosition, GameObject, BUTTON_TYPE} from './engine'
 
 export class MyGame implements Game {
   
@@ -579,77 +579,337 @@ function playerUpdateFn(o: ObjectInstance<any, any>, gamepad: IGamepad, collisio
     sprites.get('floorLedge'),
   ]
 
-  if (o.props.dy === undefined) { o.props.dy = 0 }
+  if (o.props.zreal === undefined) {
+    o.props.xreal = 40
+    o.props.yreal = 30
+    o.props.zreal = 100
+    o.props.still = 0
+    o.props.dz = -3 // since we start out mid-air
+    o.props.maxfall = -9
+    o.props.coyote = 0
+    o.props.coyotemax = 5
+    o.props.reswait = 0
+    o.props.z = 0 // ???
+    o.props.jump = 13
 
-  if (o.props.dy >= -3) o.props.dy -= 1 // terminal velocity so we do not fall through tiles (they are 8px tall)
 
-  let newSprite = null
-  let newX = o.pos.x
-  let newY = o.pos.y
+    o.props.landed = true
+    o.props.lwait = 0
+    o.props.dropwait = 0
+    o.props.dwaitmax = 8
+    o.props.canuse = false
+    o.props.usewait = 0
+    o.props.useidle = 0
+    o.props.mir = false
+    o.props.frame = 0
+    o.props.still = 165
+  }
+
+  move_player(o, gamepad, collisionChecker, sprites, instances, camera, floors)
+  draw_player(true, o, sprites)
+
+  console.error(o.pos)
+  console.error(o.props)
+
+}
+
+
+function move_player(o: ObjectInstance<any, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, floors: Sprite[]) {
+  const p = o.props
+
+  const n1 = -1 // negativeOne just to reduce tokens
+  // only 1 of these is true
+  const sfront = true
+  const sleft = false
+  const sright = false
+  const sback = false
+  const intro = 85
+  let r_dir = 0
+  let r_wait = 0
+
+   // actions
+   if (p.lwait > 0) { p.lwait -= 1 }
+   if (intro >= 85) {
+      // rotate right
+      if (gamepad.isButtonPressed(BUTTON_TYPE.CLUSTER_BOTTOM) && p.landed) {
+         r_dir = n1
+         r_wait = 0
+         sfx(11)
+      // rotate left
+      } else if (gamepad.isButtonPressed(BUTTON_TYPE.CLUSTER_LEFT) && p.landed) {
+         r_dir = 1
+         r_wait = 0
+         sfx(10)
+      } else {
+         // move
+         let dp = 0
+         if (gamepad.isButtonPressed(BUTTON_TYPE.ARROW_LEFT)) { dp -= 1 }
+         if (gamepad.isButtonPressed(BUTTON_TYPE.ARROW_RIGHT)) { dp += 1 }
+         if (dp < 0) { p.mir = true
+         } else if (dp > 0) { p.mir = false }
+         
+         p.dpos = dp
+         
+         if (sfront) {
+            p.xreal += p.dpos
+         } else if (sleft) {
+            p.yreal += p.dpos
+         } else if (sback) {
+            p.xreal -= p.dpos
+         } else if (sright) {
+            p.yreal -= p.dpos
+         }
+      }
+   }
+   // animate
+   if (p.dpos == 0) {
+      if (p.still == 0) {
+         p.frame = 0
+      } else if (p.still > 200) {
+         p.frame += 1
+         if (p.frame > 5) {
+            p.still,p.frame = 0,0
+         }
+      }
+      p.still += 1
+   } else {
+      if (p.still > 0) {
+         p.still,p.frame = 0,0
+      }
+      p.frame = incmod(p.frame,24)
+   }
+   pzmove(o, gamepad, collisionChecker, sprites, instances, camera, floors)
+}
+
+
+
+function sfx(id: number) { }
+
+function incmod(n1: number, n2: number) {
+  return (n1 + 1) % n2
+}
+
+function flr(n: number) {
+  return Math.floor(n)
+}
+
+function pgetpos(o: ObjectInstance<any, any>) {
+  o.props.x = from_real(o.props.xreal)
+  o.props.y = from_real(o.props.yreal)
+  o.props.z = from_real(o.props.zreal)
+}
+
+function from_real(n: number) {
+  return flr(n/8)
+}
+
+function to_real(n: number) {
+  return n*8
+}
+
+function savelast() { }
+
+function find_floor(layerNum: any, o: ObjectInstance<any, any>, collisionChecker: CollisionChecker, floors: Sprite[]) {
 
   const bbox = o.toBBox()
-  const itemsBelow = collisionChecker.searchPoint({
-    x: Math.round((bbox.maxX + bbox.minX) / 2),
-    y: bbox.maxY + 1,
+  const x = Math.round((bbox.maxX + bbox.minX) / 2)
+  const itemsBelow = collisionChecker.searchBBox({
+    minX: x,
+    maxX: x,
+    minY: bbox.maxY + 1, // chose these because jumping does not result in mid-air player
+    maxY: bbox.maxY + 7,
   })
   .filter(item => floors.indexOf(item.sprite) >= 0) // only look at the floors
 
-  const hasAirBelow = itemsBelow.length === 0
+  return itemsBelow.length !== 0
+}
 
-  if (!hasAirBelow && o.props.dy <= 0) {
-    o.props.lastSafePosition = o.pos // save in case player dies
-    o.props.dy = 0
-    newY = itemsBelow[0].pos.y - 8
+
+
+
+
+
+
+
+
+
+
+function pzmove(o: ObjectInstance<any, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, floors: Sprite[]) {
+  const p = o.props
+
+  const n1 = -1 // negativeOne just to reduce tokens
+  // only 1 of these is true
+  const sfront = true
+  const sleft = false
+  const sright = false
+  const sback = false
+  const intro = 85
+  let r_dir = 0
+  let r_wait = 0
+
+  const talkline = 0
+  let side = 0 // front,left,right,back or something
+  
+   pgetpos(o)
+   // vertical movement
+   p.floor = find_floor(p.z, o, collisionChecker, floors)
+   // if in the air
+   if (! p.floor || p.dz > 0) {
+      p.landed = false
+   }
+   // if falling
+   if (p.dz <= 0) {
+      // if floor approaching
+      if (p.floor) {
+         let znext = from_real(p.zreal+flr(p.dz/3))
+         if (znext < p.z) {
+            // land
+            p.zreal = checkNaN(p.z*8)
+            if (p.zreal%8 == 0 && ! p.landed) {
+               p.landed = true
+               p.lwait = 3
+               p.dz = 0
+               p.coyote = p.coyotemax
+               sfx(23)
+            }
+         }
+      }
+   }
+   // jump/drop if (landed
+   if (intro >= 85 && talkline == 0 && (p.landed || p.coyote > 0)) {
+      if (p.lwait <= 0) {
+         // drop down
+         if (gamepad.isButtonPressed(BUTTON_TYPE.ARROW_DOWN) && p.usewait <= 0) {
+            p.dropwait += 1
+         } else {
+            p.dropwait = 0
+         }
+         // execute jump/drop
+         if (gamepad.isButtonPressed(BUTTON_TYPE.ARROW_UP) || p.dropwait >= p.dwaitmax) {
+            if (p.dropwait >= 5) {
+              debugger
+               p.dz = -2
+            } else {
+               p.dz = p.jump
+               sfx(8)
+            }
+            p.dropwait,p.floor,p.landed,p.coyote = 0,false,false,0
+         } else { p.dz = 0
+         }
+      }
+   }
+   // gravity/coyote time
+   if (! p.landed && p.dz > p.maxfall) {
+      if (p.coyote > 0) {
+         p.coyote -= 1
+      } else {
+         p.dz -= 1
+      }
+   }
+   // save last safe position
+   if (p.coyote >= p.coyotemax) {
+      savelast()
+   }
+   // update position
+   p.zreal += checkNaN(flr(p.dz/3))
+   // respawn
+   if (p.zreal < 0) {
+      if (p.reswait <= 0) {
+         sfx(9)
+         p.reswait = 30
+      } else {
+         p.reswait -= 1
+         if (p.reswait <= 0) {
+           p.xreal = p.xlast
+           p.yreal = p.ylast
+           p.zreal = checkNaN(p.zlast)
+           side = p.slast
+           p.open = p.olast
+           p.landed = true
+           p.dz = 0
+           p.coyote = p.coyotemax
+         }
+      }
+   }
+}
+
+
+
+
+
+
+
+
+function draw_player(front: boolean, o: ObjectInstance<any, any>, sprites: SpriteController) {
+  const atrans = 0
+  const happy = false
+
+  const playerStanding = sprites.get('playerStanding')
+  const playerWalking = sprites.get('playerWalking')
+  const playerJumping = sprites.get('playerJumping')
+  const playerFalling = sprites.get('playerFalling')
+  // const happySprite = sprites.get('playerHappy')
+
+  const p = o.props
+  
+  if (p.otrans > 0 || atrans > 0) {
+    // pal_hidden()
+    console.log('Draw shadowed sprite')
+  }
+  let sp = playerStanding
+  // if (happy > 0) { sp = happySprite }
+  /*else*/ if (p.dz > 0 || istalk()) { sp = playerJumping }
+  else if (p.floor == false) { sp = playerFalling }
+  else if (p.dpos != 0) { sp = playerWalking }
+
+
+  o.setSprite(sp)
+  
+  // draw_player_feet(front,sp)
+  draw_player_head(front, o)
+  // pal()
+}
+
+function istalk() { return false }
+
+
+function draw_player_head(front: boolean, o: ObjectInstance<any, any>) {
+  const p = o.props
+
+  const cur_x = 0
+  const cur_y = 0
+  const cur_z = 0
+  const r_factor = 0
+  const sleft = false
+  const sright = false
+  const sback = false
+
+  if (front || (p.x == cur_x && p.y == cur_y && p.z+1 == cur_z)) {
+  let zz = 112-p.zreal
+  let xx = 12+p.xreal+r_factor*(p.yreal/8-4)
+  if (p.usewait <= 0 &&
+    !istalk() &&
+    (p.lwait > 0 || p.dropwait > 0)) {
+    zz += 1
+  }
+  if (sleft) {
+    xx = 28+p.yreal-r_factor*(p.xreal/8-6)
+  } else if (sback) {
+    xx = 108-p.xreal-r_factor*(p.yreal/8-4)
+  } else if (sright) {
+    xx = 92-p.yreal+r_factor*(p.xreal/8-6)
   }
 
-
-  if (gamepad.isDpadPressed()) {
-    const dir = gamepad.dpadDir()
-    switch (dir) {
-      case DPAD.LEFT:
-      case DPAD.RIGHT:
-        newSprite = playerWalking
-        // Flip the sprite if we press left/right
-        o.hFlip = dir === DPAD.LEFT ? true : false
-        break
-      case DPAD.UP:
-        if (!hasAirBelow && o.props.dy <= 0) o.props.dy = 10 // 13
-        break
-      case DPAD.DOWN:
-        break
-    }
-
-    newX += (dir === DPAD.RIGHT ? 1 : dir === DPAD.LEFT ? -1 : 0)
-    newY += (dir === DPAD.DOWN  ? 8 : 0)
-
-  } else {
-    newSprite = playerStanding
+  o.hFlip = p.mir
+  o.moveTo({x: xx, y: zz})
+  //  sspr(8*flr(sp-32),16,8,10,xx,zz,8,10,p.mir,false)
   }
+}
 
 
-
-  if (o.props.dy !== 0) {
-    newY -= Math.floor(o.props.dy / 3) // the game used '3'
+function checkNaN(n: number) {
+  if (Number.isNaN(n)) { 
+    throw new Error('Expected number to not be NaN but failed')
   }
-
-  if (o.props.dy > 0) {
-    newSprite = playerJumping
-  } else if (o.props.dy < 0) {
-    newSprite = playerFalling
-  }
-
-  if (newSprite !== null) {
-    o.setSprite(newSprite)
-  }
-
-  if (o.pos.y > 100) { 
-    // restore the user from the last safe ground they stood on
-    o.moveTo(o.props.lastSafePosition)
-  } else {
-    o.moveTo({
-      x: newX,
-      y: newY,
-    })
-  }
-
+  return n
 }
