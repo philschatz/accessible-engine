@@ -16,42 +16,9 @@ const KEY_REPEAT_WITHIN = 110 // MacOS seems to repeat at 80ms (up to 102ms)
 
 export class KeyboardGamepad implements IGamepad {
   private lastSaw = Date.now()
-  private isSubscribedToDpad = false
-  private zeroToFour: number | undefined = undefined
+  private curPressed: BUTTON_TYPE | undefined = undefined
 
-  constructor() {
-    // Prepare the keyboard handler
-    if (process.stdin.setRawMode) {
-      process.stdin.setRawMode(true)
-    } else {
-      throw new Error(`ERROR: stdin does not allow setting setRawMode (we need that for keyboard input`)
-    }
-    process.stdin.resume()
-    process.stdin.setEncoding('utf8')
-  }
-
-  reset() {
-    this.zeroToFour = undefined
-  }
-  dpadDir() {
-    if (!this.isSubscribedToDpad) { throw new Error(`ERROR: remember to call controller.listenToDpad() during loading if your game requires it`)}
-    if (this.zeroToFour === undefined) { throw new Error(`ERROR: Check that one of the dpad directions was pressed`)}
-    return this.zeroToFour
-  }
-
-  isDpadPressed() {
-    if (!this.isSubscribedToDpad) { throw new Error(`ERROR: remember to call controller.listenToDpad() during loading if your game requires it`)}
-    // Node only receives key press events. If we have not seen a key press event recently then they are no longer pressing
-    if (this.lastSaw + KEY_REPEAT_WITHIN < Date.now()) {
-      debug('Key seems to be no longer pressed. Took too long', Date.now() - this.lastSaw)
-      return false
-    }
-    return this.zeroToFour !== undefined
-  }
-
-  listenToDpad() {
-    this.isSubscribedToDpad = true
-
+  listenTo(btns: BUTTON_TYPE[]) {
     // Prepare the keyboard handler
     if (process.stdin.setRawMode) {
       process.stdin.setRawMode(true)
@@ -69,68 +36,58 @@ export class KeyboardGamepad implements IGamepad {
             case 'W':
             case 'w':
             case '\u001B\u005B\u0041': // UP-ARROW
-                this.zeroToFour = 1; break
+              this.curPressed = BUTTON_TYPE.ARROW_UP; break
             case 'S':
             case 's':
             case '\u001B\u005B\u0042': // DOWN-ARROW
-                this.zeroToFour = 3; break
+              this.curPressed = BUTTON_TYPE.ARROW_DOWN; break
             case 'A':
             case 'a':
             case '\u001B\u005B\u0044': // LEFT-ARROW
-                this.zeroToFour = 2; break
+              this.curPressed = BUTTON_TYPE.ARROW_LEFT; break
             case 'D':
             case 'd':
             case '\u001B\u005B\u0043': // RIGHT-ARROW
-                this.zeroToFour = 0; break
-            // case 'X':
-            // case 'x':
-            // case ' ':
-            // case '\u000D':
-            //     this.actionKey = true; break
+              this.curPressed = BUTTON_TYPE.ARROW_RIGHT; break
+            case 'X':
+            case 'x':
+            case ' ':
+            case '\u000D':
+              this.curPressed = BUTTON_TYPE.CLUSTER_BOTTOM; break
+            case 'Q':
+            case 'q':
+              this.curPressed = BUTTON_TYPE.BUMPER_TOP_LEFT; break
+            case 'E':
+            case 'e':
+              this.curPressed = BUTTON_TYPE.BUMPER_TOP_RIGHT; break
             case '\u0003': // Ctrl+C
             case '\u001B': // Escape
                 return process.exit(1)
             default:
-                this.zeroToFour = undefined
-                debug(`Did not understand key pressed: "${key}"`)
+              this.curPressed = undefined
+              debug(`Did not understand key pressed: "${key}"`)
         }
     })
   }
-
-
-  isSomethingPressed() { return this.isDpadPressed() }
-  listenTo(btns: BUTTON_TYPE[]) {  }
   isButtonPressed(btn: BUTTON_TYPE) {
-    if (this.lastSaw + KEY_REPEAT_WITHIN < Date.now()) {
-      this.zeroToFour = undefined
-    }
-
-    switch(btn) {
-      case BUTTON_TYPE.ARROW_UP:
-        return this.zeroToFour === 1
-      case BUTTON_TYPE.ARROW_DOWN:
-        return this.zeroToFour === 3
-      case BUTTON_TYPE.ARROW_LEFT:
-        return this.zeroToFour === 2
-      case BUTTON_TYPE.ARROW_RIGHT:
-        return this.zeroToFour === 0
-      case BUTTON_TYPE.CLUSTER_BOTTOM:
-      case BUTTON_TYPE.CLUSTER_LEFT:
-        return false
-      default:
-        throw new Error(`Did not understand button yet. ${btn}`)
-    } 
+    return this.getCurPressed() === btn
   }
 
+  private getCurPressed() {
+    if (this.lastSaw + KEY_REPEAT_WITHIN < Date.now()) {
+      this.curPressed = undefined
+    }
+    return this.curPressed
+  }
 }
 
 
 export class ActualGamepad implements IGamepad {
   private deviceProductIds: number[] = []
-  private pressedButtons: number[] = []
+  private pressedButtons: boolean[] = []
   private pressedAxes: number[] = []
 
-  constructor() {
+  listenTo(btns: BUTTON_TYPE[]) {
     gamepad.init()
 
     // Create a game loop and poll for events
@@ -144,81 +101,38 @@ export class ActualGamepad implements IGamepad {
       this.deviceProductIds[id] = device.productID
     })
 
-    gamepad.on('up',   (id, num) => {
-      // debug('gamepad up', id, num)
-      this.pressedButtons[num] = 0
-    })
-    gamepad.on('down', (id, num) => this.pressedButtons[num] = 1)
-    gamepad.on('move', (id, axis, value) => {
-      // if ([17, 19, 15, 12, 22, 20, 16, 6, 11, 18, 14, /*accellerometers*/ 21, 25, 24].indexOf(axis) >= 0) {
-      //   return // ignore
-      // }
-      // if (Math.abs(value) > .999) {
-      //   debug('gamepad move', id, axis, value)
-      // }
-
-      // PS4
-      // if (this.deviceProductIds[id] === 2508) {
-      //   if      (axis === 5 && value <= -0.5) { this.dir = DPAD.UP }
-      //   else if (axis === 5 && value >=  0.5) { this.dir = DPAD.DOWN }
-      //   else if (axis === 4 && value <= -0.5) { this.dir = DPAD.LEFT }
-      //   else if (axis === 4 && value >=  0.5) { this.dir = DPAD.RIGHT }
-      //   else if (axis === 4 && value === 0) { this.dir = undefined }
-      //   else if (axis === 5 && value === 0) { this.dir = undefined }
-      // }
-      this.pressedAxes[axis] = value
-    })
-  }
-  reset() {
+    gamepad.on('up',   (id, num) => this.pressedButtons[num] = false)
+    gamepad.on('down', (id, num) => this.pressedButtons[num] = true)
+    gamepad.on('move', (id, axis, value) => this.pressedAxes[axis] = value)
 
   }
-  dpadDir() {
-    if (this.deviceProductIds[0] === 2508) {
-      if (this.pressedButtons[1] > 0) { return 1 }
-      if (this.pressedAxes[4] < -0.5) { return 2 }
-      if (this.pressedAxes[4] >  0.5) { return 0 }
-      if (this.pressedAxes[5] < -0.5) { return 1 }
-      if (this.pressedAxes[5] >  0.5) { return 3 }
-    }
-  }
-  isDpadPressed() {
-    if (this.deviceProductIds[0] === 2508) {
-      const isPressed = !!(
-             this.pressedButtons[1] // "X"
-          || this.pressedAxes[4] // DPad Left/Right
-          || this.pressedAxes[5] // DPad Up/Down
-      )
-      if (isPressed) debug('Something is pressed on the game controller', this.pressedButtons, 'andThenTheAxesVButtons', this.pressedAxes)
-      return isPressed
-    } else { 
-      //debug('Unsupported Gamepad')
-    }
-    return false
-  }
-  listenToDpad() {
-
-  }
-
-  isSomethingPressed() { return this.isDpadPressed() }
-  listenTo(btns: BUTTON_TYPE[]) {  }
   isButtonPressed(btn: BUTTON_TYPE) {
+    if (this.deviceProductIds.length === 0) { return false }
+
+    // PS4
     if (this.deviceProductIds[0] === 2508) {
       switch(btn) {
-        case BUTTON_TYPE.ARROW_UP:
-          return this.pressedAxes[5] < -0.5
-        case BUTTON_TYPE.ARROW_DOWN:
-          return this.pressedAxes[5] > 0.5
-        case BUTTON_TYPE.ARROW_LEFT:
-          return this.pressedAxes[4] < -0.5
-        case BUTTON_TYPE.ARROW_RIGHT:
-          return this.pressedAxes[4] > 0.5
-        case BUTTON_TYPE.CLUSTER_BOTTOM:
-          return this.pressedButtons[1] > 0.5
-        case BUTTON_TYPE.CLUSTER_TOP:
+        case BUTTON_TYPE.ARROW_UP:    return this.pressedAxes[5] < -0.5
+        case BUTTON_TYPE.ARROW_DOWN:  return this.pressedAxes[5] > 0.5
+        case BUTTON_TYPE.ARROW_LEFT:  return this.pressedAxes[4] < -0.5
+        case BUTTON_TYPE.ARROW_RIGHT: return this.pressedAxes[4] > 0.5
 
-        case BUTTON_TYPE.CLUSTER_LEFT:
-          return false
-        case BUTTON_TYPE.CLUSTER_RIGHT:
+
+        case BUTTON_TYPE.CLUSTER_LEFT:        return this.pressedButtons[0]
+        case BUTTON_TYPE.CLUSTER_BOTTOM:      return this.pressedButtons[1]
+        case BUTTON_TYPE.CLUSTER_RIGHT:       return this.pressedButtons[2]
+        case BUTTON_TYPE.CLUSTER_TOP:         return this.pressedButtons[3]
+        case BUTTON_TYPE.BUMPER_TOP_LEFT:     return this.pressedButtons[4]
+        case BUTTON_TYPE.BUMPER_TOP_RIGHT:    return this.pressedButtons[5]
+        case BUTTON_TYPE.BUMPER_BOTTOM_LEFT:  return this.pressedButtons[6]
+        case BUTTON_TYPE.BUMPER_BOTTOM_RIGHT: return this.pressedButtons[7]
+        case BUTTON_TYPE.SELECT:              return this.pressedButtons[8]
+        case BUTTON_TYPE.START:               return this.pressedButtons[9]
+        case BUTTON_TYPE.STICK_PRESS_LEFT:    return this.pressedButtons[10]
+        case BUTTON_TYPE.STICK_PRESS_RIGHT:   return this.pressedButtons[11]
+        case BUTTON_TYPE.HOME:                return this.pressedButtons[12]
+        case BUTTON_TYPE.TOUCHSCREEN:         return this.pressedButtons[13]
+          
         default:
           throw new Error(`Did not understand button yet. ${btn}`)
       } 

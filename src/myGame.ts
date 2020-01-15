@@ -3,7 +3,7 @@ import {Game, Camera, SpriteController, IGamepad, Image, DefiniteMap, Sprite, In
 export class MyGame implements Game {
   
   load(gamepad: IGamepad, sprites: SpriteController) {
-    gamepad.listenToDpad()
+    gamepad.listenTo([BUTTON_TYPE.ARROW_LEFT, BUTTON_TYPE.ARROW_RIGHT, BUTTON_TYPE.ARROW_DOWN, BUTTON_TYPE.ARROW_UP, BUTTON_TYPE.CLUSTER_BOTTOM])
 
     const images = new DefiniteMap<Image>()
 
@@ -488,7 +488,8 @@ export class MyGame implements Game {
     const player = instances.factory('player', sprites.get('playerStanding'), playerUpdateFn)
     const floor1 = instances.simple(sprites, 'floorOrange1')
     const floor2 = instances.simple(sprites, 'floorOrange2')
-    const floorLedge = instances.simple(sprites, 'floorLedge')
+    const floor3 = instances.simple(sprites, 'floorWhite1')
+    const ledge = instances.simple(sprites, 'floorLedge')
     const wallO = instances.simple(sprites, 'wallOrange')
     const wallC = instances.simple(sprites, 'wallCyan')
     const wall2 = instances.simple(sprites, 'wallBrown')
@@ -500,75 +501,141 @@ export class MyGame implements Game {
     const treeTrunkLeft = instances.simple(sprites, 'treeTrunkLeft')
     const treeTrunkRight = instances.simple(sprites, 'treeTrunkRight')
 
-    function g(item: GameObject<any, any>, pos: IPosition) {
+    function g(item: GameObject<any, any>, pos: IPosition, zIndex: number) {
       // convert from grid coordinates to pixels
-      return item.new({
-        x: pos.x * 8,
+      const o = item.new({
+        x: (pos.x - 6) * 8, // subtract 6 so that the rotation point is the center of the island
         y: pos.y * 8,
       })
+      if (zIndex === 0) { throw new Error('BUG: zIndex is only set to zero for the player')}
+      o.zIndex = zIndex
+      return o
     }
 
 
-    g(floor1, {x:  5, y:  6})
-    g(floor2, {x:  6, y:  6})
-    g(floor1, {x:  7, y:  7})
-    g(floor1, {x:  8, y:  7})
-    g(floor2, {x:  9, y:  7})
-    g(floor2, {x: 10, y:  7})
-    g(floor1, {x: 11, y:  7})
-
-    g(wallO, {x:  5, y:  7})
-    g(wallO, {x:  6, y:  7})
+    g(floor1, {x:  5, y:  6}, 2)
+    g(floor2, {x:  6, y:  6}, 2)
+    g(floor1, {x:  7, y:  7}, 2)
+    g(floor1, {x:  8, y:  7}, 2)
+    g(floor2, {x:  9, y:  7}, 2)
+    g(floor2, {x: 10, y:  7}, 2)
+    g(floor1, {x: 11, y:  7}, 2)
     
-    g(wallC, {x:  6, y:  8})
-    g(wallC, {x:  7, y:  8})
-    g(wallC, {x:  9, y:  8})
-    g(wallC, {x: 10, y:  8})
-    g(wallC, {x:  6, y:  9})
-    g(wallC, {x:  7, y:  9})
-    g(wallC, {x:  9, y:  9})
-    g(wallC, {x: 10, y:  9})
-    g(wallC, {x:  6, y: 10})
-    g(wallC, {x:  7, y: 10})
-    g(wallC, {x:  8, y: 10})
-    g(wallC, {x:  9, y: 10})
-    g(wallC, {x: 10, y: 10})
-    g(wall2, {x:  6, y: 11})
-    g(wallC, {x:  7, y: 11})
-    g(wall2, {x:  8, y: 11})
-    g(wallC, {x:  9, y: 11})
 
-    g(door, {x:  8, y:  9})
+    g(wallO, {x:  5, y:  7}, 2)
+    g(wallO, {x:  6, y:  7}, 2)
+    
+    g(wallC, {x:  6, y:  8}, 2)
+    g(wallC, {x:  7, y:  8}, 2)
+    g(wallC, {x:  9, y:  8}, 2)
+    g(wallC, {x: 10, y:  8}, 2)
+    g(wallC, {x:  6, y:  9}, 2)
+    g(wallC, {x:  7, y:  9}, 2)
+    g(wallC, {x:  9, y:  9}, 2)
+    g(wallC, {x: 10, y:  9}, 2)
+    g(wallC, {x:  6, y: 10}, 2)
+    g(wallC, {x:  7, y: 10}, 2)
+    g(wallC, {x:  8, y: 10}, 3) // because of the sunken-in ledge
+    g(wallC, {x:  9, y: 10}, 2)
+    g(wallC, {x: 10, y: 10}, 2)
+    g(wall2, {x:  6, y: 11}, 3)
+    g(wallC, {x:  7, y: 11}, 3)
+    g(wall2, {x:  8, y: 11}, 3)
+    g(wallC, {x:  9, y: 11}, 3)
+
+    g(door, {x:  8, y:  9}, 2)
 
     // draw these later so they show up on top of wall tiles
-    g(floorLedge, {x:  8, y:  10})
-    g(floorLedge, {x:  5, y:  10})
-    g(floorLedge, {x: 11, y:  10})
-    g(floorLedge, {x:  6, y:   9})
-    g(floorLedge, {x: 10, y:   9})
+    g(ledge, {x:  5, y:  10}, 3)
+    g(ledge, {x:  8, y:  10}, 2)
+    g(ledge, {x: 11, y:  10}, 3)
+    g(ledge, {x:  6, y:   9}, 1)
+    g(ledge, {x: 10, y:   9}, 1)
 
 
-    g(treeTrunkLeft,  {x: 8, y: 6})
-    g(treeTrunkRight, {x: 9, y: 6})
-    g(treeBottom,     {x: 8, y: 5})
-    g(treeBottom,     {x: 9, y: 5})
-    g(treeTopLeft,    {x: 8, y: 4})
-    g(treeTopRight,   {x: 9, y: 4})
+    g(treeTrunkLeft,  {x: 8, y: 6}, 4)
+    g(treeTrunkRight, {x: 9, y: 6}, 5)
+    g(treeBottom,     {x: 8, y: 5}, 4)
+    g(treeBottom,     {x: 9, y: 5}, 5)
+    g(treeTopLeft,    {x: 8, y: 4}, 4)
+    g(treeTopRight,   {x: 9, y: 4}, 5)
 
 
-    g(player, {x:  11, y:  9}).zIndex = 0
+
+    // right side
+    g(floor1, {x: 11, y:  7}, 3)
+    g(floor1, {x: 11, y:  7}, 4)
+    g(floor1, {x: 11, y:  7}, 5)
+    
+    g(floor3, {x: 11, y:  8}, 6) // these are just to keep the player up when rotating
+    g(floor3, {x: 11, y:  8}, 7)
+    g(floor3, {x: 11, y:  8}, 8)
+    g(floor3, {x: 11, y:  8}, 9)
+    g(floor3, {x: 11, y:  8}, 10)
+    g(floor3, {x: 11, y:  8}, 11)
+
+    g(door,   {x: 10, y:  9}, 3)
+    g(door,   {x: 10, y:  9}, 4)
+
+    g(wallC,  {x: 10, y:  8}, 5)
+    g(wallC,  {x: 10, y:  9}, 5)
+
+    // g(wallC,  {x:  9, y: 10}, 4)
+    g(ledge,  {x: 10, y: 10}, 4)
+
+    g(player, {x: 6, y:  0}, 1).props.id = 'player'
 
   }
 
 }
 
+const EVERYTHING_BBOX = {
+  minX: -1000,
+  maxX: 1000,
+  minY: -1000,
+  maxY: 1000,
+}
 
-function playerUpdateFn(o: ObjectInstance<any, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera) {
-  const playerJumping = sprites.get('playerJumping')
-  const playerFalling = sprites.get('playerFalling')
-  const playerWalking = sprites.get('playerWalking')
-  const playerStanding = sprites.get('playerStanding')
+type PlayerProps = {
+  zreal: number
+  xreal: number
+  yreal: number
+  still: number
+  dz: number
+  maxfall: number
+  coyote: number
+  coyotemax: number
+  reswait: number
+  // tile coordinates
+  x: number
+  y: number
+  z: number
+  
+  jump: number
+  landed: boolean
+  lwait: number
+  dropwait: number
+  dwaitmax: number
+  canuse: boolean
+  usewait: number
+  useidle: number
+  mir: boolean // horizontally mirror the sprite
+  frame: number
 
+  dpos: number
+  floor: boolean
+  xlast: number
+  ylast: number
+  zlast: number
+
+  slast: number // side last
+  open: boolean // not sure of the type
+  olast: boolean
+
+  side: number // the world orientation
+}
+
+function playerUpdateFn(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera) {
   const floors = [
     sprites.get('treeTopLeft'),
     sprites.get('treeTopRight'),
@@ -579,10 +646,11 @@ function playerUpdateFn(o: ObjectInstance<any, any>, gamepad: IGamepad, collisio
     sprites.get('floorLedge'),
   ]
 
+  // initialize the props
   if (o.props.zreal === undefined) {
-    o.props.xreal = 40
-    o.props.yreal = 30
-    o.props.zreal = 100
+    o.props.xreal = to_real(o.pos.x)
+    o.props.yreal = to_real(o.pos.y)
+    o.props.zreal = to_real(o.zIndex)
     o.props.still = 0
     o.props.dz = -3 // since we start out mid-air
     o.props.maxfall = -9
@@ -603,18 +671,33 @@ function playerUpdateFn(o: ObjectInstance<any, any>, gamepad: IGamepad, collisio
     o.props.mir = false
     o.props.frame = 0
     o.props.still = 165
+
+    o.props.side = 0 // front
+
+    // initialize the 3D coordinates for each object
+    collisionChecker.searchBBox(EVERYTHING_BBOX)
+    .forEach(ob => {
+      ob.props.x = from_real(ob.pos.x)
+      ob.props.y = from_real(ob.pos.y)
+      ob.props.z = checkNaN(ob.zIndex)
+    })
+
+    // the player is always in front
+    o.zIndex = 0
   }
 
   move_player(o, gamepad, collisionChecker, sprites, instances, camera, floors)
   draw_player(true, o, sprites)
 
-  console.error(o.pos)
-  console.error(o.props)
-
+  camera.pos = {
+    x: o.pos.x,
+    y: camera.pos.y
+  }
+  
 }
 
 
-function move_player(o: ObjectInstance<any, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, floors: Sprite[]) {
+function move_player(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, floors: Sprite[]) {
   const p = o.props
 
   const n1 = -1 // negativeOne just to reduce tokens
@@ -630,6 +713,8 @@ function move_player(o: ObjectInstance<any, any>, gamepad: IGamepad, collisionCh
    // actions
    if (p.lwait > 0) { p.lwait -= 1 }
    if (intro >= 85) {
+      if (gamepad.isButtonPressed(BUTTON_TYPE.BUMPER_TOP_LEFT)) { rotate_world(-1, o, collisionChecker) }
+      if (gamepad.isButtonPressed(BUTTON_TYPE.BUMPER_TOP_RIGHT)) { rotate_world(+1, o, collisionChecker) }
       // rotate right
       if (gamepad.isButtonPressed(BUTTON_TYPE.CLUSTER_BOTTOM) && p.landed) {
          r_dir = n1
@@ -693,7 +778,7 @@ function flr(n: number) {
   return Math.floor(n)
 }
 
-function pgetpos(o: ObjectInstance<any, any>) {
+function pgetpos(o: ObjectInstance<PlayerProps, any>) {
   o.props.x = from_real(o.props.xreal)
   o.props.y = from_real(o.props.yreal)
   o.props.z = from_real(o.props.zreal)
@@ -709,7 +794,7 @@ function to_real(n: number) {
 
 function savelast() { }
 
-function find_floor(layerNum: any, o: ObjectInstance<any, any>, collisionChecker: CollisionChecker, floors: Sprite[]) {
+function find_floor(layerNum: any, o: ObjectInstance<PlayerProps, any>, collisionChecker: CollisionChecker, floors: Sprite[]) {
 
   const bbox = o.toBBox()
   const x = Math.round((bbox.maxX + bbox.minX) / 2)
@@ -734,7 +819,7 @@ function find_floor(layerNum: any, o: ObjectInstance<any, any>, collisionChecker
 
 
 
-function pzmove(o: ObjectInstance<any, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, floors: Sprite[]) {
+function pzmove(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, floors: Sprite[]) {
   const p = o.props
 
   const n1 = -1 // negativeOne just to reduce tokens
@@ -785,7 +870,7 @@ function pzmove(o: ObjectInstance<any, any>, gamepad: IGamepad, collisionChecker
             p.dropwait = 0
          }
          // execute jump/drop
-         if (gamepad.isButtonPressed(BUTTON_TYPE.ARROW_UP) || p.dropwait >= p.dwaitmax) {
+         if (gamepad.isButtonPressed(BUTTON_TYPE.ARROW_UP) || gamepad.isButtonPressed(BUTTON_TYPE.CLUSTER_BOTTOM) || p.dropwait >= p.dwaitmax) {
             if (p.dropwait >= 5) {
               debugger
                p.dz = -2
@@ -912,4 +997,46 @@ function checkNaN(n: number) {
     throw new Error('Expected number to not be NaN but failed')
   }
   return n
+}
+
+
+
+function rotate_world(dir: number, o: ObjectInstance<PlayerProps, any>, collisionChecker: CollisionChecker) {
+  o.props.side = (o.props.side + dir + 4) % 4
+  const things = collisionChecker.searchBBox(EVERYTHING_BBOX)
+  things.forEach(ob => {
+    let x = 0
+    let y = 0
+    let z = 0
+    switch (o.props.side) {
+      case 0: // front
+        x = ob.props.x
+        y = ob.props.y
+        z = ob.props.z
+        break
+      case 1: // right
+        x = ob.props.z
+        y = ob.props.y
+        z = ob.props.x
+        break
+      case 2: // back
+        x = -ob.props.x
+        y = ob.props.y
+        z = 1000 - ob.props.z // since zIndex needs to be positive
+        break
+      case 3: // left
+        x = -ob.props.z
+        y = ob.props.y
+        z = 1000 - ob.props.x
+        break
+      default: throw new Error(`BUG: Invalid side "${o.props.side}"`)
+    }
+    ob.moveTo({
+      x: to_real(x),
+      y: to_real(y),
+    })
+    if (z <= 0) { throw new Error(`BUG: zIndex should always be > 0 but it was "${z}"`)}
+    ob.zIndex = z
+  })
+
 }

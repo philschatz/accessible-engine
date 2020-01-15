@@ -231,7 +231,7 @@ export class Engine {
     }
     this.curTick++
 
-        // Update each object
+    // Update each object
     // TODO: Only update objects in view or ones that have an alwaysUpdate=true flag set (TBD)
     this.bush.all().forEach(i => {
       i.static.updateFn(i, this.gamepad, this.collisionChecker, this.sprites, this.instances, this.camera)
@@ -313,10 +313,10 @@ export class Camera {
   public toBBox(): BBox {
     const {width, height} = this.dim
     return {
-      minX: this.pos.x,
-      maxX: this.pos.x + width,
-      minY: this.pos.y,
-      maxY: this.pos.y + height
+      minX: this.pos.x - width / 2,
+      maxX: this.pos.x + width / 2,
+      minY: this.pos.y - height / 2,
+      maxY: this.pos.y + height / 2
     }
   }
 }
@@ -389,12 +389,6 @@ export enum DIRECTION {
 }
 
 export interface IGamepad {
-  reset(): void
-  dpadDir(): number
-  isDpadPressed(): boolean
-  listenToDpad()
-
-  isSomethingPressed(): boolean
   listenTo(btns: BUTTON_TYPE[])
   isButtonPressed(btn: BUTTON_TYPE): boolean
 }
@@ -446,23 +440,6 @@ export class OrGamepad implements IGamepad {
     this.pads = pads
   }
 
-  reset() {
-    this.pads.forEach(p => p.reset())
-  }
-
-  dpadDir() {
-    const p = this.pads.find(p => p.isDpadPressed())
-    return p ? p.dpadDir() : undefined
-  }
-  isDpadPressed() {
-    return !!this.pads.find(p => p.isDpadPressed())
-  }
-  listenToDpad() {
-    this.pads.forEach(p => p.listenToDpad())
-  }
- 
-
-  isSomethingPressed() { for (const pad of this.pads) { if (pad.isSomethingPressed()) { return true } } return false }
   listenTo(btns: BUTTON_TYPE[]) { for (const pad of this.pads) { pad.listenTo(btns) } }
   isButtonPressed(btn: BUTTON_TYPE) { for (const pad of this.pads) { if (pad.isButtonPressed(btn)) { return true } } return false }
 }
