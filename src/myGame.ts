@@ -1,4 +1,5 @@
 import {Game, Camera, SpriteController, IGamepad, Image, DefiniteMap, Sprite, InstanceController, DPAD, ObjectInstance, CollisionChecker, IPosition, GameObject, BUTTON_TYPE} from './engine'
+import {setMoveTo} from './terminal'
 
 export class MyGame implements Game {
   
@@ -478,6 +479,87 @@ export class MyGame implements Game {
       [K,K,K,K,K,K,K,K],
     ]))
 
+
+    images.add('caveOpenLeft', new Image([ // 172 & 188
+      [c,W,c,W,c,W,W,W],
+      [P,c,P,c,P,P,P,c],
+      [c,W,c,W,K,K,K,K],
+      [P,c,P,c,K,K,K,K],
+      [c,W,W,W,K,K,K,K],
+      [P,c,c,W,K,K,K,K],
+      [P,c,c,W,K,K,K,K],
+      [P,P,P,c,K,K,K,K],
+
+      [c,W,W,W,K,K,K,K],
+      [P,c,c,W,K,K,K,K],
+      [P,c,c,W,K,K,K,K],
+      [P,P,P,c,K,K,K,K],
+      [c,W,W,W,K,K,K,K],
+      [P,c,c,W,K,K,K,K],
+      [P,c,c,W,K,K,K,K],
+      [P,P,P,c,K,K,K,K],
+    ]))
+
+    images.add('caveOpenRight', new Image([ // 173 & 189
+      [c,W,W,W,c,W,c,W],
+      [P,P,P,c,P,c,P,c],
+      [K,K,K,K,c,W,c,W],
+      [K,K,K,K,P,c,P,c],
+      [K,K,K,K,c,W,W,W],
+      [K,K,K,K,P,c,c,W],
+      [K,K,K,K,P,c,c,W],
+      [K,K,K,K,P,P,P,c],
+
+      [K,K,K,K,c,W,W,W],
+      [K,K,K,K,P,c,c,W],
+      [K,K,K,K,P,c,c,W],
+      [K,K,K,K,P,P,P,c],
+      [K,K,K,K,c,W,W,W],
+      [K,K,K,K,P,c,c,W],
+      [K,K,K,K,P,c,c,W],
+      [K,K,K,K,P,P,P,c],
+    ]))
+
+    images.add('caveCloseLeft', new Image([ // 172 & 188
+      [c,W,c,W,c,W,W,W],
+      [P,c,P,c,P,P,P,c],
+      [c,W,c,W,c,c,c,c],
+      [P,c,P,c,c,c,c,c],
+      [c,W,W,W,c,c,c,c],
+      [P,c,c,W,c,c,c,c],
+      [P,c,c,W,c,c,c,c],
+      [P,P,P,c,c,c,c,P],
+
+      [c,W,W,W,c,c,c,P],
+      [P,c,c,W,c,c,c,c],
+      [P,c,c,W,c,c,c,c],
+      [P,P,P,c,c,c,c,c],
+      [c,W,W,W,c,c,c,c],
+      [P,c,c,W,c,c,c,c],
+      [P,c,c,W,c,c,c,c],
+      [P,P,P,c,c,c,c,c],
+    ]))
+
+    images.add('caveCloseRight', new Image([ // 173 & 189
+      [c,W,W,W,c,W,c,W],
+      [P,P,P,c,P,c,P,c],
+      [c,c,c,c,c,W,c,W],
+      [c,c,c,c,P,c,P,c],
+      [c,c,c,c,c,W,W,W],
+      [c,c,c,c,P,c,c,W],
+      [c,c,c,c,P,c,c,W],
+      [P,c,c,c,P,P,P,c],
+
+      [P,c,c,c,c,W,W,W],
+      [c,c,c,c,P,c,c,W],
+      [c,c,c,c,P,c,c,W],
+      [c,c,c,c,P,P,P,c],
+      [c,c,c,c,c,W,W,W],
+      [c,c,c,c,P,c,c,W],
+      [c,c,c,c,P,c,c,W],
+      [c,c,c,c,P,P,P,c],
+    ]))
+
     // Add all the images as single-image sprites too.
     for (const [name, image] of images.entries()) {
       sprites.add(name, Sprite.forSingleImage(image))
@@ -494,6 +576,10 @@ export class MyGame implements Game {
     const wallC = instances.simple(sprites, 'wallCyan')
     const wall2 = instances.simple(sprites, 'wallBrown')
     const door = instances.simple(sprites, 'door')
+    const caveOpenLeft = instances.simple(sprites, 'caveOpenLeft')
+    const caveOpenRight = instances.simple(sprites, 'caveOpenRight')
+    const caveCloseLeft = instances.simple(sprites, 'caveCloseLeft')
+    const caveCloseRight = instances.simple(sprites, 'caveCloseRight')
 
     const treeTopLeft = instances.simple(sprites, 'treeTopLeft')
     const treeTopRight = instances.simple(sprites, 'treeTopRight')
@@ -501,7 +587,14 @@ export class MyGame implements Game {
     const treeTrunkLeft = instances.simple(sprites, 'treeTrunkLeft')
     const treeTrunkRight = instances.simple(sprites, 'treeTrunkRight')
 
+    const validator = {}
     function g(item: GameObject<any, any>, pos: IPosition, zIndex: number) {
+      const key = `${pos.x}, ${pos.y}, ${zIndex}`
+      if (validator[key]) {
+        throw new Error(`BUG: 2 voxels in the same spot: ${key}`)
+      }
+      validator[key] = true
+
       // convert from grid coordinates to pixels
       const o = item.new({
         x: pos.x * 8,
@@ -574,20 +667,27 @@ export class MyGame implements Game {
     g(floor3, {x: 11, y:  8}, 10)
     g(floor3, {x: 11, y:  8}, 11)
 
-    g(door,   {x: 10, y:  9}, 3)
-    g(door,   {x: 10, y:  9}, 4)
-    g(wallC,  {x: 10, y:  8}, 5)
-    g(wallC,  {x: 10, y:  9}, 5)
+    g(caveOpenRight,   {x: 10, y:  9}, 3)
+    g(caveOpenLeft,    {x: 10, y:  9}, 4)
+    g(wallC,           {x: 10, y:  8}, 5)
+    g(wallC,           {x: 10, y:  9}, 5)
     // g(wallC,  {x:  9, y: 10}, 4)
-    g(ledge,  {x: 10, y: 10}, 4)
+    g(ledge,           {x: 10, y: 10}, 4)
+
+
+    // left side
+    g(caveCloseLeft,   {x:  6, y:  9}, 3)
+    g(caveCloseRight,  {x:  6, y:  9}, 4)
+    g(wallC,           {x:  6, y:  8}, 5)
+    g(wallC,           {x:  6, y:  9}, 5)
 
 
     // back side
     g(wall2, {x:  8, y:  8}, 3)
     g(wall2, {x:  8, y:  9}, 3)
-    g(ledge, {x:  8, y: 10}, 3)
+    g(ledge, {x:  8, y: 10}, 4) // since the front ledge was recessed
     g(wallC, {x:  8, y: 11}, 2)
-    g(wallC, {x:  7, y: 11}, 3)
+    // g(wallC, {x:  7, y: 11}, 3)
     g(wallC, {x:  6, y: 11}, 2)
 
 
@@ -699,6 +799,9 @@ function playerUpdateFn(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, 
   move_player(o, gamepad, collisionChecker, sprites, instances, camera, floors)
   draw_player(true, o, sprites)
 
+  // Log the player's coordinates
+  process.stdout.write(setMoveTo(0, 0))
+  console.log(`Player: grid=(${o.props.x},${o.props.y},${o.props.z}H) win=(${o.pos.x},${o.pos.y}) Real=(${o.props.xreal},${o.props.yreal},${o.props.zreal}H)      `)
 }
 
 

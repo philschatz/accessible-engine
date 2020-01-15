@@ -213,6 +213,7 @@ export class DoubleTerminalRenderer implements IRenderer {
       setMoveTo(pos.x * 2, pos.y) +
       setBgColor(hex) +
       '  ' +
+      setMoveTo(1, 1) + 
       setBgColor(BLACK) // reset back to black
     )
     this.pixelsOnScreen.set(pos, hex)
@@ -260,6 +261,7 @@ export class TerminalRenderer implements IRenderer {
       setFgColor(bottomHex) +
       setBgColor(topHex) +
       '▄' +
+      setMoveTo(1, 1) + 
       setFgColor(WHITE) + // reset fg to white
       setBgColor(BLACK) // reset back to black
     )
@@ -308,7 +310,7 @@ function writeBgColor(hex: string) {
 function writeFgColor(hex: string) {
     process.stdout.write(setFgColor(hex))
 }
-function setMoveTo(x: number, y: number) {
+export function setMoveTo(x: number, y: number) {
     return ansiEscapes.cursorTo(x, y)
 }
 function setShowCursor() {
