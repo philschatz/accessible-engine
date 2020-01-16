@@ -188,11 +188,11 @@ export class CollisionChecker {
   }
 
   searchBBox(bbox: BBox) {
-    return this.bush.search(bbox)
+    return this.bush.search(bbox) //.sort(zIndexComparator)
   }
 
   searchPoint(pos: IPosition) {
-    return this.bush.search({
+    return this.searchBBox({
       minX: pos.x,
       maxX: pos.x,
       minY: pos.y,
@@ -245,17 +245,7 @@ export class Engine {
     const tiles = this.bush.search(this.camera.toBBox())
 
     // Lower zIndex needs to be drawn later
-    tiles.sort((a, b) => {
-      if (a.zIndex === undefined && b.zIndex === undefined) {
-        return 0
-      } else if (b.zIndex === undefined) {
-        return 1
-      } else if (a.zIndex === undefined) {
-        return -1
-      } else {
-        return b.zIndex - a.zIndex
-      }
-    })
+    tiles.sort(zIndexComparator)
 
     this.renderer.drawStart()
     for (const t of tiles) {
@@ -442,4 +432,17 @@ export class OrGamepad implements IGamepad {
 
   listenTo(btns: BUTTON_TYPE[]) { for (const pad of this.pads) { pad.listenTo(btns) } }
   isButtonPressed(btn: BUTTON_TYPE) { for (const pad of this.pads) { if (pad.isButtonPressed(btn)) { return true } } return false }
+}
+
+
+export function zIndexComparator(a: ObjectInstance<any, any>, b: ObjectInstance<any, any>) {
+  if (a.zIndex === undefined && b.zIndex === undefined) {
+    return 0
+  } else if (b.zIndex === undefined) {
+    return 1
+  } else if (a.zIndex === undefined) {
+    return -1
+  } else {
+    return b.zIndex - a.zIndex
+  }
 }

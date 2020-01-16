@@ -1,4 +1,4 @@
-import {Game, Camera, SpriteController, IGamepad, Image, DefiniteMap, Sprite, InstanceController, DPAD, ObjectInstance, CollisionChecker, IPosition, GameObject, BUTTON_TYPE} from './engine'
+import {Game, Camera, SpriteController, IGamepad, Image, DefiniteMap, Sprite, InstanceController, DPAD, ObjectInstance, CollisionChecker, IPosition, GameObject, BUTTON_TYPE, zIndexComparator} from './engine'
 import {setMoveTo} from './terminal'
 
 export class MyGame implements Game {
@@ -693,7 +693,7 @@ export class MyGame implements Game {
 
     
 
-    g(player, {x: 11, y:  9}, 1)
+    g(player, {x: 11, y:  2}, 1)
 
   }
 
@@ -743,6 +743,8 @@ type PlayerProps = {
   olast: boolean
 
   side: number // the world orientation
+
+  shadowed: boolean
 }
 
 function playerUpdateFn(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera) {
@@ -783,6 +785,8 @@ function playerUpdateFn(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, 
     o.props.still = 165
 
     o.props.side = 0 // front
+
+    o.props.shadowed = false
 
     // initialize the 3D coordinates for each object
     collisionChecker.searchBBox(EVERYTHING_BBOX)
@@ -907,21 +911,155 @@ function to_real(n: number) {
 
 function savelast() { }
 
-function find_floor(layerNum: any, o: ObjectInstance<PlayerProps, any>, collisionChecker: CollisionChecker, floors: Sprite[]) {
+function find_floor(layer: number, o: ObjectInstance<PlayerProps, any>, collisionChecker: CollisionChecker, floors: Sprite[]) {
 
+  const p = o.props
   const bbox = o.toBBox()
   const x = Math.round((bbox.maxX + bbox.minX) / 2)
-  const itemsBelow = collisionChecker.searchBBox({
+
+
+  // Find out if there are walls in front of us
+  const walls = collisionChecker.searchBBox(bbox)
+  .filter(thing => thing !== o) // exclude the player
+  .sort(zIndexComparator)
+  
+  let hasWallsInFront = false
+  if (walls.length > 0) {
+    const front = walls[0]
+    switch (p.side) {
+      case 0: hasWallsInFront = front.props.z <= p.y; break // front
+      case 2: hasWallsInFront = front.props.z >= p.y; break // back
+      case 1: hasWallsInFront = front.props.x <= p.x; break // left
+      case 3: hasWallsInFront = front.props.x >= p.x; break // right
+    }
+  }
+
+  // check if there is a floor below
+  const floorsBelow = collisionChecker.searchBBox({
     minX: x,
     maxX: x,
     minY: bbox.maxY + 1, // chose these because jumping does not result in mid-air player
     maxY: bbox.maxY + 7,
   })
   .filter(item => floors.indexOf(item.sprite) >= 0) // only look at the floors
+  .sort(zIndexComparator)
 
-  return itemsBelow.length !== 0
+  p.shadowed = hasWallsInFront
+  if (hasWallsInFront) {
+    // look for floors in the back (reverse the list)
+    floorsBelow.reverse()
+  }
+  
+  if (floorsBelow.length > 0) {
+    // Shift the player to be above the floor
+    const front = floorsBelow[0]
+    switch (p.side) {
+      case 0: p.yreal = to_real(front.props.z) + 4; break // front
+      case 2: p.yreal = to_real(front.props.z) - 4; break // back
+      case 1: p.xreal = to_real(front.props.x) + 4; break // left
+      case 3: p.xreal = to_real(front.props.x) - 4; break // right
+    }
+  } else if (walls.length > 0) {
+    // move player to front
+    const front = walls[0]
+    switch (p.side) {
+      case 0: p.yreal = to_real(front.props.z) - 1; break // front
+      case 2: p.yreal = to_real(front.props.z) + 1; break // back
+      case 1: p.xreal = to_real(front.props.x) - 1; break // left
+      case 3: p.xreal = to_real(front.props.x) + 1; break // right
+    }
+  }
+
+  return floorsBelow.length !== 0
 }
 
+function ismid(x: number, a: number, z: number) {
+  return a <= x && x <= z
+}
+
+// function find_floor(layer: number, o: ObjectInstance<PlayerProps, any>, collisionChecker: CollisionChecker, floors: Sprite[]) {
+//   let p = o.props
+
+//   const area = 0 // which room aka level
+//   const sfront = p.side === 0
+//   const sleft = p.side === 1
+//   const sback = p.side === 2
+//   const sright = p.side === 3
+//   let tile = 0
+//   let minpos = 1
+//   let maxpos = 8
+//   let floorz = []
+//   let walls = []
+//   // min/maxpos are min/max player coord
+//   // if outside map, don't collide
+//   if (!ismid(layer,1,12)) {
+//     // if falling in front, move to front
+//     if ((sfront && p.y >= 8) || 
+//         (sleft && p.x <= 1) ||
+//         (sback && p.y <= 1) || 
+//         (sright && p.y >= 12)) {
+//       p.open = true
+//     }
+//     return false
+
+//     // front view
+//   } else if (sfront) {
+//     if (ismid(p.x,0,11)) {
+//      let ppos = 8 - p.y
+//      let xlr = p.x + 12 * area
+//      // 1. grab spritesheet columns
+//      for (let i = 0; i < 7; i++) {
+//       let ylr = 8*layer-i
+//       add(floors,sget(xlr,ylr+31))
+//       add(walls,sget(xlr,ylr+39))
+//      }
+//      // 2. locate front wall
+//      //  (skip if (at front)
+//      if (! p.open && ppos > 1) {
+//       for (let i=ppos-1; i > 1; i--) {
+//        tile = walls[i]
+//        if (tile > 0) {
+//         minpos = i+1
+//         p.open = false
+//         break
+//        }
+//       }
+//       // if no walls hit
+//       if (minpos <= 1) {
+//        p.open = true
+//       }
+//     } else {
+//      // already at front
+//       p.open = true
+//     }
+//      // 3. find back wall
+//      if (p.open) {
+//       for (let i=1; i < 8; i++) {
+//        tile = walls[i]
+//        if (tile > 0) {
+//         maxpos = i
+//         break
+//        }
+//       }
+//     }
+//      // 4. find nearest floor to camera
+//      for (let i=minpos; i < maxpos; i++) {
+//       tile = floors[i]
+//       if (ismid(tile,1,9)) {
+//        p.yreal = (8-i)*8+4
+//        return true
+//       }
+//     }
+//      // 5. if no floor, jump to front
+//      p.yreal = (8-minpos)*8+4
+//      // (then go to eof)
+//   } else {
+//      // if off side of map, exposed
+//      p.open = true
+//   }
+//   }
+
+// }
 
 
 
@@ -1055,7 +1193,7 @@ function draw_player(front: boolean, o: ObjectInstance<any, any>, sprites: Sprit
     console.log('Draw shadowed sprite')
   }
   let sp = playerStanding
-  // if (happy > 0) { sp = happySprite }
+  // if happy > 0) { sp = happySprite }
   /*else*/ if (p.dz > 0 || istalk()) { sp = playerJumping }
   else if (p.floor == false) { sp = playerFalling }
   else if (p.dpos != 0) { sp = playerWalking }
@@ -1116,19 +1254,20 @@ function checkNaN(n: number) {
 
 
 function rotate_world(dir: number, o: ObjectInstance<PlayerProps, any>, collisionChecker: CollisionChecker) {
-  o.props.side = (o.props.side + dir + 4) % 4
+  const p = o.props
+  p.side = (p.side + dir + 4) % 4
   const things = collisionChecker.searchBBox(EVERYTHING_BBOX)
   things.forEach(ob => {
     let x = 0
     let y = 0
     let z = 0
-    switch (o.props.side) {
+    switch (p.side) {
       case 0: // front
         x = ob.props.x
         y = ob.props.y
         z = ob.props.z
         break
-      case 1: // right
+      case 1: // left
         x = ob.props.z
         y = ob.props.y
         z = ob.props.x
@@ -1138,12 +1277,12 @@ function rotate_world(dir: number, o: ObjectInstance<PlayerProps, any>, collisio
         y = ob.props.y
         z = 1000 - ob.props.z // since zIndex needs to be positive
         break
-      case 3: // left
+      case 3: // right
         x = 12-ob.props.z
         y = ob.props.y
         z = 1000 - ob.props.x
         break
-      default: throw new Error(`BUG: Invalid side "${o.props.side}"`)
+      default: throw new Error(`BUG: Invalid side "${p.side}"`)
     }
     ob.moveTo({
       x: to_real(x),
