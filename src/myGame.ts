@@ -666,6 +666,15 @@ export class MyGame implements Game {
     g(floor3, {x: 11, y:  8}, 9)
     g(floor3, {x: 11, y:  8}, 10)
     g(floor3, {x: 11, y:  8}, 11)
+    g(floor3, {x: 11, y:  8}, 12)
+    g(floor3, {x: 11, y:  8}, 13)
+    g(floor3, {x: 11, y:  8}, 14)
+    g(floor3, {x: 11, y:  8}, 15)
+    g(floor3, {x: 11, y:  8}, 16)
+    g(floor3, {x: 11, y:  8}, 17)
+    g(floor3, {x: 11, y:  8}, 18)
+    g(floor3, {x: 11, y:  8}, 19)
+    g(floor1, {x: 11, y:  8}, 20)
 
     g(caveOpenRight,   {x: 10, y:  9}, 3)
     g(caveOpenLeft,    {x: 10, y:  9}, 4)
@@ -805,11 +814,8 @@ function playerUpdateFn(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, 
   move_player(o, gamepad, collisionChecker, sprites, instances, camera, floors)
   draw_player(true, o, sprites)
 
-  camera.pos = {
-    x: 20, // o.pos.x,
-    y: 128 / 2
-  }
 
+  camera.nudge(o.pos, 40, 10)
   // Log the player's coordinates
   process.stdout.write(setMoveTo(0, 0))
   console.log(`Player: grid=(${o.props.x},${o.props.y},${o.props.z}H) win=(${o.pos.x},${o.pos.y}) Real=(${o.props.xreal},${o.props.yreal},${o.props.zreal}H)      `)
@@ -981,96 +987,6 @@ function find_floor(layer: number, o: ObjectInstance<PlayerProps, any>, collisio
 function ismid(x: number, a: number, z: number) {
   return a <= x && x <= z
 }
-
-// function find_floor(layer: number, o: ObjectInstance<PlayerProps, any>, collisionChecker: CollisionChecker, floors: Sprite[]) {
-//   let p = o.props
-
-//   const area = 0 // which room aka level
-//   const sfront = p.side === 0
-//   const sleft = p.side === 1
-//   const sback = p.side === 2
-//   const sright = p.side === 3
-//   let tile = 0
-//   let minpos = 1
-//   let maxpos = 8
-//   let floorz = []
-//   let walls = []
-//   // min/maxpos are min/max player coord
-//   // if outside map, don't collide
-//   if (!ismid(layer,1,12)) {
-//     // if falling in front, move to front
-//     if ((sfront && p.y >= 8) || 
-//         (sleft && p.x <= 1) ||
-//         (sback && p.y <= 1) || 
-//         (sright && p.y >= 12)) {
-//       p.open = true
-//     }
-//     return false
-
-//     // front view
-//   } else if (sfront) {
-//     if (ismid(p.x,0,11)) {
-//      let ppos = 8 - p.y
-//      let xlr = p.x + 12 * area
-//      // 1. grab spritesheet columns
-//      for (let i = 0; i < 7; i++) {
-//       let ylr = 8*layer-i
-//       add(floors,sget(xlr,ylr+31))
-//       add(walls,sget(xlr,ylr+39))
-//      }
-//      // 2. locate front wall
-//      //  (skip if (at front)
-//      if (! p.open && ppos > 1) {
-//       for (let i=ppos-1; i > 1; i--) {
-//        tile = walls[i]
-//        if (tile > 0) {
-//         minpos = i+1
-//         p.open = false
-//         break
-//        }
-//       }
-//       // if no walls hit
-//       if (minpos <= 1) {
-//        p.open = true
-//       }
-//     } else {
-//      // already at front
-//       p.open = true
-//     }
-//      // 3. find back wall
-//      if (p.open) {
-//       for (let i=1; i < 8; i++) {
-//        tile = walls[i]
-//        if (tile > 0) {
-//         maxpos = i
-//         break
-//        }
-//       }
-//     }
-//      // 4. find nearest floor to camera
-//      for (let i=minpos; i < maxpos; i++) {
-//       tile = floors[i]
-//       if (ismid(tile,1,9)) {
-//        p.yreal = (8-i)*8+4
-//        return true
-//       }
-//     }
-//      // 5. if no floor, jump to front
-//      p.yreal = (8-minpos)*8+4
-//      // (then go to eof)
-//   } else {
-//      // if off side of map, exposed
-//      p.open = true
-//   }
-//   }
-
-// }
-
-
-
-
-
-
 
 
 
@@ -1293,9 +1209,8 @@ function rotate_world(dir: number, o: ObjectInstance<PlayerProps, any>, collisio
       x: to_real(x),
       y: to_real(y),
     })
-    // if (z <= 0) { throw new Error(`BUG: zIndex should always be > 0 but it was "${z}"`)}
     ob.zIndex = z
   })
-  o.props.zreal += 1 // for ome reason the player falls through when we rotate
+  o.props.zreal += 1 // for some reason the player falls through when we rotate
   o.zIndex = -1000 // player is always on top
 }

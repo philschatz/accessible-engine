@@ -218,7 +218,7 @@ export class Engine {
     this.collisionChecker = new CollisionChecker(this.bush)
     this.sprites = new DefiniteMap<Sprite>()
     this.instances = new InstanceController(this.bush)
-    this.camera = new Camera({width: 128, height: 128})
+    this.camera = new Camera({width: 128, height: 96})
     this.gamepad = gamepad
     this.renderer = renderer
     this.game = game
@@ -319,6 +319,31 @@ export class Camera {
       y: bbox.minY
     }
   }
+
+  track(target: IPosition) {
+    this.pos = target
+  }
+
+  nudge(target: IPosition, xAmount: number | null, yAmount: number | null) {
+    const {x, y} = this.pos
+  
+    this.pos = {
+      x: boxNudge(x, target.x, xAmount),
+      y: boxNudge(y, target.y, yAmount)
+    }  
+  }
+}
+
+function boxNudge(source: number, target: number, leashLength: number | null) {
+  if (leashLength === null) return source
+
+  let diff = target - source
+  if (diff > leashLength) {
+    return source + (diff - leashLength)
+  } else if (diff < -leashLength) {
+    return source + (diff + leashLength)
+  }
+  return source
 }
 
 type UpdateFn<P, S> = (o: ObjectInstance<P, S>, gamepad: IGamepad, collisionCheker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera) => void
