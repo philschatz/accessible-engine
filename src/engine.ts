@@ -252,7 +252,7 @@ export class Engine {
       if (t.startTick === 0) { t.startTick = this.curTick }
       const image = t.sprite.tick(t.startTick, this.curTick)
       if (!image) { throw new Error(`BUG: Could not find image for the sprite.`)}
-      const screenPos = relativeTo({x: t.pos.x, y: t.pos.y - image.pixels.length + 1 /* Shift the image up because it might not be a 8x8 sprite, like if it is a tall person */}, this.camera.pos)
+      const screenPos = relativeTo({x: t.pos.x, y: t.pos.y - image.pixels.length + 1 /* Shift the image up because it might not be a 8x8 sprite, like if it is a tall person */}, this.camera.topLeft())
       this.drawPixels(screenPos, image.pixels, t.hFlip, false)
     }
     this.renderer.drawEnd()
@@ -302,11 +302,21 @@ export class Camera {
 
   public toBBox(): BBox {
     const {width, height} = this.dim
+    const w = width / 2
+    const h = height / 2
     return {
-      minX: this.pos.x,
-      maxX: this.pos.x + width,
-      minY: this.pos.y,
-      maxY: this.pos.y + height
+      minX: this.pos.x - w,
+      maxX: this.pos.x + w,
+      minY: this.pos.y - h,
+      maxY: this.pos.y + h
+    }
+  }
+
+  public topLeft(): IPosition {
+    const bbox = this.toBBox()
+    return {
+      x: bbox.minX,
+      y: bbox.minY
     }
   }
 }

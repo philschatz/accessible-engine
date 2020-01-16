@@ -597,11 +597,11 @@ export class MyGame implements Game {
 
       // convert from grid coordinates to pixels
       const o = item.new({
-        x: pos.x * 8,
+        x: (pos.x - 6) * 8,
         y: pos.y * 8,
       })
-      if (zIndex === 0) { throw new Error('BUG: zIndex is only set to zero for the player')}
-      o.zIndex = zIndex
+      
+      o.zIndex = zIndex - 2
       return o
     }
 
@@ -745,6 +745,7 @@ type PlayerProps = {
   side: number // the world orientation
 
   shadowed: boolean
+  rotateCooldown: number
 }
 
 function playerUpdateFn(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera) {
@@ -760,7 +761,7 @@ function playerUpdateFn(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, 
 
   // initialize the props
   if (o.props.zreal === undefined) {
-    o.props.xreal = 40
+    o.props.xreal = 0
     o.props.yreal = 30
     o.props.zreal = 100
     o.props.still = 0
@@ -787,6 +788,7 @@ function playerUpdateFn(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, 
     o.props.side = 0 // front
 
     o.props.shadowed = false
+    o.props.rotateCooldown = 0
 
     // initialize the 3D coordinates for each object
     collisionChecker.searchBBox(EVERYTHING_BBOX)
@@ -797,11 +799,16 @@ function playerUpdateFn(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, 
     })
 
     // the player is always in front
-    o.zIndex = 0
+    o.zIndex = -1000
   }
 
   move_player(o, gamepad, collisionChecker, sprites, instances, camera, floors)
   draw_player(true, o, sprites)
+
+  camera.pos = {
+    x: 20, // o.pos.x,
+    y: 128 / 2
+  }
 
   // Log the player's coordinates
   process.stdout.write(setMoveTo(0, 0))
@@ -811,6 +818,8 @@ function playerUpdateFn(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, 
 
 function move_player(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, floors: Sprite[]) {
   const p = o.props
+
+  if (p.rotateCooldown > 0) { p.rotateCooldown -= 1 }
 
   const n1 = -1 // negativeOne just to reduce tokens
   // only 1 of these is true
@@ -825,13 +834,9 @@ function move_player(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, col
    // actions
    if (p.lwait > 0) { p.lwait -= 1 }
    if (intro >= 85) {
-      if (gamepad.isButtonPressed(BUTTON_TYPE.BUMPER_TOP_LEFT))  { rotate_world(-1, o, collisionChecker) }
-      if (gamepad.isButtonPressed(BUTTON_TYPE.BUMPER_TOP_RIGHT)) { rotate_world(+1, o, collisionChecker) }
-      let count = Date.now()
-      // HACK loop until user stopped pressing the button
-      while (gamepad.isButtonPressed(BUTTON_TYPE.BUMPER_TOP_LEFT) || gamepad.isButtonPressed(BUTTON_TYPE.BUMPER_TOP_RIGHT)) {
-        if (count + 1000 > Date.now()) { break }
-      }
+      if (gamepad.isButtonPressed(BUTTON_TYPE.BUMPER_TOP_LEFT) && p.rotateCooldown === 0)  { p.rotateCooldown = 10; rotate_world(-1, o, collisionChecker) }
+      if (gamepad.isButtonPressed(BUTTON_TYPE.BUMPER_TOP_RIGHT) && p.rotateCooldown === 0) { p.rotateCooldown = 10; rotate_world(+1, o, collisionChecker) }
+      
       // rotate right
       if (gamepad.isButtonPressed(BUTTON_TYPE.CLUSTER_BOTTOM) && p.landed) {
          r_dir = n1
@@ -1223,18 +1228,18 @@ function draw_player_head(front: boolean, o: ObjectInstance<any, any>) {
 
   if (front || (p.x == cur_x && p.y == cur_y && p.z+1 == cur_z)) {
     let zz = 112-p.zreal
-    let xx = 12+p.xreal+r_factor*(p.yreal/8-4)
+    let xx = p.xreal+r_factor*(p.yreal/8-4)
     if (p.usewait <= 0 &&
       !istalk() &&
       (p.lwait > 0 || p.dropwait > 0)) {
       zz += 1
     }
     if (sleft) {
-      xx = 28+p.yreal-r_factor*(p.xreal/8-6)
+      xx = p.yreal-r_factor*(p.xreal/8-6)
     } else if (sback) {
-      xx = 108-p.xreal-r_factor*(p.yreal/8-4)
+      xx = -p.xreal-r_factor*(p.yreal/8-4)
     } else if (sright) {
-      xx = 92-p.yreal+r_factor*(p.xreal/8-6)
+      xx = -p.yreal+r_factor*(p.xreal/8-6)
     }
 
     o.hFlip = p.mir
@@ -1273,14 +1278,14 @@ function rotate_world(dir: number, o: ObjectInstance<PlayerProps, any>, collisio
         z = ob.props.x
         break
       case 2: // back
-        x = 12-ob.props.x
+        x = -ob.props.x
         y = ob.props.y
-        z = 1000 - ob.props.z // since zIndex needs to be positive
+        z = -ob.props.z
         break
       case 3: // right
-        x = 12-ob.props.z
+        x = -ob.props.z
         y = ob.props.y
-        z = 1000 - ob.props.x
+        z = -ob.props.x
         break
       default: throw new Error(`BUG: Invalid side "${p.side}"`)
     }
@@ -1288,8 +1293,9 @@ function rotate_world(dir: number, o: ObjectInstance<PlayerProps, any>, collisio
       x: to_real(x),
       y: to_real(y),
     })
-    if (z <= 0) { throw new Error(`BUG: zIndex should always be > 0 but it was "${z}"`)}
+    // if (z <= 0) { throw new Error(`BUG: zIndex should always be > 0 but it was "${z}"`)}
     ob.zIndex = z
   })
-  o.zIndex = 0 // player is always on top
+  o.props.zreal += 1 // for ome reason the player falls through when we rotate
+  o.zIndex = -1000 // player is always on top
 }
