@@ -754,7 +754,10 @@ type PlayerProps = {
   side: number // the world orientation
 
   shadowed: boolean
-  rotateCooldown: number
+  
+  r_dir: number
+  r_wait: number
+  r_factor: number
 }
 
 function playerUpdateFn(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera) {
@@ -769,35 +772,39 @@ function playerUpdateFn(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, 
   ]
 
   // initialize the props
-  if (o.props.zreal === undefined) {
-    o.props.xreal = 0
-    o.props.yreal = 30
-    o.props.zreal = 100
-    o.props.still = 0
-    o.props.dz = -3 // since we start out mid-air
-    o.props.maxfall = -9
-    o.props.coyote = 0
-    o.props.coyotemax = 5
-    o.props.reswait = 0
-    o.props.z = 0 // ???
-    o.props.jump = 13
+  const p = o.props
+  if (p.zreal === undefined) {
+    p.xreal = 0
+    p.yreal = 30
+    p.zreal = 100
+    p.still = 0
+    p.dz = -3 // since we start out mid-air
+    p.maxfall = -9
+    p.coyote = 0
+    p.coyotemax = 5
+    p.reswait = 0
+    p.z = 0 // ???
+    p.jump = 13
 
 
-    o.props.landed = true
-    o.props.lwait = 0
-    o.props.dropwait = 0
-    o.props.dwaitmax = 8
-    o.props.canuse = false
-    o.props.usewait = 0
-    o.props.useidle = 0
-    o.props.mir = false
-    o.props.frame = 0
-    o.props.still = 165
+    p.landed = true
+    p.lwait = 0
+    p.dropwait = 0
+    p.dwaitmax = 8
+    p.canuse = false
+    p.usewait = 0
+    p.useidle = 0
+    p.mir = false
+    p.frame = 0
+    p.still = 165
 
-    o.props.side = 0 // front
+    p.side = 0 // front
 
-    o.props.shadowed = false
-    o.props.rotateCooldown = 0
+    p.shadowed = false
+
+    p.r_dir = 0
+    p.r_wait = 11 // done rotating
+    p.r_factor = 0
 
     // initialize the 3D coordinates for each object
     collisionChecker.searchBBox(EVERYTHING_BBOX)
@@ -811,11 +818,14 @@ function playerUpdateFn(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, 
     o.zIndex = -1000
   }
 
-  move_player(o, gamepad, collisionChecker, sprites, instances, camera, floors)
+  if (p.r_wait > 10) { // ignore player movement & collision detection while rotating
+    move_player(o, gamepad, collisionChecker, sprites, instances, camera, floors)
+  }
+  rotate_world(o, collisionChecker)
   draw_player(true, o, sprites)
 
-
-  camera.nudge(o.pos, 40, 10)
+  camera.pos = {x: camera.pos.x, y: 50} // keep the camera @ a constant height
+  camera.nudge(o.pos, 20, null)
   // Log the player's coordinates
   process.stdout.write(setMoveTo(0, 0))
   console.log(`Player: grid=(${o.props.x},${o.props.y},${o.props.z}H) win=(${o.pos.x},${o.pos.y}) Real=(${o.props.xreal},${o.props.yreal},${o.props.zreal}H)      `)
@@ -825,8 +835,6 @@ function playerUpdateFn(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, 
 function move_player(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, floors: Sprite[]) {
   const p = o.props
 
-  if (p.rotateCooldown > 0) { p.rotateCooldown -= 1 }
-
   const n1 = -1 // negativeOne just to reduce tokens
   // only 1 of these is true
   const sfront = o.props.side === 0 
@@ -834,24 +842,22 @@ function move_player(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, col
   const sback = o.props.side === 2
   const sright = o.props.side === 3
   const intro = 85
-  let r_dir = 0
-  let r_wait = 0
 
    // actions
    if (p.lwait > 0) { p.lwait -= 1 }
    if (intro >= 85) {
-      if (gamepad.isButtonPressed(BUTTON_TYPE.BUMPER_TOP_LEFT) && p.rotateCooldown === 0)  { p.rotateCooldown = 10; rotate_world(-1, o, collisionChecker) }
-      if (gamepad.isButtonPressed(BUTTON_TYPE.BUMPER_TOP_RIGHT) && p.rotateCooldown === 0) { p.rotateCooldown = 10; rotate_world(+1, o, collisionChecker) }
+      // if (gamepad.isButtonPressed(BUTTON_TYPE.BUMPER_TOP_LEFT) && p.rotateCooldown === 0)  { p.rotateCooldown = 10; rotate_world(-1, o, collisionChecker) }
+      // if (gamepad.isButtonPressed(BUTTON_TYPE.BUMPER_TOP_RIGHT) && p.rotateCooldown === 0) { p.rotateCooldown = 10; rotate_world(+1, o, collisionChecker) }
       
       // rotate right
-      if (gamepad.isButtonPressed(BUTTON_TYPE.CLUSTER_BOTTOM) && p.landed) {
-         r_dir = n1
-         r_wait = 0
+      if (gamepad.isButtonPressed(BUTTON_TYPE.BUMPER_TOP_RIGHT) && p.landed) {
+         p.r_dir = n1
+         p.r_wait = 0
          sfx(11)
       // rotate left
-      } else if (gamepad.isButtonPressed(BUTTON_TYPE.CLUSTER_LEFT) && p.landed) {
-         r_dir = 1
-         r_wait = 0
+      } else if (gamepad.isButtonPressed(BUTTON_TYPE.BUMPER_TOP_LEFT) && p.landed) {
+         p.r_dir = 1
+         p.r_wait = 0
          sfx(10)
       } else {
          // move
@@ -1001,8 +1007,6 @@ function pzmove(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisio
   const sback = o.props.side === 2
   const sright = o.props.side === 3
   const intro = 85
-  let r_dir = 0
-  let r_wait = 0
 
   const talkline = 0
   let side = 0 // front,left,right,back or something
@@ -1136,7 +1140,6 @@ function draw_player_head(front: boolean, o: ObjectInstance<any, any>) {
   const cur_x = 0
   const cur_y = 0
   const cur_z = 0
-  const r_factor = 0
   const sfront = o.props.side === 0
   const sleft = o.props.side === 1
   const sback = o.props.side === 2
@@ -1144,18 +1147,18 @@ function draw_player_head(front: boolean, o: ObjectInstance<any, any>) {
 
   if (front || (p.x == cur_x && p.y == cur_y && p.z+1 == cur_z)) {
     let zz = 112-p.zreal
-    let xx = p.xreal+r_factor*(p.yreal/8-4)
+    let xx = p.xreal+Math.round(p.r_factor*(p.yreal/8-4))
     if (p.usewait <= 0 &&
       !istalk() &&
       (p.lwait > 0 || p.dropwait > 0)) {
       zz += 1
     }
     if (sleft) {
-      xx = p.yreal-r_factor*(p.xreal/8-6)
+      xx = p.yreal-Math.round(p.r_factor*(p.xreal/8-6))
     } else if (sback) {
-      xx = -p.xreal-r_factor*(p.yreal/8-4)
+      xx = -p.xreal-Math.round(p.r_factor*(p.yreal/8-4))
     } else if (sright) {
-      xx = -p.yreal+r_factor*(p.xreal/8-6)
+      xx = -p.yreal+Math.round(p.r_factor*(p.xreal/8-6))
     }
 
     o.hFlip = p.mir
@@ -1174,43 +1177,52 @@ function checkNaN(n: number) {
 
 
 
-function rotate_world(dir: number, o: ObjectInstance<PlayerProps, any>, collisionChecker: CollisionChecker) {
+function rotate_world(o: ObjectInstance<PlayerProps, any>, collisionChecker: CollisionChecker) {
   const p = o.props
-  p.side = (p.side + dir + 4) % 4
-  const things = collisionChecker.searchBBox(EVERYTHING_BBOX)
-  things.forEach(ob => {
-    let x = 0
-    let y = 0
-    let z = 0
-    switch (p.side) {
-      case 0: // front
-        x = ob.props.x
-        y = ob.props.y
-        z = ob.props.z
-        break
-      case 1: // left
-        x = ob.props.z
-        y = ob.props.y
-        z = ob.props.x
-        break
-      case 2: // back
-        x = -ob.props.x
-        y = ob.props.y
-        z = -ob.props.z
-        break
-      case 3: // right
-        x = -ob.props.z
-        y = ob.props.y
-        z = -ob.props.x
-        break
-      default: throw new Error(`BUG: Invalid side "${p.side}"`)
-    }
-    ob.moveTo({
-      x: to_real(x),
-      y: to_real(y),
+  if (p.r_wait <= 10) {
+    if (p.r_wait < 5) { p.r_factor = p.r_wait*p.r_dir/2 }
+    else if (p.r_wait < 10) { p.r_factor = (p.r_wait-10)*p.r_dir/2 }
+    else p.r_factor = 0
+
+    if (p.r_wait === 5) { p.side = (p.side + p.r_dir + 4) % 4 }
+
+    p.r_wait += 1
+
+    const things = collisionChecker.searchBBox(EVERYTHING_BBOX)
+    things.forEach(ob => {
+      let x = 0
+      let y = 0
+      let z = 0
+      switch (p.side) {
+        case 0: // front
+          x = to_real(ob.props.x) + Math.round(p.r_factor * ob.props.z)
+          y = ob.props.y
+          z = ob.props.z
+          break
+        case 1: // left
+          x = to_real(ob.props.z) + Math.round(p.r_factor * ob.props.x)
+          y = ob.props.y
+          z = ob.props.x
+          break
+        case 2: // back
+          x = -(to_real(ob.props.x) + Math.round(p.r_factor * ob.props.z))
+          y = ob.props.y
+          z = -ob.props.z
+          break
+        case 3: // right
+          x = -(to_real(ob.props.z) + Math.round(p.r_factor * ob.props.x))
+          y = ob.props.y
+          z = -ob.props.x
+          break
+        default: throw new Error(`BUG: Invalid side "${p.side}"`)
+      }
+      ob.moveTo({
+        x,
+        y: to_real(y),
+      })
+      ob.zIndex = z
     })
-    ob.zIndex = z
-  })
-  o.props.zreal += 1 // for some reason the player falls through when we rotate
-  o.zIndex = -1000 // player is always on top
+    o.zIndex = -1000 // player is always on top
+  
+  }
 }

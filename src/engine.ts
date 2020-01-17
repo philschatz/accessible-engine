@@ -100,8 +100,10 @@ export class GameObject<P = {}, S = {}> {
   moveTo(o: ObjectInstance<P, S>, newPos: IPosition) {
     if (!this.instances.has(o)) { throw new Error('BUG: Trying to move an object that the framework is unaware of')}
     if (Number.isNaN(newPos.x) || Number.isNaN(newPos.y)) {
-      debugger
       throw new Error(`Position neeeds to have numbers as their coordinates. At least one of them was not a number. (${newPos.x}, ${newPos.y})`)
+    }
+    if (newPos.x !== Math.floor(newPos.x) || newPos.y !== Math.floor(newPos.y)) {
+      throw new Error('BUG: coordinates need to be whole numbers')
     }
     this.bush.remove(o)
     o.pos = newPos
