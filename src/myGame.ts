@@ -1,4 +1,4 @@
-import {Game, Camera, SpriteController, IGamepad, Image, DefiniteMap, Sprite, InstanceController, DPAD, ObjectInstance, CollisionChecker, IPosition, GameObject, BUTTON_TYPE, zIndexComparator} from './engine'
+import {Game, Camera, SpriteController, IGamepad, Image, DefiniteMap, Sprite, InstanceController, DPAD, ObjectInstance, CollisionChecker, IPosition, GameObject, BUTTON_TYPE, zIndexComparator, IPixel} from './engine'
 import {setMoveTo} from './terminal'
 
 export class MyGame implements Game {
@@ -706,6 +706,14 @@ export class MyGame implements Game {
 
   }
 
+  drawBackground(tiles: ObjectInstance<any, any>[], camera: Camera, drawPixelsFn: (screenPos: IPosition, pixels: IPixel[][], hFlip: boolean, vFlip: boolean) => void) {
+    const bbox = camera.toBBox()
+    const color = '#29ADFF' // (light blue)
+
+    const pixels = Array(bbox.maxY - bbox.minY).fill(Array(bbox.maxX - bbox.minX).fill(color))
+
+    drawPixelsFn({x: 0, y: 0}, pixels, false, false)
+  }
 }
 
 const EVERYTHING_BBOX = {

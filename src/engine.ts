@@ -250,6 +250,9 @@ export class Engine {
     tiles.sort(zIndexComparator)
 
     this.renderer.drawStart()
+
+    this.game.drawBackground(tiles, this.camera, this.drawPixels.bind(this))
+
     for (const t of tiles) {
       if (t.startTick === 0) { t.startTick = this.curTick }
       const image = t.sprite.tick(t.startTick, this.curTick)
@@ -291,6 +294,7 @@ function relativeTo(pos1: IPosition, pos2: IPosition): IPosition {
 export interface Game {
   load(gamepad: IGamepad, sprites: SpriteController)
   init(sprites: SpriteController, instances: InstanceController)
+  drawBackground(tiles: ObjectInstance<any, any>[], camera: Camera, drawPixelsFn: (screenPos: IPosition, pixels: IPixel[][], hFlip: boolean, vFlip: boolean) => void)
 }
 
 export class Camera {
