@@ -1,5 +1,7 @@
-import {Game, Camera, SpriteController, IGamepad, Image, DefiniteMap, Sprite, InstanceController, DPAD, ObjectInstance, CollisionChecker, IPosition, GameObject, BUTTON_TYPE, zIndexComparator, IPixel} from './engine'
-import {setMoveTo} from './terminal'
+import {Game, Camera, SpriteController, IGamepad, Image, DefiniteMap, Sprite, InstanceController, DPAD, ObjectInstance, CollisionChecker, IPosition, GameObject, BUTTON_TYPE, zIndexComparator, IPixel, DrawPixelsFn, ShowDialogFn} from './engine'
+import {setMoveTo, DoubleArray} from './terminal'
+import { LETTERS } from './letters'
+import { BBox } from 'rbush'
 
 export class MyGame implements Game {
   
@@ -706,7 +708,7 @@ export class MyGame implements Game {
 
   }
 
-  drawBackground(tiles: ObjectInstance<any, any>[], camera: Camera, drawPixelsFn: (screenPos: IPosition, pixels: IPixel[][], hFlip: boolean, vFlip: boolean) => void) {
+  drawBackground(tiles: ObjectInstance<any, any>[], camera: Camera, drawPixelsFn: DrawPixelsFn) {
     const bbox = camera.toBBox()
     const color = '#29ADFF' // (light blue)
 
@@ -714,6 +716,116 @@ export class MyGame implements Game {
 
     drawPixelsFn({x: 0, y: 0}, pixels, false, false)
   }
+}
+
+enum POSITION {
+  ABSOLUTE,
+  RELATIVE
+}
+
+enum PLACEMENT {
+  UP,
+  DOWN,
+  AWAY
+}
+
+type DialogOptions = {
+  position: POSITION // at the top/bottom of the screen or above/below the target
+  placement: PLACEMENT
+  target?: IPosition
+  maxLines: number
+  cornerSprite?: Sprite // (top-left)
+  nonCornerSprite?: Sprite // top/left/bottom/right
+  gradualMessage: boolean
+  // gradualSfX: SFX  // or maybe just use this instead of the boolean
+  title?: string
+  titleFgColor?: string
+  titleBgColor?: string
+
+  message: string
+  messageFgColor: string
+  messageShadowColor?: string
+  bgColor: string
+
+  actionIcon?: Sprite
+  actionBounce?: boolean
+
+  caretSprite?: Sprite
+}
+
+
+function drawDialog(camera: Camera, startTick: number, currentTick: number, drawPixelsFn: DrawPixelsFn, o: DialogOptions) {
+  const bbox = camera.toBBox()
+  const {width, height} = camera.size()
+
+  let top = 0
+  let left = 0
+  let bottom = 0
+  let right = 0
+  switch (o.position) {
+    case POSITION.ABSOLUTE:
+      switch (o.placement) {
+        case PLACEMENT.UP:
+          top = 0
+          left = 0
+          bottom = o.maxLines * (8 + 2) // 2 pixels for padding
+          right = width
+          break
+        case PLACEMENT.DOWN:
+          top = height - (o.maxLines * (8 + 2))
+          left = 0
+          bottom = height
+          right = width
+          break
+        default: throw new Error('BUG: Unsupported so far')
+      }
+      break
+      
+    default: throw new Error('BUG: Unsupported so far')
+  }
+
+  // Draw the border
+  if (o.cornerSprite && o.maxLines === 1) {
+    if (top !== bottom) throw new Error('We are assuming that we will render only one line')
+    const endpoint = o.cornerSprite.tick(startTick, currentTick).pixels
+    drawPixelsFn({x:  left, y: top}, endpoint, false, false)
+    drawPixelsFn({x: right, y: top}, endpoint, true , false)
+  } else if (o.cornerSprite) {
+    const corner = o.cornerSprite.tick(startTick, currentTick).pixels
+    drawPixelsFn({x:  left, y:    top}, corner, false, false)
+    drawPixelsFn({x: right, y:    top}, corner,  true, false)
+    drawPixelsFn({x:  left, y: bottom}, corner, false,  true)
+    drawPixelsFn({x: right, y: bottom}, corner,  true,  true)
+    
+    if (o.nonCornerSprite) {
+      const nonCorner = o.nonCornerSprite.tick(startTick, currentTick).pixels
+
+      for (let x = 0; x < right - left; x++) {
+        drawPixelsFn({x, y:    top}, nonCorner, false, false)
+        drawPixelsFn({x, y: bottom}, nonCorner, false,  true)
+      }
+      for (let y = 0; y < bottom - top; y++) {
+        drawPixelsFn({x:  left, y}, nonCorner,  true, false)
+        drawPixelsFn({x: right, y}, nonCorner,  true,  true)
+      }
+    }
+  } else {
+    const pixels = Array(bottom - top).fill(Array(right - left).fill(o.bgColor))
+    drawPixelsFn({x: left, y: top}, pixels, false, false)
+  }
+
+  // convert the lines of text to characters
+  const lines = o.message.split('\n')
+  lines.forEach((line, rowNum) => {
+    for (let colNum = 0; colNum < line.length; colNum++) {
+      const c = line[colNum]
+
+      const pixels = LETTERS.get(c).map(row => row.map(bit => bit ? o.messageFgColor : null))
+      const x = left + colNum * 8
+      const y = top + rowNum * 8
+      drawPixelsFn({x, y}, pixels, false, false)
+    }
+  })
 }
 
 const EVERYTHING_BBOX = {
@@ -768,7 +880,7 @@ type PlayerProps = {
   r_factor: number
 }
 
-function playerUpdateFn(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera) {
+function playerUpdateFn(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, showDialog: ShowDialogFn) {
   const floors = [
     sprites.get('treeTopLeft'),
     sprites.get('treeTopRight'),
@@ -826,6 +938,90 @@ function playerUpdateFn(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, 
     o.zIndex = -1000
   }
 
+
+// Refer to: http://rosettacode.org/wiki/Bitmap/Bresenham's_line_algorithm#JavaScript
+function bline(x0: number, y0: number, x1: number, y1: number, setPixel: (x: number, y: number) => void) {
+  var dx = Math.abs(x1 - x0),
+      sx = x0 < x1 ? 1 : -1;
+  var dy = Math.abs(y1 - y0),
+      sy = y0 < y1 ? 1 : -1;
+  var err = (dx > dy ? dx : -dy) / 2;
+  while (true) {
+      setPixel(x0, y0);
+      if (x0 === x1 && y0 === y1) break;
+      var e2 = err;
+      if (e2 > -dx) {
+          err -= dy;
+          x0 += sx;
+      }
+      if (e2 < dy) {
+          err += dx;
+          y0 += sy;
+      }
+  }
+}
+// Show a test dialog all the time
+const options = {
+  position: POSITION.ABSOLUTE,
+  placement: PLACEMENT.UP,
+  maxLines: 3,
+  gradualMessage: false,
+  message: 'GOMEZ...\nSOMETHING WENT WRONG.',
+  messageFgColor: '#ffffff',
+  bgColor: '#00ff00'
+}
+
+showDialog(options.message, (message: string, camera: Camera, startTick: number, currentTick: number, drawPixelsFn: DrawPixelsFn) => {
+  
+  const canvas = new DoubleArray<string>()
+
+  // from https://www.cc.gatech.edu/grads/m/Aaron.E.McClennen/Bresenham/code.html
+  function drawLine(start: IPosition, end: IPosition, color: string) {
+    bline(start.x, start.y, end.x, end.y, (x, y) => canvas.set({x, y}, color))
+  }
+
+  function drawRect(start: IPosition, end: IPosition, color: string) {
+    drawLine({x: start.x, y: start.y}, {x:   end.x, y: start.y}, color)
+    drawLine({x: start.x, y:   end.y}, {x:   end.x, y:   end.y}, color)
+    drawLine({x: start.x, y: start.y}, {x: start.x, y:   end.y}, color)
+    drawLine({x:   end.x, y: start.y}, {x:   end.x, y:   end.y}, color)
+  }
+
+  const tl = {x:   4, y:  4}
+  const br = {x: 124, y: 4 + (8) * 2} // 2 lines of text
+
+  for (let y = tl.y; y < br.y; y++) {
+    for (let x = tl.x; x < br.x; x++) {
+      if ((x + y) % 2 === 0) {
+        canvas.set({x, y}, '#1D2B53') // dark blue
+      }
+    }
+  }
+
+  drawRect(tl, br, '#FFF1E8') // white
+  drawLine({x: tl.x + 1, y: br.y + 1}, {x: br.x + 1, y: br.y + 1}, '#1D2B53')
+  drawLine({x: br.x + 1, y: tl.y + 1}, {x: br.x + 1, y: br.y + 1}, '#1D2B53')
+
+  drawPixelsFn({x: 0, y: 0}, canvas.asArray(), false, false)
+
+  // convert the lines of text to characters
+  const lines = message.split('\n')
+  lines.forEach((line, rowNum) => {
+    for (let colNum = 0; colNum < line.length; colNum++) {
+      const c = line[colNum]
+
+      const pixels = LETTERS.get(c).map(row => row.map(bit => bit ? '#FFF1E8' : null))
+      const x = tl.x + 2 + colNum * 8
+      const y = tl.y + 2 + rowNum * 8
+      drawPixelsFn({x, y}, pixels, false, false)
+    }
+  })
+
+  
+})
+
+
+
   if (p.r_wait > 10) { // ignore player movement & collision detection while rotating
     move_player(o, gamepad, collisionChecker, sprites, instances, camera, floors)
   }
@@ -836,8 +1032,14 @@ function playerUpdateFn(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, 
   camera.nudge(o.pos, 20, null)
   // Log the player's coordinates
   process.stdout.write(setMoveTo(0, 0))
-  console.log(`Player: grid=(${o.props.x},${o.props.y},${o.props.z}H) win=(${o.pos.x},${o.pos.y}) Real=(${o.props.xreal},${o.props.yreal},${o.props.zreal}H)      `)
+  const now = process.hrtime()
+  const diff = process.hrtime(lastRender)
+  lastRender = now
+  const seconds = diff[0] + diff[1] / (1000 * 1000 * 1000)
+  console.log(`Player: grid=(${o.props.x},${o.props.y},${o.props.z}H) win=(${o.pos.x},${o.pos.y}) Real=(${o.props.xreal},${o.props.yreal},${o.props.zreal}H) FPS:${(new Number(1/seconds)).toFixed(1)}     `)
 }
+
+let lastRender: [number, number] = [0, 0]
 
 
 function move_player(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, floors: Sprite[]) {

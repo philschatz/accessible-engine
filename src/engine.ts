@@ -203,6 +203,12 @@ export class CollisionChecker {
   }
 }
 
+type Pair<A, B> = {
+  a: A,
+  b: B
+}
+
+export type PaintFn = (message: string, camera: Camera, startTick: number, currentTick: number, drawPixelsFn: DrawPixelsFn) => void
 
 export class Engine {
   private curTick: number = 0
@@ -214,6 +220,7 @@ export class Engine {
   private readonly instances: InstanceController
   private readonly camera: Camera
   private readonly gamepad: IGamepad
+  private pendingDialogs: Pair<string, PaintFn>[]
 
   constructor(game: Game, renderer: IRenderer, gamepad: IGamepad) {
     this.bush = new MyRBush()
@@ -224,6 +231,10 @@ export class Engine {
     this.gamepad = gamepad
     this.renderer = renderer
     this.game = game
+    this.pendingDialogs = []
+
+    this.drawPixels = this.drawPixels.bind(this)
+    this.showDialog = this.showDialog.bind(this)
   }
 
   tick() {
@@ -236,7 +247,7 @@ export class Engine {
     // Update each object
     // TODO: Only update objects in view or ones that have an alwaysUpdate=true flag set (TBD)
     this.bush.all().forEach(i => {
-      i.static.updateFn(i, this.gamepad, this.collisionChecker, this.sprites, this.instances, this.camera)
+      i.static.updateFn(i, this.gamepad, this.collisionChecker, this.sprites, this.instances, this.camera, this.showDialog)
     })
 
     this.draw()
@@ -251,7 +262,7 @@ export class Engine {
 
     this.renderer.drawStart()
 
-    this.game.drawBackground(tiles, this.camera, this.drawPixels.bind(this))
+    this.game.drawBackground(tiles, this.camera, this.drawPixels)
 
     for (const t of tiles) {
       if (t.startTick === 0) { t.startTick = this.curTick }
@@ -260,6 +271,12 @@ export class Engine {
       const screenPos = relativeTo({x: t.pos.x, y: t.pos.y - image.pixels.length + 1 /* Shift the image up because it might not be a 8x8 sprite, like if it is a tall person */}, this.camera.topLeft())
       this.drawPixels(screenPos, image.pixels, t.hFlip, false)
     }
+
+    this.pendingDialogs.forEach(({a, b}) => {
+      b(a, this.camera, 0, 0, this.drawPixels)
+    })
+    this.pendingDialogs = []
+
     this.renderer.drawEnd()
   }
 
@@ -267,12 +284,16 @@ export class Engine {
     const height = pixels.length
     let relY = 0
     for (const row of pixels) {
+      if (!row) { 
+        relY++
+        continue
+      }
       const width = row.length
       let relX = 0
       for (const pixel of row) {
         const x = screenPos.x + (hFlip ? width - relX: relX)
         const y = screenPos.y + (vFlip ? height - relY: relY)
-        if (pixel !== null && x >= 0 && y >= 0) {
+        if (pixel !== null && pixel !== undefined && x >= 0 && y >= 0) {
           const pos = {x, y}
           this.renderer.drawPixel(pos, pixel)
         }
@@ -281,6 +302,10 @@ export class Engine {
       relY++
     }
     
+  }
+
+  showDialog(message: string, painter: PaintFn) {
+    this.pendingDialogs.push({a: message, b: painter})
   }
 }
 
@@ -291,20 +316,24 @@ function relativeTo(pos1: IPosition, pos2: IPosition): IPosition {
   }
 }
 
+export type DrawPixelsFn = (screenPos: IPosition, pixels: IPixel[][], hFlip: boolean, vFlip: boolean) => void
+
 export interface Game {
   load(gamepad: IGamepad, sprites: SpriteController)
   init(sprites: SpriteController, instances: InstanceController)
-  drawBackground(tiles: ObjectInstance<any, any>[], camera: Camera, drawPixelsFn: (screenPos: IPosition, pixels: IPixel[][], hFlip: boolean, vFlip: boolean) => void)
+  drawBackground(tiles: ObjectInstance<any, any>[], camera: Camera, drawPixelsFn: DrawPixelsFn)
 }
 
 export class Camera {
   public pos: IPosition
-  private dim: Size
+  private readonly dim: Size
 
   constructor(dim: Size) {
     this.dim = dim
     this.pos = {x: 0, y: 0}
   }
+
+  public size() { return this.dim }
 
   public toBBox(): BBox {
     const {width, height} = this.dim
@@ -352,7 +381,9 @@ function boxNudge(source: number, target: number, leashLength: number | null) {
   return source
 }
 
-type UpdateFn<P, S> = (o: ObjectInstance<P, S>, gamepad: IGamepad, collisionCheker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera) => void
+
+export type ShowDialogFn = (message: string, painter: PaintFn) => void
+export type UpdateFn<P, S> = (o: ObjectInstance<P, S>, gamepad: IGamepad, collisionCheker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, showDialogFn: ShowDialogFn) => void
 
 export class InstanceController {
   private readonly bush: RBush<ObjectInstance<any, any>>

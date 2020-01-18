@@ -43,9 +43,15 @@ const sleep = async (ms: number) => new Promise((resolve, reject) => {
 
 const run = async () => {
   console.log('NOTE: Keyboards in a terminal do not work well for platformers (holding down a key). So when you run & jump you should tap up and then keep tapping left/right to keep moving in that direction')
+  let previous = Date.now()
   while (true) {
-    await sleep(16 * (process.env['SLOW'] ? 10 : 1)) // 60 fps = 1000/60 = 16.6666ms
+    const now = Date.now()
+    const diff = now - previous
+    const sleepTime = Math.max(0, 16 - diff)
+    // console.error(`Took: ${diff} Sleep time = ${sleepTime}`)
+    await sleep(sleepTime * (process.env['SLOW'] ? 10 : 1)) // 60 fps = 1000/60 = 16.6666ms
     engine.tick()
+    previous = now
   }
 }
 
