@@ -1,6 +1,12 @@
 import * as HID from 'node-hid'
-import { IGamepadRoot, IGamepad, BUTTON_TYPE } from './api'
+import { IGamepadRoot, IGamepad, BUTTON_TYPE, STICK_TYPE } from './api'
+import ps3 from './ps3.json'
 import ps4 from './ps4v2.json'
+
+const configs = new Map<string, Config>()
+
+addConfig(ps4)
+addConfig(ps3)
 
 function debug(message?: any, ...optionalParams: any[]) {
   // console.error(message, ...optionalParams)
@@ -33,10 +39,10 @@ type Config = {
   }
 }
 
-const configs = new Map<string, Config>()
 
-
-configs.set(`${ps4.vendorId}/${ps4.productId}`, ps4)
+function addConfig(c) {
+  configs.set(`${c.vendorId}/${c.productId}`, c)
+}
 
 const cache = new Map<string, Gamepad>()
 
@@ -105,7 +111,11 @@ class Gamepad implements IGamepad {
     if (!this.config.joysticks) { return }
 
     this.config.joysticks.forEach(j => {
-      this.jStates.set(j.name, {x: data[j.xPin], y: data[j.yPin]})
+      let x = data[j.xPin]
+      let y = data[j.yPin]
+      x = (x - 127) / 128
+      y = (y - 127) / 128
+      this.jStates.set(j.name, {x, y})
     })
   }
 
@@ -146,6 +156,10 @@ class Gamepad implements IGamepad {
 
   isButtonPressed(btn: BUTTON_TYPE) {
     return this.bStates.has(btn)
+  }
+
+  getStickCoordinates(stick: STICK_TYPE) {
+    return this.jStates.get(stick) || null
   }
 
   // ------------------------------------
@@ -238,6 +252,10 @@ export class KeyboardGamepad implements IGamepad {
     return c ? c.indexOf(this.getCurPressed()) >= 0 : false
   }
 
+  getStickCoordinates(stick: STICK_TYPE) {
+    return null
+  }
+
   private getCurPressed() {
     if (this.timestamp + KEY_REPEAT_WITHIN < Date.now()) {
       this.curPressed = ''
@@ -267,6 +285,21 @@ export class OrGamepad implements IGamepad {
     }
     return false
   }
+
+  getStickCoordinates(stick: STICK_TYPE) {
+    const farthest = new Map<number, IPosition>()
+    let max = -1
+    for (const pad of this.pads) {
+      const c = pad.getStickCoordinates(stick) || {x: 0, y: 0}
+      const distance = Math.abs(c.x) + Math.abs(c.y)
+      max = Math.max(max, distance)
+      farthest.set(distance, c)
+    }
+    if (max > 0) {
+      return farthest.get(max)
+    }
+    return {x: 0, y: 0}
+  }
 }
 
 export class AnyGamepad implements IGamepad {
@@ -293,4 +326,20 @@ export class AnyGamepad implements IGamepad {
     }
     return false
   }
+
+  getStickCoordinates(stick: STICK_TYPE) {
+    const farthest = new Map<number, IPosition>()
+    let max = -1
+    for (const pad of this.pads) {
+      const c = pad.getStickCoordinates(stick) || {x: 0, y: 0}
+      const distance = Math.abs(c.x) + Math.abs(c.y)
+      max = Math.max(max, distance)
+      farthest.set(distance, c)
+    }
+    if (max > 0) {
+      return farthest.get(max)
+    }
+    return {x: 0, y: 0}
+  }
+
 }

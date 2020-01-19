@@ -1,0 +1,66 @@
+{
+  "vendorId": 1356,
+  "productId": 616,
+  "displayName": "PLAYSTATION(R)3 Controller",
+
+  "standard": {
+    "buttons": [
+      "CLUSTER_DOWN",
+      "CLUSTER_RIGHT",
+      "CLUSTER_LEFT",
+      "CLUSTER_UP",
+      "BUMPER_TOP_LEFT",
+      "BUMPER_TOP_RIGHT",
+      "BUMPER_BACK_LEFT",
+      "BUMPER_BACK_RIGHT",
+      "SELECT",
+      "START",
+      "AXIS_LEFT",
+      "AXIS_RIGHT",
+      "DPAD_UP",
+      "DPAD_DOWN",
+      "DPAD_LEFT",
+      "DPAD_RIGHT",
+      "HOME"
+    ],
+    "axes": [
+      ["LEFT", "x"],
+      ["LEFT", "y"],
+      ["RIGHT", "x"],
+      ["RIGHT", "y"]
+    ]
+  },
+
+  "buttons": [
+
+    { "pin": 2, "names": ["SELECT"],     "bit": 0 },
+    { "pin": 2, "names": ["AXIS_LEFT"],  "bit": 1 },
+    { "pin": 2, "names": ["AXIS_RIGHT"], "bit": 2 },
+    { "pin": 2, "names": ["START"],      "bit": 3 },
+  
+    { "pin": 2, "names": ["DPAD_UP"],    "bit": 4 },
+    { "pin": 2, "names": ["DPAD_RIGHT"], "bit": 5 },
+    { "pin": 2, "names": ["DPAD_DOWN"],  "bit": 6 },
+    { "pin": 2, "names": ["DPAD_LEFT"],  "bit": 7 },
+
+    { "pin": 3, "names": ["BUMPER_BOTTOM_LEFT"],  "bit": 0 },
+    { "pin": 3, "names": ["BUMPER_BOTTOM_RIGHT"], "bit": 1 },
+    { "pin": 3, "names": ["BUMPER_TOP_LEFT"],     "bit": 2 },
+    { "pin": 3, "names": ["BUMPER_TOP_RIGHT"],    "bit": 3 },
+
+    { "pin": 3, "names": ["CLUSTER_UP"],    "bit": 4 },
+    { "pin": 3, "names": ["CLUSTER_RIGHT"], "bit": 5 },
+    { "pin": 3, "names": ["CLUSTER_DOWN"],  "bit": 6 },
+    { "pin": 3, "names": ["CLUSTER_LEFT"],  "bit": 7 },
+    
+
+    { "pin": 4, "names": ["HOME"],  "bit": 0 }
+
+],
+
+  "joysticks": [
+      { "name": "LEFT",  "xPin": 6, "yPin": 7 },
+      { "name": "RIGHT", "xPin": 8, "yPin": 9 }
+  ]
+
+}

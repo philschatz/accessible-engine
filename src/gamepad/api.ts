@@ -1,3 +1,5 @@
+import { IPosition } from "../engine";
+
 export enum BUTTON_TYPE {
   DPAD_UP = 'DPAD_UP',
   DPAD_DOWN = 'DPAD_DOWN',
@@ -33,6 +35,7 @@ export interface IGamepadRoot {
 
 export interface IGamepad {
   isButtonPressed(btn: BUTTON_TYPE): boolean
+  getStickCoordinates(stick: STICK_TYPE): IPosition | null
   
   // https://developer.mozilla.org/en-US/docs/Web/API/Gamepad
   buttons: {pressed: boolean, value: number}[]
