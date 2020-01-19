@@ -36,11 +36,11 @@ function setUnion<T>(set1: Iterable<T>, set2: Iterable<T>) {
 }
 
 const keyConfig = {}
-keyConfig[BUTTON_TYPE.ARROW_UP]   = ['W', 'w', '\u001B\u005B\u0041']
-keyConfig[BUTTON_TYPE.ARROW_DOWN] = ['S', 's', '\u001B\u005B\u0042']
-keyConfig[BUTTON_TYPE.ARROW_LEFT] = ['A', 'a', '\u001B\u005B\u0044']
-keyConfig[BUTTON_TYPE.ARROW_RIGHT] = ['D', 'd', '\u001B\u005B\u0043']
-keyConfig[BUTTON_TYPE.CLUSTER_BOTTOM] = ['X', 'x', ' ', '\u000D']
+keyConfig[BUTTON_TYPE.DPAD_UP]   = ['W', 'w', '\u001B\u005B\u0041']
+keyConfig[BUTTON_TYPE.DPAD_DOWN] = ['S', 's', '\u001B\u005B\u0042']
+keyConfig[BUTTON_TYPE.DPAD_LEFT] = ['A', 'a', '\u001B\u005B\u0044']
+keyConfig[BUTTON_TYPE.DPAD_RIGHT] = ['D', 'd', '\u001B\u005B\u0043']
+keyConfig[BUTTON_TYPE.CLUSTER_DOWN] = ['X', 'x', ' ', '\u000D']
 keyConfig[BUTTON_TYPE.BUMPER_TOP_LEFT] = ['Q', 'q']
 keyConfig[BUTTON_TYPE.BUMPER_TOP_RIGHT] = ['E', 'e']
 

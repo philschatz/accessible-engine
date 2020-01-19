@@ -1,5 +1,6 @@
 import * as HID from 'node-hid'
 import { IGamepadRoot, IGamepad, BUTTON_TYPE } from './api'
+import ps4 from './ps4v2.json'
 
 function debug(message?: any, ...optionalParams: any[]) {
   // console.error(message, ...optionalParams)
@@ -28,11 +29,14 @@ type Config = {
 
   standard: {
     buttons: string[]
-    axes: [string, "x" | "y"][]
+    axes: string[][] // [string, "x" | "y"][]
   }
 }
 
-const configs = new Map<[number, number], Config>()
+const configs = new Map<string, Config>()
+
+
+configs.set(`${ps4.vendorId}/${ps4.productId}`, ps4)
 
 const cache = new Map<string, Gamepad>()
 
@@ -45,7 +49,7 @@ class GamepadRoot implements IGamepadRoot {
   getGamepads(): Gamepad[] {
     const devices = HID.devices()
     const gamepadsOrNull = devices.map(d => {
-      const c = configs.get([d.vendorId, d.productId])
+      const c = configs.get(`${d.vendorId}/${d.productId}`)
       if (c) {
         let i = cache.get(d.path)
         if (!i) {
@@ -94,13 +98,14 @@ class Gamepad implements IGamepad {
   private onUsbFrame(data) {
     this.processJoysticks(data)
     this.processButtons(data)
+    this.lastUpdated = Date.now()
   }
 
   private processJoysticks(data) {
     if (!this.config.joysticks) { return }
 
     this.config.joysticks.forEach(j => {
-      this.jStates[j.name] = {x: data[j.xPin], y: data[j.yPin]}
+      this.jStates.set(j.name, {x: data[j.xPin], y: data[j.yPin]})
     })
   }
 
@@ -109,20 +114,31 @@ class Gamepad implements IGamepad {
       const v = data[b.pin]
       let newState
       if (b.bit !== undefined) {
-        newState = (v & b.bit) === b.bit
-      } else if (b.clearBit !== undefined) { // b.value !== undefined
-        // This is used by the PS4 DualShock Controller
-        let noDpad = (v & b.clearBit) === b.clearBit
+        // This is used by the PS4 Controller's cluster keys
+        const bitNum = 1 << b.bit
+        newState = (v & bitNum) === bitNum
+      } else if (b.clearBit !== undefined) {
+        // This is used by the PS4 Controller's DPAD_UP key
+        const cbitNum = 1 << b.clearBit
+        let noDpad = (v & cbitNum) === cbitNum
         if (noDpad) {
           newState = false
         } else {
           newState = (v & b.mask) === b.value
         }
+      } else if (b.mask) {
+        // This is used by the PS4 Controller's DPAD_* keys
+        newState = (v & b.mask) === b.value
       } else {
         newState = v === b.value
       }
 
-      b.names.forEach(n => { if (newState) { this.bStates.add(n) } else { this.bStates.delete(n)} } )
+      // Update the state of the button.
+      // Diagonal buttons should only turn ON the dPad, never turn them off.
+      // This is because the player could be pressing DPAD_UP and that still needs to be true
+      if (b.names.length === 1 || newState) {
+        b.names.forEach(n => { if (newState) { this.bStates.add(n) } else { this.bStates.delete(n)} } )
+      }
 
     })
     this.lastUpdated = Date.now()

@@ -1020,8 +1020,8 @@ function move_player(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, col
       } else {
          // move
          let dp = 0
-         if (gamepad.isButtonPressed(BUTTON_TYPE.ARROW_LEFT)) { dp -= 1 }
-         if (gamepad.isButtonPressed(BUTTON_TYPE.ARROW_RIGHT)) { dp += 1 }
+         if (gamepad.isButtonPressed(BUTTON_TYPE.DPAD_LEFT)) { dp -= 1 }
+         if (gamepad.isButtonPressed(BUTTON_TYPE.DPAD_RIGHT)) { dp += 1 }
          if (dp < 0) { p.mir = true
          } else if (dp > 0) { p.mir = false }
          
@@ -1198,13 +1198,13 @@ function pzmove(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisio
    if (intro >= 85 && talkline == 0 && (p.landed || p.coyote > 0)) {
       if (p.lwait <= 0) {
          // drop down
-         if (gamepad.isButtonPressed(BUTTON_TYPE.ARROW_DOWN) && p.usewait <= 0) {
+         if (gamepad.isButtonPressed(BUTTON_TYPE.DPAD_DOWN) && p.usewait <= 0) {
             p.dropwait += 1
          } else {
             p.dropwait = 0
          }
          // execute jump/drop
-         if (gamepad.isButtonPressed(BUTTON_TYPE.ARROW_UP) || gamepad.isButtonPressed(BUTTON_TYPE.CLUSTER_BOTTOM) || p.dropwait >= p.dwaitmax) {
+         if (gamepad.isButtonPressed(BUTTON_TYPE.DPAD_UP) || gamepad.isButtonPressed(BUTTON_TYPE.CLUSTER_DOWN) || p.dropwait >= p.dwaitmax) {
             if (p.dropwait >= 5) {
               debugger
                p.dz = -2
