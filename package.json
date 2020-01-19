@@ -9,7 +9,6 @@
   "devDependencies": {
     "@types/ansi-escapes": "^4.0.0",
     "@types/ansi-styles": "^3.2.1",
-    "@types/gamepad": "^1.5.0",
     "@types/node": "^13.1.6",
     "@types/node-hid": "^0.7.3",
     "@types/rbush": "^3.0.0",
@@ -19,9 +18,7 @@
   "dependencies": {
     "ansi-escapes": "^4.3.0",
     "ansi-styles": "^4.2.1",
-    "dualshock-controller": "github:Kylir/node-dualshock-controller",
-    "gamepad": "github:warp/node-gamepad#node-12-support",
-    "node-gamepad": "github:kaikousa/node-gamepad#dualshock4v2",
+    "node-hid": "^1.1.0",
     "rbush": "^3.0.1"
   }
 }

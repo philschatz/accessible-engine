@@ -12,3 +12,12 @@ Needs to have the following properties (unlike pico-8 or puzzlescript):
 - Variant sprites should also be grouped together so the screenreader can ignore them
 
 See [./myGame.ts](./myGame.ts) for an example
+
+
+# Controllers
+
+I tried multiple gamepad libraries but they had the following problems:
+
+- [dualshock-controller](https://github.com/Kylir/node-dualshock-controller) only worked for PS4 controllers and only the fork contained the configuration for the v2 PS4 controller
+- [gamepad](https://github.com/warp/node-gamepad#node-12-support) randomly segfaulted, the DPad was reported as a joystick, and only a fork supported node 12
+- [node-gamepad](https://github.com/kaikousa/node-gamepad#dualshock4v2) only supported pressing one button at a time and only a fork contained the PS4 vs configuration
