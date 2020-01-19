@@ -1,4 +1,5 @@
 import Rbush from 'rbush'
+import { IGamepad } from './gamepad/api'
 
 
 class MyRBush extends Rbush<ObjectInstance<any, any>> {
@@ -208,7 +209,7 @@ type Pair<A, B> = {
   b: B
 }
 
-export type PaintFn = (message: string, camera: Camera, startTick: number, currentTick: number, drawPixelsFn: DrawPixelsFn) => void
+export type PaintFn = (message: string[], camera: Camera, startTick: number, currentTick: number, drawPixelsFn: DrawPixelsFn) => void
 
 export class Engine {
   private curTick: number = 0
@@ -220,7 +221,7 @@ export class Engine {
   private readonly instances: InstanceController
   private readonly camera: Camera
   private readonly gamepad: IGamepad
-  private pendingDialogs: Pair<string, PaintFn>[]
+  private pendingDialogs: Pair<string[], PaintFn>[]
 
   constructor(game: Game, renderer: IRenderer, gamepad: IGamepad) {
     this.bush = new MyRBush()
@@ -304,7 +305,7 @@ export class Engine {
     
   }
 
-  showDialog(message: string, painter: PaintFn) {
+  showDialog(message: string[], painter: PaintFn) {
     this.pendingDialogs.push({a: message, b: painter})
   }
 }
@@ -382,7 +383,7 @@ function boxNudge(source: number, target: number, leashLength: number | null) {
 }
 
 
-export type ShowDialogFn = (message: string, painter: PaintFn) => void
+export type ShowDialogFn = (message: string[], painter: PaintFn) => void
 export type UpdateFn<P, S> = (o: ObjectInstance<P, S>, gamepad: IGamepad, collisionCheker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, showDialogFn: ShowDialogFn) => void
 
 export class InstanceController {
@@ -412,47 +413,6 @@ export class InstanceController {
     if (i === undefined) { throw new Error(`BUG: Could not find tile named "${name}". Currently have the following: ${JSON.stringify([...this.instances.keys()])}`)}
     return [...i.instances]
   }
-}
-
-export enum BUTTON_TYPE {
-  ARROW_UP = 'ARROW_UP',
-  ARROW_DOWN = 'ARROW_DOWN',
-  ARROW_LEFT = 'ARROW_LEFT',
-  ARROW_RIGHT = 'ARROW_RIGHT',
-  HOME = 'HOME',
-  START = 'START',
-  SELECT = 'SELECT',
-  CLUSTER_TOP = 'CLUSTER_TOP',
-  CLUSTER_LEFT = 'CLUSTER_LEFT',
-  CLUSTER_RIGHT = 'CLUSTER_RIGHT',
-  CLUSTER_BOTTOM = 'CLUSTER_BOTTOM',
-  BUMPER_TOP_LEFT = 'BUMPER_TOP_LEFT',
-  BUMPER_BOTTOM_LEFT = 'BUMPER_BOTTOM_LEFT',
-  BUMPER_TOP_RIGHT = 'BUMPER_TOP_RIGHT',
-  BUMPER_BOTTOM_RIGHT = 'BUMPER_BOTTOM_RIGHT',
-  STICK_PRESS_LEFT = 'STICK_PRESS_LEFT',
-  STICK_PRESS_RIGHT = 'STICK_PRESS_RIGHT',
-  TOUCHSCREEN = 'TOUCHSCREEN'
-}
-export enum STICK_TYPE {
-  LEFT = 'LEFT',
-  RIGHT = 'RIGHT'
-}
-export enum ANALOG_TYPE {
-  BUMPER_LEFT = 'BUMPER_LEFT',
-  BUMPER_RIGHT = 'BUMPER_RIGHT'
-}
-
-export enum DIRECTION {
-  UP = 'UP',
-  DOWN = 'DOWN',
-  LEFT = 'LEFT',
-  RIGHT = 'RIGHT'
-}
-
-export interface IGamepad {
-  listenTo(btns: BUTTON_TYPE[])
-  isButtonPressed(btn: BUTTON_TYPE): boolean
 }
 
 
@@ -495,16 +455,6 @@ export enum DPAD {
   DOWN = 3,
 }
 
-
-export class OrGamepad implements IGamepad {
-  private pads: IGamepad[]
-  constructor(pads: IGamepad[]) {
-    this.pads = pads
-  }
-
-  listenTo(btns: BUTTON_TYPE[]) { for (const pad of this.pads) { pad.listenTo(btns) } }
-  isButtonPressed(btn: BUTTON_TYPE) { for (const pad of this.pads) { if (pad.isButtonPressed(btn)) { return true } } return false }
-}
 
 
 export function zIndexComparator(a: ObjectInstance<any, any>, b: ObjectInstance<any, any>) {

@@ -1,0 +1,53 @@
+{
+  "vendorId": 1356,
+  "productId": 2508,
+
+  "standard": {
+    "buttons": [
+      "CLUSTER_DOWN",
+      "CLUSTER_RIGHT",
+      "CLUSTER_LEFT",
+      "CLUSTER_UP",
+      "BUMPER_TOP_LEFT",
+      "BUMPER_TOP_RIGHT",
+      "BUMPER_BACK_LEFT",
+      "BUMPER_BACK_RIGHT",
+      "SELECT",
+      "START",
+      "AXIS_LEFT",
+      "AXIS_RIGHT",
+      "DPAD_UP",
+      "DPAD_DOWN",
+      "DPAD_LEFT",
+      "DPAD_RIGHT",
+      "HOME"
+    ],
+    "axes": [
+      ["LEFT", "x"],
+      ["LEFT", "y"],
+      ["RIGHT", "x"],
+      ["RIGHT", "y"]
+    ]
+  },
+
+  "buttons": [
+    { "pin": 5, "names": ["DPAD_UP"],    "value": 0, "mask": 16, "clearBit": 3 },
+    { "pin": 5, "names": ["DPAD_RIGHT"], "value": 2, "mask": 16 },
+    { "pin": 5, "names": ["DPAD_DOWN"],  "value": 4, "mask": 16 },
+    { "pin": 5, "names": ["DPAD_LEFT"],  "value": 6, "mask": 16 },
+    { "pin": 5, "names": ["DPAD_RIGHT", "DPAD_UP"],   "value": 1, "mask": 16 },
+    { "pin": 5, "names": ["DPAD_RIGHT", "DPAD_DOWN"], "value": 3, "mask": 16 },
+    { "pin": 5, "names": ["DPAD_LEFT", "DPAD_DOWN"],  "value": 5, "mask": 16 },
+    { "pin": 5, "names": ["DPAD_LEFT", "DPAD_UP"],    "value": 7, "mask": 16 },
+    { "pin": 5, "names": ["CLUSTER_LEFT"],  "bit": 4 },
+    { "pin": 5, "names": ["CLUSTER_DOWN"],  "bit": 5 },
+    { "pin": 5, "names": ["CLUSTER_RIGHT"], "bit": 6 },
+    { "pin": 5, "names": ["CLUSTER_UP"],    "bit": 7 }
+  ],
+
+  "joysticks": [
+      { "name": "LEFT",  "xPin": 1, "yPin": 2 },
+      { "name": "RIGHT", "xPin": 3, "yPin": 4 }
+  ]
+
+}

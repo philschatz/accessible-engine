@@ -1,12 +1,13 @@
-import {Game, Camera, SpriteController, IGamepad, Image, DefiniteMap, Sprite, InstanceController, DPAD, ObjectInstance, CollisionChecker, IPosition, GameObject, BUTTON_TYPE, zIndexComparator, IPixel, DrawPixelsFn, ShowDialogFn} from './engine'
+import {Game, Camera, SpriteController, Image, DefiniteMap, Sprite, InstanceController, DPAD, ObjectInstance, CollisionChecker, IPosition, GameObject, zIndexComparator, IPixel, DrawPixelsFn, ShowDialogFn} from './engine'
 import {setMoveTo, DoubleArray} from './terminal'
 import { LETTERS } from './letters'
 import { BBox } from 'rbush'
+import { IGamepad, BUTTON_TYPE } from './gamepad/api'
 
 export class MyGame implements Game {
   
   load(gamepad: IGamepad, sprites: SpriteController) {
-    gamepad.listenTo([BUTTON_TYPE.ARROW_LEFT, BUTTON_TYPE.ARROW_RIGHT, BUTTON_TYPE.ARROW_DOWN, BUTTON_TYPE.ARROW_UP, BUTTON_TYPE.CLUSTER_BOTTOM])
+    // gamepad.listenTo([BUTTON_TYPE.ARROW_LEFT, BUTTON_TYPE.ARROW_RIGHT, BUTTON_TYPE.ARROW_DOWN, BUTTON_TYPE.ARROW_UP, BUTTON_TYPE.CLUSTER_BOTTOM])
 
     const images = new DefiniteMap<Image>()
 
@@ -878,6 +879,8 @@ type PlayerProps = {
   r_dir: number
   r_wait: number
   r_factor: number
+
+  tick: number // just used for local testing
 }
 
 function playerUpdateFn(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, showDialog: ShowDialogFn) {
@@ -894,6 +897,7 @@ function playerUpdateFn(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, 
   // initialize the props
   const p = o.props
   if (p.zreal === undefined) {
+    p.tick = 0
     p.xreal = 0
     p.yreal = 30
     p.zreal = 100
@@ -938,87 +942,31 @@ function playerUpdateFn(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, 
     o.zIndex = -1000
   }
 
-
-// Refer to: http://rosettacode.org/wiki/Bitmap/Bresenham's_line_algorithm#JavaScript
-function bline(x0: number, y0: number, x1: number, y1: number, setPixel: (x: number, y: number) => void) {
-  var dx = Math.abs(x1 - x0),
-      sx = x0 < x1 ? 1 : -1;
-  var dy = Math.abs(y1 - y0),
-      sy = y0 < y1 ? 1 : -1;
-  var err = (dx > dy ? dx : -dy) / 2;
-  while (true) {
-      setPixel(x0, y0);
-      if (x0 === x1 && y0 === y1) break;
-      var e2 = err;
-      if (e2 > -dx) {
-          err -= dy;
-          x0 += sx;
-      }
-      if (e2 < dy) {
-          err += dx;
-          y0 += sy;
-      }
-  }
-}
 // Show a test dialog all the time
 const options = {
   position: POSITION.ABSOLUTE,
   placement: PLACEMENT.UP,
   maxLines: 3,
   gradualMessage: false,
-  message: 'GOMEZ...\nSOMETHING WENT WRONG.',
+  message: ['GOMEZ...', 'SOMETHING WENT WRONG.'],
   messageFgColor: '#ffffff',
   bgColor: '#00ff00'
 }
 
-showDialog(options.message, (message: string, camera: Camera, startTick: number, currentTick: number, drawPixelsFn: DrawPixelsFn) => {
+p.tick += 1
+let mult = 200
+let msg = 'GOMEZ...'
+if (p.tick >= mult *  1) { msg = 'SOMETHING WENT WRONG.' }
+if (p.tick >= mult *  2) { msg = 'THE WARP GATE BROKE!' }
+if (p.tick >= mult *  3) { msg = 'WE ARE STRANDED HERE!' }
+if (p.tick >= mult *  4) { msg = 'MAYBE YOU CAN FIND' }
+if (p.tick >= mult *  5) { msg = 'SOME WAY TO FIX IT?' }
+if (p.tick >= mult *  6) { msg = '' }
+
+if (msg) {
+  showDialog([msg], dialogTwo)
+}
   
-  const canvas = new DoubleArray<string>()
-
-  // from https://www.cc.gatech.edu/grads/m/Aaron.E.McClennen/Bresenham/code.html
-  function drawLine(start: IPosition, end: IPosition, color: string) {
-    bline(start.x, start.y, end.x, end.y, (x, y) => canvas.set({x, y}, color))
-  }
-
-  function drawRect(start: IPosition, end: IPosition, color: string) {
-    drawLine({x: start.x, y: start.y}, {x:   end.x, y: start.y}, color)
-    drawLine({x: start.x, y:   end.y}, {x:   end.x, y:   end.y}, color)
-    drawLine({x: start.x, y: start.y}, {x: start.x, y:   end.y}, color)
-    drawLine({x:   end.x, y: start.y}, {x:   end.x, y:   end.y}, color)
-  }
-
-  const tl = {x:   4, y:  4}
-  const br = {x: 124, y: 4 + (8) * 2} // 2 lines of text
-
-  for (let y = tl.y; y < br.y; y++) {
-    for (let x = tl.x; x < br.x; x++) {
-      if ((x + y) % 2 === 0) {
-        canvas.set({x, y}, '#1D2B53') // dark blue
-      }
-    }
-  }
-
-  drawRect(tl, br, '#FFF1E8') // white
-  drawLine({x: tl.x + 1, y: br.y + 1}, {x: br.x + 1, y: br.y + 1}, '#1D2B53')
-  drawLine({x: br.x + 1, y: tl.y + 1}, {x: br.x + 1, y: br.y + 1}, '#1D2B53')
-
-  drawPixelsFn({x: 0, y: 0}, canvas.asArray(), false, false)
-
-  // convert the lines of text to characters
-  const lines = message.split('\n')
-  lines.forEach((line, rowNum) => {
-    for (let colNum = 0; colNum < line.length; colNum++) {
-      const c = line[colNum]
-
-      const pixels = LETTERS.get(c).map(row => row.map(bit => bit ? '#FFF1E8' : null))
-      const x = tl.x + 2 + colNum * 8
-      const y = tl.y + 2 + rowNum * 8
-      drawPixelsFn({x, y}, pixels, false, false)
-    }
-  })
-
-  
-})
 
 
 
@@ -1435,4 +1383,124 @@ function rotate_world(o: ObjectInstance<PlayerProps, any>, collisionChecker: Col
     o.zIndex = -1000 // player is always on top
   
   }
+}
+
+
+
+
+// Refer to: http://rosettacode.org/wiki/Bitmap/Bresenham's_line_algorithm#JavaScript
+function bline(x0: number, y0: number, x1: number, y1: number, setPixel: (x: number, y: number) => void) {
+  var dx = Math.abs(x1 - x0),
+      sx = x0 < x1 ? 1 : -1;
+  var dy = Math.abs(y1 - y0),
+      sy = y0 < y1 ? 1 : -1;
+  var err = (dx > dy ? dx : -dy) / 2;
+  while (true) {
+      setPixel(x0, y0);
+      if (x0 === x1 && y0 === y1) break;
+      var e2 = err;
+      if (e2 > -dx) {
+          err -= dy;
+          x0 += sx;
+      }
+      if (e2 < dy) {
+          err += dx;
+          y0 += sy;
+      }
+  }
+}
+
+// from https://www.cc.gatech.edu/grads/m/Aaron.E.McClennen/Bresenham/code.html
+function drawLine(canvas: DoubleArray<string>, start: IPosition, end: IPosition, color: string) {
+  bline(start.x, start.y, end.x, end.y, (x, y) => canvas.set({x, y}, color))
+}
+
+function drawRect(canvas: DoubleArray<string>, start: IPosition, end: IPosition, color: string) {
+  drawLine(canvas, {x: start.x, y: start.y}, {x:   end.x, y: start.y}, color)
+  drawLine(canvas, {x: start.x, y:   end.y}, {x:   end.x, y:   end.y}, color)
+  drawLine(canvas, {x: start.x, y: start.y}, {x: start.x, y:   end.y}, color)
+  drawLine(canvas, {x:   end.x, y: start.y}, {x:   end.x, y:   end.y}, color)
+}
+
+
+function dialogOne(message: string[], camera: Camera, startTick: number, currentTick: number, drawPixelsFn: DrawPixelsFn) {
+  
+  const canvas = new DoubleArray<string>()
+
+  const tl = {x:   4, y:  4}
+  const br = {x: 124, y: 5 + (5 + 2) * message.length} // 2 lines of text
+
+  // draw diagonal shadow grid
+  for (let y = tl.y; y < br.y; y++) {
+    for (let x = tl.x; x < br.x; x++) {
+      if ((x + y) % 2 === 0) {
+        canvas.set({x, y}, '#1D2B53') // dark blue
+      }
+    }
+  }
+
+  drawRect(canvas, tl, br, '#FFF1E8') // white
+  // shadow
+  drawLine(canvas, {x: tl.x + 1, y: br.y + 1}, {x: br.x + 1, y: br.y + 1}, '#1D2B53') // blue
+  drawLine(canvas, {x: br.x + 1, y: tl.y + 1}, {x: br.x + 1, y: br.y + 1}, '#1D2B53') // blue
+
+  drawPixelsFn({x: 0, y: 0}, canvas.asArray(), false, false)
+
+  // convert the lines of text to characters
+  const lines = message
+  lines.forEach((line, rowNum) => {
+    for (let colNum = 0; colNum < line.length; colNum++) {
+      const c = line[colNum]
+
+      const pixels = LETTERS.get(c).map(row => row.map(bit => bit ? '#FFF1E8' : null))
+      const x = tl.x + 2 + colNum * (3 + 1)
+      const y = tl.y + 2 + rowNum * (5 + 2)
+      drawPixelsFn({x, y}, pixels, false, false)
+    }
+  })
+  
+}
+
+
+function dialogTwo(message: string[], camera: Camera, startTick: number, currentTick: number, drawPixelsFn: DrawPixelsFn) {
+  
+  const canvas = new DoubleArray<string>()
+
+  const len = (message[0].length * 4) + 6 // padding
+
+  const cameraBbox = camera.toBBox()
+  const mid = camera.size().width / 2 // (cameraBbox.maxX + cameraBbox.minX) / 2
+
+  const tl = {x: Math.round(mid - len / 2), y: 4}
+  const br = {x: Math.round(mid + len / 2), y: 7 + 8} // 1 line of text
+
+
+
+  for (let y = tl.y; y < br.y; y++) {
+    for (let x = tl.x; x < br.x; x++) {
+      // skip the corners
+      if (x === tl.x && y === tl.y || 
+          x === tl.x && y === br.y - 1 || 
+          x === br.x - 1 && y === br.y - 1 || 
+          x === br.x - 1 && y === tl.y
+        ) {
+        continue
+      }
+      canvas.set({x, y}, '#000000')
+    }
+  }
+
+  drawPixelsFn({x: 0, y: 0}, canvas.asArray(), false, false)
+
+  // convert the lines of text to characters
+  const line = message[0]
+  for (let colNum = 0; colNum < line.length; colNum++) {
+    const c = line[colNum]
+
+    const pixels = LETTERS.get(c).map(row => row.map(bit => bit ? '#FFF1E8' : null))
+    const x = tl.x + 3 + colNum * 4
+    const y = tl.y + 3
+    drawPixelsFn({x, y}, pixels, false, false)
+  }
+  
 }

@@ -1,35 +1,41 @@
-const gamepad = require('gamepad')
+var GamePad = require('node-gamepad')
+const config = require('node-gamepad/controllers/ps4/dualshock4v2')
+console.log(config)
+var controller = new GamePad('ps4/dualshock4v2')
+try {
+  controller.connect()
 
-gamepad.init()
+  config.buttons.forEach(({name}) => {
+    console.log(`Supports ${name}:press and :release`)
+    controller.on(`${name}:press`, () => { console.log(`${name}:press`); console.log(controller._states)})
+    controller.on(`${name}:release`, () => { console.log(`${name}:release`); console.log(controller._states) })
+  })
+  // config.joysticks.forEach(({name}) => {
+  //   console.log(`Supports ${name}:move({x,y})`)
+  //   controller.on(`${name}:move`, (a) => console.log(`${name}:move`, a))
+  // })    
+} catch (e) {
+  console.error('Could not find PS4 dual-shock controller.')
+  console.error(e)
+}
 
-// Create a game loop and poll for events
-setInterval(gamepad.processEvents, 16)
-// Scan for new gamepads as a slower rate
-setInterval(gamepad.detectDevices, 500)
-
-// Listen for button up events on all gamepads
-gamepad.on('attach', (id, device) => {
-  console.log('gamepad attached. Desc, vendor, product: ', device.description, device.vendorID, device.productID)
-})
-
-// gamepad.on('up',   (id, num) => console.log('gamepad up', id, num))
-gamepad.on('down', (id, num) => console.log('gamepad down', num))
-
-
-// CLUSTER_TOP = 3
-// CLUSTER_BOTTOM = 1
-// CLUSTER_LEFT = 0
-// CLUSTER_RIGHT = 2
-
-// BUMPER_TOP_LEFT = 4
-// BUMPER_TOP_RIGHT = 5
-
-// BUMPER_BOTTOM_LEFT = 6
-// BUMPER_BOTTOM_RIGHT = 7
-
-// SHARE = 8
-// OPTIONS = 9
-// TOUCHPAD = 13
-// POWER = 12
-// LEFT_ANALOG = 10
-// RIGHT_ANALOG = 11
+// Supports dpadUp:press and :release
+// Supports dpadLeft:press and :release
+// Supports dpadRight:press and :release
+// Supports dpadDown:press and :release
+// Supports options:press and :release
+// Supports share:press and :release
+// Supports x:press and :release
+// Supports circle:press and :release
+// Supports square:press and :release
+// Supports triangle:press and :release
+// Supports r1:press and :release
+// Supports r2:press and :release
+// Supports l1:press and :release
+// Supports l2:press and :release
+// Supports touch:press and :release
+// Supports psx:press and :release
+// Supports l3:press and :release
+// Supports r3:press and :release
+// Supports left:move({x,y})
+// Supports right:move({x,y})
