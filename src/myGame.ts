@@ -1084,7 +1084,11 @@ function to_real(n: number) {
   return n*8
 }
 
-function savelast() { }
+function savelast(p: PlayerProps) {
+  p.xlast = p.xreal
+  p.ylast = p.yreal
+  p.zlast = p.zreal
+}
 
 function find_floor(layer: number, o: ObjectInstance<PlayerProps, any>, collisionChecker: CollisionChecker, floors: Sprite[]) {
 
@@ -1190,6 +1194,7 @@ function pzmove(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisio
                p.dz = 0
                p.coyote = p.coyotemax
                sfx(23)
+               savelast(p)
             }
          }
       }
@@ -1225,10 +1230,11 @@ function pzmove(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisio
          p.dz -= 1
       }
    }
+   
    // save last safe position
-   if (p.coyote >= p.coyotemax) {
-      savelast()
-   }
+  //  if (p.coyote >= p.coyotemax) {
+  //     savelast(p)
+  //  }
    // update position
    p.zreal += checkNaN(flr(p.dz/3))
    // respawn
