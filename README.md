@@ -21,3 +21,6 @@ I tried multiple gamepad libraries but they had the following problems:
 - [dualshock-controller](https://github.com/Kylir/node-dualshock-controller) only worked for PS4 controllers and only the fork contained the configuration for the v2 PS4 controller
 - [gamepad](https://github.com/warp/node-gamepad#node-12-support) randomly segfaulted, the DPad was reported as a joystick, and only a fork supported node 12
 - [node-gamepad](https://github.com/kaikousa/node-gamepad#dualshock4v2) only supported pressing one button at a time and only a fork contained the PS4 vs configuration
+
+
+There is a large database of game controllers but this is the [only description of the file format I have found](https://github.com/Vladar4/sdl2_nim/blob/7f3422cd5480ba0961a1f8922ed7609326215656/sdl2/private/gamecontroller.nim#L77)
