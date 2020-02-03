@@ -723,7 +723,18 @@ export class MyGame implements Game {
   }
 
   drawOverlay(drawPixelsFn: DrawPixelsFn, drawTextFn: DrawTextFn, fields: SimpleObject) {
-    CAMERA_SIZE.width - 16
+    const cubeCount = fields.cubeCount || 0
+    const cubeCountStr = `${cubeCount}`
+    const cubeCountPos = {x: CAMERA_SIZE.width - 10 - cubeCountStr.length * 5, y: 2}
+    drawTextFn(cubeCountPos, cubeCountStr, '#000000')
+
+    const canvas = new DoubleArray<string>()
+    drawRect(canvas, {x: 0, y: 0}, {x: 6, y: 6}, '#000000')
+    drawRect(canvas, {x: 1, y: 1}, {x: 5, y: 5}, '#FFF024') // yellow
+    drawRect(canvas, {x: 2, y: 2}, {x: 4, y: 4}, '#FFF024') // yellow
+    drawRect(canvas, {x: 3, y: 3}, {x: 3, y: 3}, '#FFF024') // yellow
+    
+    drawPixelsFn({ x: CAMERA_SIZE.width - 2 - 8, y: 1 }, canvas.asArray(), false, false)
   }
 
   drawDialog(message: string, drawPixelsFn: DrawPixelsFn, drawTextFn: DrawTextFn, elapsedMs: number, target: null, additional: Opt<SimpleObject>) {
@@ -758,109 +769,6 @@ export class MyGame implements Game {
 
   }
 
-}
-
-enum POSITION {
-  ABSOLUTE,
-  RELATIVE
-}
-
-enum PLACEMENT {
-  UP,
-  DOWN,
-  AWAY
-}
-
-type DialogOptions = {
-  position: POSITION // at the top/bottom of the screen or above/below the target
-  placement: PLACEMENT
-  target?: IPosition
-  maxLines: number
-  cornerSprite?: Sprite // (top-left)
-  nonCornerSprite?: Sprite // top/left/bottom/right
-  gradualMessage: boolean
-  // gradualSfX: SFX  // or maybe just use this instead of the boolean
-  title?: string
-  titleFgColor?: string
-  titleBgColor?: string
-
-  message: string
-  messageFgColor: string
-  messageShadowColor?: string
-  bgColor: string
-
-  actionIcon?: Sprite
-  actionBounce?: boolean
-
-  caretSprite?: Sprite
-}
-
-
-function drawDialog(camera: Camera, startTick: number, currentTick: number, drawPixelsFn: DrawPixelsFn, o: DialogOptions) {
-  const bbox = camera.toBBox()
-  const { width, height } = camera.size()
-
-  let top = 0
-  let left = 0
-  let bottom = 0
-  let right = 0
-  switch (o.position) {
-    case POSITION.ABSOLUTE:
-      switch (o.placement) {
-        case PLACEMENT.UP:
-          top = 0
-          left = 0
-          bottom = o.maxLines * (8 + 2) // 2 pixels for padding
-          right = width
-          break
-        case PLACEMENT.DOWN:
-          top = height - (o.maxLines * (8 + 2))
-          left = 0
-          bottom = height
-          right = width
-          break
-        default: throw new Error('BUG: Unsupported so far')
-      }
-      break
-
-    default: throw new Error('BUG: Unsupported so far')
-  }
-
-  // Draw the border
-  if (o.cornerSprite && o.maxLines === 1) {
-    if (top !== bottom) throw new Error('We are assuming that we will render only one line')
-    const endpoint = o.cornerSprite.tick(startTick, currentTick).pixels
-    drawPixelsFn({ x: left, y: top }, endpoint, false, false)
-    drawPixelsFn({ x: right, y: top }, endpoint, true, false)
-  } else if (o.cornerSprite) {
-    const corner = o.cornerSprite.tick(startTick, currentTick).pixels
-    drawPixelsFn({ x: left, y: top }, corner, false, false)
-    drawPixelsFn({ x: right, y: top }, corner, true, false)
-    drawPixelsFn({ x: left, y: bottom }, corner, false, true)
-    drawPixelsFn({ x: right, y: bottom }, corner, true, true)
-
-    if (o.nonCornerSprite) {
-      const nonCorner = o.nonCornerSprite.tick(startTick, currentTick).pixels
-
-      for (let x = 0; x < right - left; x++) {
-        drawPixelsFn({ x, y: top }, nonCorner, false, false)
-        drawPixelsFn({ x, y: bottom }, nonCorner, false, true)
-      }
-      for (let y = 0; y < bottom - top; y++) {
-        drawPixelsFn({ x: left, y }, nonCorner, true, false)
-        drawPixelsFn({ x: right, y }, nonCorner, true, true)
-      }
-    }
-  } else {
-    const pixels = Array(bottom - top).fill(Array(right - left).fill(o.bgColor))
-    drawPixelsFn({ x: left, y: top }, pixels, false, false)
-  }
-
-  // convert the lines of text to characters
-  const lines = o.message.split('\n')
-  lines.forEach((line, rowNum) => {
-    // drawText({x: left, y: top}, line, o.messageFgColor)
-  })
 }
 
 const EVERYTHING_BBOX = {
@@ -917,7 +825,7 @@ type PlayerProps = {
   tick: number // just used for local testing
 }
 
-function playerUpdateFn(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, showDialog: ShowDialogFn) {
+function playerUpdateFn(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, showDialog: ShowDialogFn, overlayState: SimpleObject) {
   const floors = [
     sprites.get('treeTopLeft'),
     sprites.get('treeTopRight'),
@@ -976,17 +884,6 @@ function playerUpdateFn(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, 
     o.zIndex = -1000
   }
 
-  // Show a test dialog all the time
-  const options = {
-    position: POSITION.ABSOLUTE,
-    placement: PLACEMENT.UP,
-    maxLines: 3,
-    gradualMessage: false,
-    message: ['GOMEZ...', 'SOMETHING WENT WRONG.'],
-    messageFgColor: '#ffffff',
-    bgColor: '#00ff00'
-  }
-
   p.tick += 1
   let mult = 200
   let msg = 'GOMEZ...'
@@ -1019,6 +916,9 @@ function playerUpdateFn(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, 
   lastRender = now
   const seconds = diff[0] + diff[1] / (1000 * 1000 * 1000)
   console.log(`Player: grid=(${o.props.x},${o.props.y},${o.props.z}H) win=(${o.pos.x},${o.pos.y}) Real=(${o.props.xreal},${o.props.yreal},${o.props.zreal}H) FPS:${(new Number(1 / seconds)).toFixed(1)}     `)
+
+  // Show something in the overlay
+  overlayState.cubeCount = o.props.x
 }
 
 let lastRender: [number, number] = [0, 0]

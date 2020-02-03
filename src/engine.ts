@@ -219,6 +219,7 @@ export class Engine {
   private readonly instances: InstanceController
   private readonly camera: Camera
   private readonly gamepad: IGamepad
+  private overlayState: SimpleObject
   private pendingDialog: Opt<{message: string, startTick: number, additional: Opt<SimpleObject>}>
 
   constructor(game: Game, renderer: IRenderer, gamepad: IGamepad) {
@@ -231,6 +232,7 @@ export class Engine {
     this.renderer = renderer
     this.game = game
     this.pendingDialog = null
+    this.overlayState = {}
 
     this.drawText = this.drawText.bind(this)
     this.drawPixels = this.drawPixels.bind(this)
@@ -247,7 +249,7 @@ export class Engine {
     // Update each object
     // TODO: Only update objects in view or ones that have an alwaysUpdate=true flag set (TBD)
     this.bush.all().forEach(i => {
-      i.static.updateFn(i, this.gamepad, this.collisionChecker, this.sprites, this.instances, this.camera, this.showDialog)
+      i.static.updateFn(i, this.gamepad, this.collisionChecker, this.sprites, this.instances, this.camera, this.showDialog, this.overlayState)
     })
 
     this.draw()
@@ -271,6 +273,8 @@ export class Engine {
       const screenPos = relativeTo({x: t.pos.x, y: t.pos.y - image.pixels.length + 1 /* Shift the image up because it might not be a 8x8 sprite, like if it is a tall person */}, this.camera.topLeft())
       this.drawPixels(screenPos, image.pixels, t.hFlip, false)
     }
+
+    this.game.drawOverlay(this.drawPixels, this.drawText, this.overlayState)
 
     if (this.pendingDialog) {
       this.game.drawDialog(this.pendingDialog.message, this.drawPixels, this.drawText, this.curTick - this.pendingDialog.startTick, null, this.pendingDialog.additional)
@@ -309,7 +313,11 @@ export class Engine {
     for (let colNum = 0; colNum < line.length; colNum++) {
       const c = line[colNum]
 
-      const pixels = LETTERS.get(c).map(row => row.map(bit => bit ? '#FFF1E8' : null))
+      const l = LETTERS.get(c)
+      if (!l) {
+        throw new Error(`BUG: Do not have sprite for character "${c}"`)
+      }
+      const pixels = l.map(row => row.map(bit => bit ? hexColor : null))
       const x = screenPos.x + colNum * 4
       const y = screenPos.y
       this.drawPixels({ x, y }, pixels, false, false)
@@ -410,7 +418,7 @@ function boxNudge(source: number, target: number, leashLength: number | null) {
 
 
 export type ShowDialogFn = (message: string, additional: Opt<SimpleObject>) => void
-export type UpdateFn<P, S> = (o: ObjectInstance<P, S>, gamepad: IGamepad, collisionCheker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, showDialogFn: ShowDialogFn) => void
+export type UpdateFn<P, S> = (o: ObjectInstance<P, S>, gamepad: IGamepad, collisionCheker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, showDialogFn: ShowDialogFn, overlayState: SimpleObject) => void
 
 export class InstanceController {
   private readonly bush: RBush<ObjectInstance<any, any>>
