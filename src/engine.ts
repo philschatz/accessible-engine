@@ -1,5 +1,6 @@
 import Rbush from 'rbush'
 import { IGamepad } from './gamepad/api'
+import { LETTERS } from './letters'
 
 
 class MyRBush extends Rbush<ObjectInstance<any, any>> {
@@ -231,6 +232,7 @@ export class Engine {
     this.game = game
     this.pendingDialog = null
 
+    this.drawText = this.drawText.bind(this)
     this.drawPixels = this.drawPixels.bind(this)
     this.showDialog = this.showDialog.bind(this)
   }
@@ -271,7 +273,7 @@ export class Engine {
     }
 
     if (this.pendingDialog) {
-      this.game.drawDialog(this.pendingDialog.message, this.drawPixels, this.curTick - this.pendingDialog.startTick, null, this.pendingDialog.additional)
+      this.game.drawDialog(this.pendingDialog.message, this.drawPixels, this.drawText, this.curTick - this.pendingDialog.startTick, null, this.pendingDialog.additional)
       this.pendingDialog = null
     }
 
@@ -298,8 +300,20 @@ export class Engine {
         relX++
       }
       relY++
+    } 
+  }
+
+  private drawText(screenPos: IPosition, message: string, hexColor: string) {
+    // convert the lines of text to characters
+    const line = message
+    for (let colNum = 0; colNum < line.length; colNum++) {
+      const c = line[colNum]
+
+      const pixels = LETTERS.get(c).map(row => row.map(bit => bit ? '#FFF1E8' : null))
+      const x = screenPos.x + colNum * 4
+      const y = screenPos.y
+      this.drawPixels({ x, y }, pixels, false, false)
     }
-    
   }
 
   showDialog(message: string, additional: SimpleObject) {
@@ -321,6 +335,7 @@ function relativeTo(pos1: IPosition, pos2: IPosition): IPosition {
 }
 
 export type DrawPixelsFn = (screenPos: IPosition, pixels: IPixel[][], hFlip: boolean, vFlip: boolean) => void
+export type DrawTextFn = (screenPos: IPosition, letters: string, hexColor: string) => void
 
 type SimpleValue = null | boolean | number | string | SimpleValue[]
 
@@ -332,8 +347,8 @@ export interface Game {
   load(gamepad: IGamepad, sprites: SpriteController)
   init(sprites: SpriteController, instances: InstanceController)
   drawBackground(tiles: ObjectInstance<any, any>[], camera: Camera, drawPixelsFn: DrawPixelsFn)
-  drawOverlay(drawPixelsFn: DrawPixelsFn, additional: SimpleObject)
-  drawDialog(message: string, drawPixelsFn: DrawPixelsFn, elapsedMs: number, target: null, additional: Opt<SimpleObject>)
+  drawOverlay(drawPixelsFn: DrawPixelsFn, drawTextFn: DrawTextFn, additional: SimpleObject)
+  drawDialog(message: string, drawPixelsFn: DrawPixelsFn, drawTextFn: DrawTextFn, elapsedMs: number, target: null, additional: Opt<SimpleObject>)
 }
 
 export class Camera {

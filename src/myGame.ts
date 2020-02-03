@@ -1,8 +1,12 @@
-import { Game, Camera, SpriteController, Image, DefiniteMap, Sprite, InstanceController, DPAD, ObjectInstance, CollisionChecker, IPosition, GameObject, zIndexComparator, IPixel, DrawPixelsFn, ShowDialogFn, SimpleObject, Opt } from './engine'
+import { Game, Camera, SpriteController, Image, DefiniteMap, Sprite, InstanceController, DPAD, ObjectInstance, CollisionChecker, IPosition, GameObject, zIndexComparator, IPixel, DrawPixelsFn, ShowDialogFn, SimpleObject, Opt, DrawTextFn } from './engine'
 import { setMoveTo, DoubleArray } from './terminal'
-import { LETTERS } from './letters'
 import { BBox } from 'rbush'
 import { IGamepad, BUTTON_TYPE } from './gamepad/api'
+
+const CAMERA_SIZE = {
+  width: 128,
+  height: 96
+}
 
 export class MyGame implements Game {
 
@@ -718,16 +722,16 @@ export class MyGame implements Game {
     drawPixelsFn({ x: 0, y: 0 }, pixels, false, false)
   }
 
-  drawOverlay(drawPixelsFn: DrawPixelsFn, fields: SimpleObject) {
-
+  drawOverlay(drawPixelsFn: DrawPixelsFn, drawTextFn: DrawTextFn, fields: SimpleObject) {
+    CAMERA_SIZE.width - 16
   }
 
-  drawDialog(message: string, drawPixelsFn: DrawPixelsFn, elapsedMs: number, target: null, additional: Opt<SimpleObject>) {
+  drawDialog(message: string, drawPixelsFn: DrawPixelsFn, drawTextFn: DrawTextFn, elapsedMs: number, target: null, additional: Opt<SimpleObject>) {
     const canvas = new DoubleArray<string>()
 
     const len = (message.length * 4) + 6 // padding
 
-    const mid = 64 // camera.width / 2
+    const mid = CAMERA_SIZE.width / 2
 
     const tl = { x: Math.round(mid - len / 2), y: 4 }
     const br = { x: Math.round(mid + len / 2), y: 7 + 8 } // 1 line of text
@@ -750,16 +754,7 @@ export class MyGame implements Game {
 
     drawPixelsFn({ x: 0, y: 0 }, canvas.asArray(), false, false)
 
-    // convert the lines of text to characters
-    const line = message
-    for (let colNum = 0; colNum < line.length; colNum++) {
-      const c = line[colNum]
-
-      const pixels = LETTERS.get(c).map(row => row.map(bit => bit ? '#FFF1E8' : null))
-      const x = tl.x + 3 + colNum * 4
-      const y = tl.y + 3
-      drawPixelsFn({ x, y }, pixels, false, false)
-    }
+    drawTextFn({x: tl.x + 3, y: tl.y + 3}, message, '#FFF1E8')
 
   }
 
@@ -864,14 +859,7 @@ function drawDialog(camera: Camera, startTick: number, currentTick: number, draw
   // convert the lines of text to characters
   const lines = o.message.split('\n')
   lines.forEach((line, rowNum) => {
-    for (let colNum = 0; colNum < line.length; colNum++) {
-      const c = line[colNum]
-
-      const pixels = LETTERS.get(c).map(row => row.map(bit => bit ? o.messageFgColor : null))
-      const x = left + colNum * 8
-      const y = top + rowNum * 8
-      drawPixelsFn({ x, y }, pixels, false, false)
-    }
+    // drawText({x: left, y: top}, line, o.messageFgColor)
   })
 }
 
@@ -1502,14 +1490,7 @@ function dialogOne(message: string[], camera: Camera, startTick: number, current
   // convert the lines of text to characters
   const lines = message
   lines.forEach((line, rowNum) => {
-    for (let colNum = 0; colNum < line.length; colNum++) {
-      const c = line[colNum]
-
-      const pixels = LETTERS.get(c).map(row => row.map(bit => bit ? '#FFF1E8' : null))
-      const x = tl.x + 2 + colNum * (3 + 1)
-      const y = tl.y + 2 + rowNum * (5 + 2)
-      drawPixelsFn({ x, y }, pixels, false, false)
-    }
+    // drawTextFn({x: tl.x + 2, y: tl.y + 2}, line, '#FFF1E8'
   })
 
 }
@@ -1545,15 +1526,5 @@ function dialogTwo(message: string[], camera: Camera, startTick: number, current
 
   drawPixelsFn({ x: 0, y: 0 }, canvas.asArray(), false, false)
 
-  // convert the lines of text to characters
-  const line = message[0]
-  for (let colNum = 0; colNum < line.length; colNum++) {
-    const c = line[colNum]
-
-    const pixels = LETTERS.get(c).map(row => row.map(bit => bit ? '#FFF1E8' : null))
-    const x = tl.x + 3 + colNum * 4
-    const y = tl.y + 3
-    drawPixelsFn({ x, y }, pixels, false, false)
-  }
-
+  // drawLettersFn({x: tl.x + 3, y: tl.y + 3}, message, '#FFF1E8')
 }
