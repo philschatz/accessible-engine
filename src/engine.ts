@@ -39,6 +39,7 @@ export class ObjectInstance<P, S> {
   public static: GameObject<P, S>
   sprite: Sprite
   startTick: number = 0
+  maskColor: Opt<string>
   public props: P
   public hFlip: boolean
 
@@ -60,7 +61,7 @@ export class ObjectInstance<P, S> {
   }
 
   toBBox(): BBox {
-    return {minX: this.pos.x, minY: this.pos.y, maxX: this.pos.x + 8, maxY: this.pos.y + 8}
+    return {minX: this.pos.x, minY: this.pos.y, maxX: this.pos.x + 7, maxY: this.pos.y + 7}
   }
 
   setSprite(sprite: Sprite) {
@@ -69,6 +70,9 @@ export class ObjectInstance<P, S> {
       this.sprite = sprite
       this.startTick = 0
     }
+  }
+  setMask(hexColor: Opt<string>) {
+    this.maskColor = hexColor
   }
 }
 
@@ -130,10 +134,12 @@ export class GameObject<P = {}, S = {}> {
 
 // An animated set of Images
 export class Sprite {
+  _name: string
   readonly playbackRate: number // 1 == every tick. 30 = every 30 ticks (1/2 a second)
   images: Image[]
 
   constructor(playbackRate: number, images: Image[]) {
+    this._name = ''
     this.playbackRate = playbackRate
     this.images = images
     // validate the images are not null
@@ -147,14 +153,13 @@ export class Sprite {
   }
 
   tick(startTick: number, curTick: number) {
-    if (this.images.length === 1) { 
-      if (!this.images[0]) { throw new Error(`BUG: Could not find sprite since there should only be one`)}
-      return this.images[0]
+    if (this.images.length === 0) {
+      throw new Error(`BUG: Could not find sprite since there should only be one`)
     }
-
     const i = Math.round((curTick - startTick) / this.playbackRate)
     const ret = this.images[i % this.images.length]
     if (!ret) { throw new Error(`BUG: Could not find sprite with index i=${i} . len=${this.images.length}`)}
+
     return ret
   }
 }
@@ -242,6 +247,11 @@ export class Engine {
   tick() {
     if (this.curTick === 0) {
       this.game.load(this.gamepad, this.sprites)
+      // For debugging attach a name to each sprite
+      for (const [name, sprite] of this.sprites.entries()) {
+        sprite._name = name
+      }
+
       this.game.init(this.sprites, this.instances)
     }
     this.curTick++
@@ -261,6 +271,7 @@ export class Engine {
 
     // Lower zIndex needs to be drawn later
     tiles.sort(zIndexComparator)
+    tiles.reverse()
 
     this.renderer.drawStart()
 
@@ -271,7 +282,12 @@ export class Engine {
       const image = t.sprite.tick(t.startTick, this.curTick)
       if (!image) { throw new Error(`BUG: Could not find image for the sprite.`)}
       const screenPos = relativeTo({x: t.pos.x, y: t.pos.y - image.pixels.length + 1 /* Shift the image up because it might not be a 8x8 sprite, like if it is a tall person */}, this.camera.topLeft())
-      this.drawPixels(screenPos, image.pixels, t.hFlip, false)
+
+      let pixels = image.pixels
+      if (t.maskColor) {
+        pixels = pixels.map(row => row.map(c => c === null ? null : t.maskColor))
+      }
+      this.drawPixels(screenPos, pixels, t.hFlip, false)
     }
 
     this.game.drawOverlay(this.drawPixels, this.drawText, this.overlayState)
@@ -499,6 +515,6 @@ export function zIndexComparator(a: ObjectInstance<any, any>, b: ObjectInstance<
   } else if (a.zIndex === undefined) {
     return -1
   } else {
-    return b.zIndex - a.zIndex
+    return a.zIndex - b.zIndex
   }
 }

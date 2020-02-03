@@ -58,7 +58,7 @@ export class DoubleTerminalRenderer implements IRenderer {
       for (let x = 0; x < width; x++) {
         const pos = {x, y}
         const toDraw = this.pixelsToDraw.get(pos, BLACK)
-        if (this.pixelsOnScreen.get(pos, BLACK) !== toDraw) {
+        if (this.pixelsOnScreen.get(pos, null) !== toDraw) {
           this._drawSinglePixel(pos, toDraw)
         }
       }

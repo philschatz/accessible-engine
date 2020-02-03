@@ -653,14 +653,12 @@ export class MyGame implements Game {
     g(ledge, { x: 10, y: 9 }, 1)
 
 
-    g(treeTrunkLeft, { x: 8, y: 6 }, 4)
-    g(treeTrunkRight, { x: 9, y: 6 }, 5)
-    g(treeBottom, { x: 8, y: 5 }, 4)
-    g(treeBottom, { x: 9, y: 5 }, 5)
     g(treeTopLeft, { x: 8, y: 4 }, 4)
     g(treeTopRight, { x: 9, y: 4 }, 5)
-
-
+    g(treeBottom, { x: 8, y: 5 }, 4)
+    g(treeBottom, { x: 9, y: 5 }, 5)
+    g(treeTrunkLeft, { x: 8, y: 6 }, 4)
+    g(treeTrunkRight, { x: 9, y: 6 }, 5)
 
     // right side
     g(floor1, { x: 11, y: 7 }, 3)
@@ -711,6 +709,12 @@ export class MyGame implements Game {
 
     g(player, { x: 11, y: 2 }, 1)
 
+
+    const x = g(wall2, {x: -1, y: -1}, -4)
+    const y = g(wall2, {x: -1, y: -1}, -1)
+    if (zIndexComparator(x, y) >= 0) {
+      throw new Error(`BUG. x compared to y should be < 0 but it was ${zIndexComparator(x, y)}`)
+    }
   }
 
   drawBackground(tiles: ObjectInstance<any, any>[], camera: Camera, drawPixelsFn: DrawPixelsFn) {
@@ -915,7 +919,7 @@ function playerUpdateFn(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, 
   const diff = process.hrtime(lastRender)
   lastRender = now
   const seconds = diff[0] + diff[1] / (1000 * 1000 * 1000)
-  console.log(`Player: grid=(${o.props.x},${o.props.y},${o.props.z}H) win=(${o.pos.x},${o.pos.y}) Real=(${o.props.xreal},${o.props.yreal},${o.props.zreal}H) FPS:${(new Number(1 / seconds)).toFixed(1)}     `)
+  console.log(`Player: grid=(${o.props.x},${o.props.y},${o.props.z}H) win=(${o.pos.x},${o.pos.y}) Real=(${o.props.xreal},${o.props.yreal},${o.props.zreal}H) side=${o.props.side} FPS:${(new Number(1 / seconds)).toFixed(1)}     `)
 
   // Show something in the overlay
   overlayState.cubeCount = o.props.x
@@ -1028,9 +1032,8 @@ function savelast(p: PlayerProps) {
 function find_floor(layer: number, o: ObjectInstance<PlayerProps, any>, collisionChecker: CollisionChecker, floors: Sprite[]) {
 
   const p = o.props
-  const bbox = o.toBBox()
+  let bbox = o.toBBox()
   const x = Math.round((bbox.maxX + bbox.minX) / 2)
-
 
   // Find out if there are walls in front of us
   const walls = collisionChecker.searchBBox(bbox)
@@ -1038,43 +1041,50 @@ function find_floor(layer: number, o: ObjectInstance<PlayerProps, any>, collisio
     .sort(zIndexComparator)
 
   let hasWallsInFront = false
+  let hasWallsBehind = false
   if (walls.length > 0) {
     const front = walls[0]
     switch (p.side) {
-      case 0: hasWallsInFront = front.props.z <= p.y; break // front
-      case 2: hasWallsInFront = front.props.z >= p.y; break // back
-      case 1: hasWallsInFront = front.props.x <= p.x; break // left
-      case 3: hasWallsInFront = front.props.x >= p.x; break // right
+      case 0: hasWallsInFront = front.props.y < p.y; break // front
+      case 2: hasWallsInFront = front.props.y > p.y; break // back
+      case 1: hasWallsInFront = front.props.x < p.x; break // left
+      case 3: hasWallsInFront = front.props.x > p.x; break // right
     }
+    hasWallsBehind = !hasWallsInFront
   }
 
   // check if there is a floor below
-  const floorsBelow = collisionChecker.searchBBox({
+  const wallsBelow = collisionChecker.searchBBox({
     minX: x,
     maxX: x,
     minY: bbox.maxY + 1, // chose these because jumping does not result in mid-air player
     maxY: bbox.maxY + 7,
   })
-    .filter(item => floors.indexOf(item.sprite) >= 0) // only look at the floors
+    .filter(item => item !== o) // exclude the player (include walls & floors)
     .sort(zIndexComparator)
 
-  p.shadowed = hasWallsInFront
-  if (hasWallsInFront) {
+  // reverse when there is a wall in the front but no floor in the front
+  let maybeShadowed = false
+  if (hasWallsInFront && (wallsBelow.length > 0 && floors.indexOf(wallsBelow[0].sprite) < 0)) {
     // look for floors in the back (reverse the list)
-    floorsBelow.reverse()
+    wallsBelow.reverse()
+    maybeShadowed = true
   }
 
-  if (floorsBelow.length > 0) {
+  if (wallsBelow.length > 0 && floors.indexOf(wallsBelow[0].sprite) >= 0) { // only look at the floors
     // Shift the player to be above the floor
-    const front = floorsBelow[0]
+    const front = wallsBelow[0]
     switch (p.side) {
       case 0: p.yreal = to_real(front.props.z) + 4; break // front
       case 2: p.yreal = to_real(front.props.z) - 4; break // back
       case 1: p.xreal = to_real(front.props.x) + 4; break // left
       case 3: p.xreal = to_real(front.props.x) - 4; break // right
     }
+    p.shadowed = maybeShadowed
+    return true
   } else if (walls.length > 0) {
     // move player to front
+    p.shadowed = false
     const front = walls[0]
     switch (p.side) {
       case 0: p.yreal = to_real(front.props.z) - 1; break // front
@@ -1084,7 +1094,7 @@ function find_floor(layer: number, o: ObjectInstance<PlayerProps, any>, collisio
     }
   }
 
-  return floorsBelow.length !== 0
+  return false
 }
 
 function ismid(x: number, a: number, z: number) {
@@ -1212,9 +1222,14 @@ function draw_player(front: boolean, o: ObjectInstance<any, any>, sprites: Sprit
 
   const p = o.props
 
+  if (p.shadowed) {
+    o.setMask('#000000')
+  } else {
+    o.setMask(null)
+  }
   if (p.otrans > 0 || atrans > 0) {
     // pal_hidden()
-    console.log('Draw shadowed sprite')
+    throw new Error('Draw shadowed sprite')
   }
   let sp = playerStanding
   // if happy > 0) { sp = happySprite }
