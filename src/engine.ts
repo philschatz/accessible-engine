@@ -29,6 +29,8 @@ export interface IPosition {
   readonly y: number
 }
 
+export type Opt<T> = null | T
+
 export class ObjectInstance<P, S> {
   public pos: IPosition
   public zIndex: number | undefined // lower is on top
@@ -204,11 +206,6 @@ export class CollisionChecker {
   }
 }
 
-type Pair<A, B> = {
-  a: A,
-  b: B
-}
-
 export type PaintFn = (message: string[], camera: Camera, startTick: number, currentTick: number, drawPixelsFn: DrawPixelsFn) => void
 
 export class Engine {
@@ -221,7 +218,7 @@ export class Engine {
   private readonly instances: InstanceController
   private readonly camera: Camera
   private readonly gamepad: IGamepad
-  private pendingDialogs: Pair<string[], PaintFn>[]
+  private pendingDialog: Opt<{message: string, startTick: number, additional: Opt<SimpleObject>}>
 
   constructor(game: Game, renderer: IRenderer, gamepad: IGamepad) {
     this.bush = new MyRBush()
@@ -232,7 +229,7 @@ export class Engine {
     this.gamepad = gamepad
     this.renderer = renderer
     this.game = game
-    this.pendingDialogs = []
+    this.pendingDialog = null
 
     this.drawPixels = this.drawPixels.bind(this)
     this.showDialog = this.showDialog.bind(this)
@@ -273,10 +270,10 @@ export class Engine {
       this.drawPixels(screenPos, image.pixels, t.hFlip, false)
     }
 
-    this.pendingDialogs.forEach(({a, b}) => {
-      b(a, this.camera, 0, 0, this.drawPixels)
-    })
-    this.pendingDialogs = []
+    if (this.pendingDialog) {
+      this.game.drawDialog(this.pendingDialog.message, this.drawPixels, this.curTick - this.pendingDialog.startTick, null, this.pendingDialog.additional)
+      this.pendingDialog = null
+    }
 
     this.renderer.drawEnd()
   }
@@ -305,8 +302,14 @@ export class Engine {
     
   }
 
-  showDialog(message: string[], painter: PaintFn) {
-    this.pendingDialogs.push({a: message, b: painter})
+  showDialog(message: string, additional: SimpleObject) {
+    if (!this.pendingDialog || this.pendingDialog.message !== message) {
+      this.pendingDialog = {
+        message,
+        additional,
+        startTick: this.curTick
+      }
+    }
   }
 }
 
@@ -319,10 +322,18 @@ function relativeTo(pos1: IPosition, pos2: IPosition): IPosition {
 
 export type DrawPixelsFn = (screenPos: IPosition, pixels: IPixel[][], hFlip: boolean, vFlip: boolean) => void
 
+type SimpleValue = null | boolean | number | string | SimpleValue[]
+
+export interface SimpleObject {
+  [key: string]: SimpleValue
+}
+
 export interface Game {
   load(gamepad: IGamepad, sprites: SpriteController)
   init(sprites: SpriteController, instances: InstanceController)
   drawBackground(tiles: ObjectInstance<any, any>[], camera: Camera, drawPixelsFn: DrawPixelsFn)
+  drawOverlay(drawPixelsFn: DrawPixelsFn, additional: SimpleObject)
+  drawDialog(message: string, drawPixelsFn: DrawPixelsFn, elapsedMs: number, target: null, additional: Opt<SimpleObject>)
 }
 
 export class Camera {
@@ -383,7 +394,7 @@ function boxNudge(source: number, target: number, leashLength: number | null) {
 }
 
 
-export type ShowDialogFn = (message: string[], painter: PaintFn) => void
+export type ShowDialogFn = (message: string, additional: Opt<SimpleObject>) => void
 export type UpdateFn<P, S> = (o: ObjectInstance<P, S>, gamepad: IGamepad, collisionCheker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, showDialogFn: ShowDialogFn) => void
 
 export class InstanceController {

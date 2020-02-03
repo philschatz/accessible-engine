@@ -1,4 +1,4 @@
-import { Game, Camera, SpriteController, Image, DefiniteMap, Sprite, InstanceController, DPAD, ObjectInstance, CollisionChecker, IPosition, GameObject, zIndexComparator, IPixel, DrawPixelsFn, ShowDialogFn } from './engine'
+import { Game, Camera, SpriteController, Image, DefiniteMap, Sprite, InstanceController, DPAD, ObjectInstance, CollisionChecker, IPosition, GameObject, zIndexComparator, IPixel, DrawPixelsFn, ShowDialogFn, SimpleObject, Opt } from './engine'
 import { setMoveTo, DoubleArray } from './terminal'
 import { LETTERS } from './letters'
 import { BBox } from 'rbush'
@@ -717,6 +717,52 @@ export class MyGame implements Game {
 
     drawPixelsFn({ x: 0, y: 0 }, pixels, false, false)
   }
+
+  drawOverlay(drawPixelsFn: DrawPixelsFn, fields: SimpleObject) {
+
+  }
+
+  drawDialog(message: string, drawPixelsFn: DrawPixelsFn, elapsedMs: number, target: null, additional: Opt<SimpleObject>) {
+    const canvas = new DoubleArray<string>()
+
+    const len = (message.length * 4) + 6 // padding
+
+    const mid = 64 // camera.width / 2
+
+    const tl = { x: Math.round(mid - len / 2), y: 4 }
+    const br = { x: Math.round(mid + len / 2), y: 7 + 8 } // 1 line of text
+
+
+
+    for (let y = tl.y; y < br.y; y++) {
+      for (let x = tl.x; x < br.x; x++) {
+        // skip the corners
+        if (x === tl.x && y === tl.y ||
+          x === tl.x && y === br.y - 1 ||
+          x === br.x - 1 && y === br.y - 1 ||
+          x === br.x - 1 && y === tl.y
+        ) {
+          continue
+        }
+        canvas.set({ x, y }, '#000000')
+      }
+    }
+
+    drawPixelsFn({ x: 0, y: 0 }, canvas.asArray(), false, false)
+
+    // convert the lines of text to characters
+    const line = message
+    for (let colNum = 0; colNum < line.length; colNum++) {
+      const c = line[colNum]
+
+      const pixels = LETTERS.get(c).map(row => row.map(bit => bit ? '#FFF1E8' : null))
+      const x = tl.x + 3 + colNum * 4
+      const y = tl.y + 3
+      drawPixelsFn({ x, y }, pixels, false, false)
+    }
+
+  }
+
 }
 
 enum POSITION {
@@ -964,7 +1010,7 @@ function playerUpdateFn(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, 
   if (p.tick >= mult * 6) { msg = '' }
 
   if (msg) {
-    showDialog([msg], dialogTwo)
+    showDialog(msg, null)
   }
 
 
@@ -1212,7 +1258,6 @@ function pzmove(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisio
       // execute jump/drop
       if (gamepad.isButtonPressed(BUTTON_TYPE.DPAD_UP) || gamepad.isButtonPressed(BUTTON_TYPE.CLUSTER_DOWN) || p.dropwait >= p.dwaitmax) {
         if (p.dropwait >= 5) {
-          debugger
           p.dz = -2
         } else {
           p.dz = p.jump
