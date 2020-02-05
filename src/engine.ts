@@ -2,11 +2,10 @@ import Rbush from 'rbush'
 import { IGamepad } from './gamepad/api'
 import { LETTERS } from './letters'
 
-
 class MyRBush extends Rbush<ObjectInstance<any, any>> {
-  toBBox(item: ObjectInstance<any, any>) { return item.toBBox() }
-  compareMinX(a: ObjectInstance<any, any>, b: ObjectInstance<any, any>) { return a.pos.x - b.pos.x }
-  compareMinY(a: ObjectInstance<any, any>, b: ObjectInstance<any, any>) { return a.pos.y - b.pos.y }
+  toBBox (item: ObjectInstance<any, any>) { return item.toBBox() }
+  compareMinX (a: ObjectInstance<any, any>, b: ObjectInstance<any, any>) { return a.pos.x - b.pos.x }
+  compareMinY (a: ObjectInstance<any, any>, b: ObjectInstance<any, any>) { return a.pos.y - b.pos.y }
 }
 
 // From https://github.com/mourner/rbush
@@ -43,7 +42,7 @@ export class ObjectInstance<P, S> {
   public props: P
   public hFlip: boolean
 
-  constructor(t: GameObject<P, S>, pos: IPosition, props: P) {
+  constructor (t: GameObject<P, S>, pos: IPosition, props: P) {
     this.sprite = t.sprite
     this.static = t
     this.pos = pos
@@ -51,52 +50,53 @@ export class ObjectInstance<P, S> {
     this.hFlip = false
   }
 
-  destroy() {
+  destroy () {
     this.static.delete(this)
   }
 
-  moveTo(pos: IPosition) {
+  moveTo (pos: IPosition) {
     // delegate
     this.static.moveTo(this, pos)
   }
 
-  toBBox(): BBox {
-    return {minX: this.pos.x, minY: this.pos.y, maxX: this.pos.x + 7, maxY: this.pos.y + 7}
+  toBBox (): BBox {
+    return { minX: this.pos.x, minY: this.pos.y, maxX: this.pos.x + 7, maxY: this.pos.y + 7 }
   }
 
-  setSprite(sprite: Sprite) {
+  setSprite (sprite: Sprite) {
     // only change the sprite when it is different
     if (this.sprite !== sprite) {
       this.sprite = sprite
       this.startTick = 0
     }
   }
-  setMask(hexColor: Opt<string>) {
+
+  setMask (hexColor: Opt<string>) {
     this.maskColor = hexColor
   }
 }
 
 export class GameObject<P = {}, S = {}> {
-  private readonly bush: RBush<ObjectInstance<{},{}>>
+  private readonly bush: RBush<ObjectInstance<{}, {}>>
   readonly sprite: Sprite
   readonly instances: Set<ObjectInstance<any, any>> = new Set()
   readonly updateFn: UpdateFn<P, S>
   public props: S
 
-  constructor(bush: RBush<ObjectInstance<{},{}>>, sprite: Sprite, updateFn: UpdateFn<P, S>) {
+  constructor (bush: RBush<ObjectInstance<{}, {}>>, sprite: Sprite, updateFn: UpdateFn<P, S>) {
     this.bush = bush
     this.sprite = sprite
     this.updateFn = updateFn
   }
 
-  public new(pos: IPosition): ObjectInstance<any, any> {
+  public new (pos: IPosition): ObjectInstance<any, any> {
     const o = new ObjectInstance(this, pos, {})
     this.instances.add(o)
     this.bush.insert(o)
     return o
   }
 
-  public newBulk(positions: IPosition[]) {
+  public newBulk (positions: IPosition[]) {
     const instances = positions.map(p => new ObjectInstance<any, any>(this, p, {}))
     this.bush.load(instances)
     for (const o of instances) {
@@ -105,8 +105,8 @@ export class GameObject<P = {}, S = {}> {
     return instances
   }
 
-  moveTo(o: ObjectInstance<P, S>, newPos: IPosition) {
-    if (!this.instances.has(o)) { throw new Error('BUG: Trying to move an object that the framework is unaware of')}
+  moveTo (o: ObjectInstance<P, S>, newPos: IPosition) {
+    if (!this.instances.has(o)) { throw new Error('BUG: Trying to move an object that the framework is unaware of') }
     if (Number.isNaN(newPos.x) || Number.isNaN(newPos.y)) {
       throw new Error(`Position neeeds to have numbers as their coordinates. At least one of them was not a number. (${newPos.x}, ${newPos.y})`)
     }
@@ -118,12 +118,12 @@ export class GameObject<P = {}, S = {}> {
     this.bush.insert(o)
   }
 
-  delete(o: ObjectInstance<P, S>) {
+  delete (o: ObjectInstance<P, S>) {
     this.instances.delete(o)
     this.bush.remove(o)
   }
 
-  deleteAll() {
+  deleteAll () {
     for (const o of this.instances) {
       this.bush.remove(o)
     }
@@ -131,58 +131,59 @@ export class GameObject<P = {}, S = {}> {
   }
 }
 
-
 // An animated set of Images
 export class Sprite {
   _name: string
   readonly playbackRate: number // 1 == every tick. 30 = every 30 ticks (1/2 a second)
   images: Image[]
 
-  constructor(playbackRate: number, images: Image[]) {
+  constructor (playbackRate: number, images: Image[]) {
     this._name = ''
     this.playbackRate = playbackRate
     this.images = images
     // validate the images are not null
     for (const s of this.images) {
-      if (s === null) { throw new Error(`ERROR: sprites need to be non-null`)}
+      if (s === null) { throw new Error('ERROR: sprites need to be non-null') }
     }
   }
 
-  static forSingleImage(s: Image) {
+  static forSingleImage (s: Image) {
     return new Sprite(1, [s])
   }
 
-  tick(startTick: number, curTick: number) {
+  tick (startTick: number, curTick: number) {
     if (this.images.length === 0) {
-      throw new Error(`BUG: Could not find sprite since there should only be one`)
+      throw new Error('BUG: Could not find sprite since there should only be one')
     }
     const i = Math.round((curTick - startTick) / this.playbackRate)
     const ret = this.images[i % this.images.length]
-    if (!ret) { throw new Error(`BUG: Could not find sprite with index i=${i} . len=${this.images.length}`)}
+    if (!ret) { throw new Error(`BUG: Could not find sprite with index i=${i} . len=${this.images.length}`) }
 
     return ret
   }
 }
 
 export type IPixel = (string | null)
-type Size = {
+interface Size {
   width: number
   height: number
 }
 
 export class Image {
   public readonly pixels: IPixel[][]
-  constructor(pixels: IPixel[][]) {
+  constructor (pixels: IPixel[][]) {
     this.pixels = pixels
   }
-  getDimension(): Size {
+
+  getDimension (): Size {
     return {
       width: this.pixels[0].length,
       height: this.pixels.length
     }
   }
-  getBBox(): BBox {
-    const {width, height} = this.getDimension()
+
+  getBBox (): BBox {
+    const { width, height } = this.getDimension()
     return {
       minX: 0,
       minY: 0,
@@ -194,20 +195,20 @@ export class Image {
 
 export class CollisionChecker {
   private readonly bush: RBush<ObjectInstance<any, any>>
-  constructor(bush: RBush<ObjectInstance<any, any>>) {
+  constructor (bush: RBush<ObjectInstance<any, any>>) {
     this.bush = bush
   }
 
-  searchBBox(bbox: BBox) {
-    return this.bush.search(bbox) //.sort(zIndexComparator)
+  searchBBox (bbox: BBox) {
+    return this.bush.search(bbox) // .sort(zIndexComparator)
   }
 
-  searchPoint(pos: IPosition) {
+  searchPoint (pos: IPosition) {
     return this.searchBBox({
       minX: pos.x,
       maxX: pos.x,
       minY: pos.y,
-      maxY: pos.y,
+      maxY: pos.y
     })
   }
 }
@@ -224,15 +225,15 @@ export class Engine {
   private readonly instances: InstanceController
   private readonly camera: Camera
   private readonly gamepad: IGamepad
-  private overlayState: SimpleObject
+  private readonly overlayState: SimpleObject
   private pendingDialog: Opt<{message: string, startTick: number, target: Opt<IPosition>, additional: Opt<SimpleObject>}>
 
-  constructor(game: Game, renderer: IRenderer, gamepad: IGamepad) {
+  constructor (game: Game, renderer: IRenderer, gamepad: IGamepad) {
     this.bush = new MyRBush()
     this.collisionChecker = new CollisionChecker(this.bush)
     this.sprites = new DefiniteMap<Sprite>()
     this.instances = new InstanceController(this.bush)
-    this.camera = new Camera({width: 128, height: 96})
+    this.camera = new Camera({ width: 128, height: 96 })
     this.gamepad = gamepad
     this.renderer = renderer
     this.game = game
@@ -244,7 +245,7 @@ export class Engine {
     this.showDialog = this.showDialog.bind(this)
   }
 
-  tick() {
+  tick () {
     if (this.curTick === 0) {
       this.game.load(this.gamepad, this.sprites)
       // For debugging attach a name to each sprite
@@ -265,7 +266,7 @@ export class Engine {
     this.draw()
   }
 
-  private draw() {
+  private draw () {
     // get all the sprites visible to the camera
     const tiles = this.bush.search(this.camera.toBBox())
 
@@ -280,8 +281,8 @@ export class Engine {
     for (const t of tiles) {
       if (t.startTick === 0) { t.startTick = this.curTick }
       const image = t.sprite.tick(t.startTick, this.curTick)
-      if (!image) { throw new Error(`BUG: Could not find image for the sprite.`)}
-      const screenPos = relativeTo({x: t.pos.x, y: t.pos.y - image.pixels.length + 1 /* Shift the image up because it might not be a 8x8 sprite, like if it is a tall person */}, this.camera.topLeft())
+      if (!image) { throw new Error('BUG: Could not find image for the sprite.') }
+      const screenPos = relativeTo({ x: t.pos.x, y: t.pos.y - image.pixels.length + 1 /* Shift the image up because it might not be a 8x8 sprite, like if it is a tall person */ }, this.camera.topLeft())
 
       let pixels = image.pixels
       if (t.maskColor) {
@@ -293,7 +294,7 @@ export class Engine {
     this.game.drawOverlay(this.drawPixels, this.drawText, this.overlayState)
 
     if (this.pendingDialog) {
-      const target = this.pendingDialog.target ? relativeTo(this.pendingDialog.target, this.camera.topLeft()): null
+      const target = this.pendingDialog.target ? relativeTo(this.pendingDialog.target, this.camera.topLeft()) : null
       this.game.drawDialog(this.pendingDialog.message, this.drawPixels, this.drawText, this.curTick - this.pendingDialog.startTick, target, this.pendingDialog.additional)
       this.pendingDialog = null
     }
@@ -301,30 +302,30 @@ export class Engine {
     this.renderer.drawEnd()
   }
 
-  private drawPixels(screenPos: IPosition, pixels: IPixel[][], hFlip: boolean, vFlip: boolean) {
+  private drawPixels (screenPos: IPosition, pixels: IPixel[][], hFlip: boolean, vFlip: boolean) {
     const height = pixels.length
     let relY = 0
     for (const row of pixels) {
-      if (!row) { 
+      if (!row) {
         relY++
         continue
       }
       const width = row.length
       let relX = 0
       for (const pixel of row) {
-        const x = screenPos.x + (hFlip ? width - relX: relX)
-        const y = screenPos.y + (vFlip ? height - relY: relY)
+        const x = screenPos.x + (hFlip ? width - relX : relX)
+        const y = screenPos.y + (vFlip ? height - relY : relY)
         if (pixel !== null && pixel !== undefined && x >= 0 && y >= 0) {
-          const pos = {x, y}
+          const pos = { x, y }
           this.renderer.drawPixel(pos, pixel)
         }
         relX++
       }
       relY++
-    } 
+    }
   }
 
-  private drawText(screenPos: IPosition, message: string, hexColor: string) {
+  private drawText (screenPos: IPosition, message: string, hexColor: string) {
     // convert the lines of text to characters
     const line = message
     for (let colNum = 0; colNum < line.length; colNum++) {
@@ -341,7 +342,7 @@ export class Engine {
     }
   }
 
-  showDialog(message: string, target: Opt<IPosition>, additional: Opt<SimpleObject>) {
+  showDialog (message: string, target: Opt<IPosition>, additional: Opt<SimpleObject>) {
     if (!this.pendingDialog || this.pendingDialog.message !== message) {
       this.pendingDialog = {
         message,
@@ -353,7 +354,7 @@ export class Engine {
   }
 }
 
-function relativeTo(pos1: IPosition, pos2: IPosition): IPosition {
+function relativeTo (pos1: IPosition, pos2: IPosition): IPosition {
   return {
     x: pos1.x - pos2.x,
     y: pos1.y - pos2.y
@@ -372,7 +373,7 @@ export interface SimpleObject {
 export interface Game {
   load(gamepad: IGamepad, sprites: SpriteController)
   init(sprites: SpriteController, instances: InstanceController)
-  drawBackground(tiles: ObjectInstance<any, any>[], camera: Camera, drawPixelsFn: DrawPixelsFn)
+  drawBackground(tiles: Array<ObjectInstance<any, any>>, camera: Camera, drawPixelsFn: DrawPixelsFn)
   drawOverlay(drawPixelsFn: DrawPixelsFn, drawTextFn: DrawTextFn, additional: SimpleObject)
   drawDialog(message: string, drawPixelsFn: DrawPixelsFn, drawTextFn: DrawTextFn, elapsedMs: number, target: Opt<IPosition>, additional: Opt<SimpleObject>)
 }
@@ -381,15 +382,15 @@ export class Camera {
   public pos: IPosition
   private readonly dim: Size
 
-  constructor(dim: Size) {
+  constructor (dim: Size) {
     this.dim = dim
-    this.pos = {x: 0, y: 0}
+    this.pos = { x: 0, y: 0 }
   }
 
-  public size() { return this.dim }
+  public size () { return this.dim }
 
-  public toBBox(): BBox {
-    const {width, height} = this.dim
+  public toBBox (): BBox {
+    const { width, height } = this.dim
     const w = width / 2
     const h = height / 2
     return {
@@ -400,7 +401,7 @@ export class Camera {
     }
   }
 
-  public topLeft(): IPosition {
+  public topLeft (): IPosition {
     const bbox = this.toBBox()
     return {
       x: bbox.minX,
@@ -408,24 +409,24 @@ export class Camera {
     }
   }
 
-  track(target: IPosition) {
+  track (target: IPosition) {
     this.pos = target
   }
 
-  nudge(target: IPosition, xAmount: number | null, yAmount: number | null) {
-    const {x, y} = this.pos
-  
+  nudge (target: IPosition, xAmount: number | null, yAmount: number | null) {
+    const { x, y } = this.pos
+
     this.pos = {
       x: boxNudge(x, target.x, xAmount),
       y: boxNudge(y, target.y, yAmount)
-    }  
+    }
   }
 }
 
-function boxNudge(source: number, target: number, leashLength: number | null) {
+function boxNudge (source: number, target: number, leashLength: number | null) {
   if (leashLength === null) return source
 
-  let diff = target - source
+  const diff = target - source
   if (diff > leashLength) {
     return source + (diff - leashLength)
   } else if (diff < -leashLength) {
@@ -434,23 +435,22 @@ function boxNudge(source: number, target: number, leashLength: number | null) {
   return source
 }
 
-
 export type ShowDialogFn = (message: string, target: Opt<IPosition>, additional: Opt<SimpleObject>) => void
 export type UpdateFn<P, S> = (o: ObjectInstance<P, S>, gamepad: IGamepad, collisionCheker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, showDialogFn: ShowDialogFn, overlayState: SimpleObject) => void
 
 export class InstanceController {
   private readonly bush: RBush<ObjectInstance<any, any>>
-  private instances: Map<String, GameObject> = new Map()
+  private readonly instances: Map<String, GameObject> = new Map()
 
-  constructor(bush: RBush<ObjectInstance<any, any>>) {
+  constructor (bush: RBush<ObjectInstance<any, any>>) {
     this.bush = bush
   }
 
-  simple(sprites: SpriteController, name: string) {
+  simple (sprites: SpriteController, name: string) {
     return this.factory(name, sprites.get(name), () => null)
   }
 
-  factory(name: String, sprite: Sprite, fnUpdate: UpdateFn<any, any>) {
+  factory (name: String, sprite: Sprite, fnUpdate: UpdateFn<any, any>) {
     let i = this.instances.get(name)
     if (i === undefined) {
       i = new GameObject(this.bush, sprite, fnUpdate)
@@ -460,13 +460,12 @@ export class InstanceController {
     return i
   }
 
-  findAll(name: string) {
+  findAll (name: string) {
     const i = this.instances.get(name)
-    if (i === undefined) { throw new Error(`BUG: Could not find tile named "${name}". Currently have the following: ${JSON.stringify([...this.instances.keys()])}`)}
+    if (i === undefined) { throw new Error(`BUG: Could not find tile named "${name}". Currently have the following: ${JSON.stringify([...this.instances.keys()])}`) }
     return [...i.instances]
   }
 }
-
 
 export interface IRenderer {
   drawStart(): void
@@ -474,26 +473,21 @@ export interface IRenderer {
   drawPixel(pos: IPosition, hex: string): void
 }
 
-
-
-
-
-
 export class DefiniteMap<V> {
   private readonly map: Map<string, V> = new Map()
 
-  add(key: string, value: V) {
-    if (this.map.has(key)) { throw new Error(`BUG: Trying to add item (sprite) when there is another item that already exists with the same name "${key}"`)}
+  add (key: string, value: V) {
+    if (this.map.has(key)) { throw new Error(`BUG: Trying to add item (sprite) when there is another item that already exists with the same name "${key}"`) }
     this.map.set(key, value)
   }
 
-  get(key: string) {
+  get (key: string) {
     const value = this.map.get(key)
     if (value === undefined) { throw new Error(`ERROR: Could not find item (sprite) named ${key}`) }
     return value
   }
 
-  entries() {
+  entries () {
     return this.map.entries()
   }
 }
@@ -507,9 +501,7 @@ export enum DPAD {
   DOWN = 3,
 }
 
-
-
-export function zIndexComparator(a: ObjectInstance<any, any>, b: ObjectInstance<any, any>) {
+export function zIndexComparator (a: ObjectInstance<any, any>, b: ObjectInstance<any, any>) {
   if (a.zIndex === undefined && b.zIndex === undefined) {
     return 0
   } else if (b.zIndex === undefined) {

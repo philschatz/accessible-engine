@@ -7,24 +7,19 @@
 // renderer needs to only draw sprites.
 // Maybe the sprites need to be within the grid, maybe not.
 
-
 // :thinking: Maybe there is a way to design zelda so that killing baddies is optionally time-sensitive.
 
 // Hmm, domino-effects should be allowed (how can this fall into animation); interactions pause until the domino-effects are done.
 
-
 // ---------
 
-import {Engine} from './engine'
-import {TerminalRenderer} from './terminal'
-import {KeyboardGamepad, AnyGamepad, OrGamepad} from './gamepad/implementation'
-import {MyGame} from './myGame'
+import { Engine } from './engine'
+import { TerminalRenderer } from './terminal'
+import { KeyboardGamepad, AnyGamepad, OrGamepad } from './gamepad/implementation'
+import { MyGame } from './myGame'
 import { BUTTON_TYPE } from './gamepad/api'
 
-
-
-
-function setUnion<T>(set1: Iterable<T>, set2: Iterable<T>) {
+function setUnion<T> (set1: Iterable<T>, set2: Iterable<T>) {
   const s: Set<T> = new Set()
   for (const o of set1) {
     s.add(o)
@@ -36,7 +31,7 @@ function setUnion<T>(set1: Iterable<T>, set2: Iterable<T>) {
 }
 
 const keyConfig = {}
-keyConfig[BUTTON_TYPE.DPAD_UP]   = ['W', 'w', '\u001B\u005B\u0041']
+keyConfig[BUTTON_TYPE.DPAD_UP] = ['W', 'w', '\u001B\u005B\u0041']
 keyConfig[BUTTON_TYPE.DPAD_DOWN] = ['S', 's', '\u001B\u005B\u0042']
 keyConfig[BUTTON_TYPE.DPAD_LEFT] = ['A', 'a', '\u001B\u005B\u0044']
 keyConfig[BUTTON_TYPE.DPAD_RIGHT] = ['D', 'd', '\u001B\u005B\u0043']
@@ -44,10 +39,7 @@ keyConfig[BUTTON_TYPE.CLUSTER_DOWN] = ['X', 'x', ' ', '\u000D']
 keyConfig[BUTTON_TYPE.BUMPER_TOP_LEFT] = ['Q', 'q']
 keyConfig[BUTTON_TYPE.BUMPER_TOP_RIGHT] = ['E', 'e']
 
-
 const engine = new Engine(new MyGame(), new TerminalRenderer(), new OrGamepad([new KeyboardGamepad(keyConfig), new AnyGamepad(1000)]))
-
-
 
 const sleep = async (ms: number) => new Promise((resolve, reject) => {
   setTimeout(resolve, ms)
@@ -61,24 +53,24 @@ const run = async () => {
     const diff = now - previous
     const sleepTime = Math.max(0, 33 - diff) // 30 fps = 1000/30 = 16.6666ms
     // console.error(`Took: ${diff} Sleep time = ${sleepTime}`)
-    await sleep(sleepTime * (process.env['SLOW'] ? 10 : 1))
+    await sleep(sleepTime * (process.env.SLOW ? 10 : 1))
     engine.tick()
     previous = now
   }
 }
 
-function handler(err, type) {
+function handler (err, type) {
   console.error(type)
   console.error(err)
 }
 
-process.on("beforeExit", () => handler(null, "beforeExit"));
-process.on("exit", () => handler(null, "exit"));
-process.on("uncaughtException", err => handler(err, "uncaughtException"));
-process.on("unhandledRejection", err => handler(err, "unhandledRejection"));
-process.on("SIGINT", () => handler(null, "SIGINT"));
-process.on("SIGQUIT", () => handler(null, "SIGQUIT"));
-process.on("SIGTERM", () => handler(null, "SIGTERM"));
+process.on('beforeExit', () => handler(null, 'beforeExit'))
+process.on('exit', () => handler(null, 'exit'))
+process.on('uncaughtException', err => handler(err, 'uncaughtException'))
+process.on('unhandledRejection', err => handler(err, 'unhandledRejection'))
+process.on('SIGINT', () => handler(null, 'SIGINT'))
+process.on('SIGQUIT', () => handler(null, 'SIGQUIT'))
+process.on('SIGTERM', () => handler(null, 'SIGTERM'))
 
 run().then(null, (err) => {
   console.error(err)

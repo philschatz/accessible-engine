@@ -8,11 +8,11 @@ const configs = new Map<string, Config>()
 addConfig(ps4)
 addConfig(ps3)
 
-function debug(message?: any, ...optionalParams: any[]) {
+function debug (message?: any, ...optionalParams: any[]) {
   // console.error(message, ...optionalParams)
 }
 
-type ConfigButton = {
+interface ConfigButton {
   pin: number
   names: string[]
   value?: number
@@ -21,13 +21,13 @@ type ConfigButton = {
   bit?: number
 }
 
-type ConfigJoystick = {
+interface ConfigJoystick {
   name: string
   xPin: number
   yPin: number
 }
 
-type Config = {
+interface Config {
   vendorId: number
   productId: number
   buttons: ConfigButton[]
@@ -39,20 +39,19 @@ type Config = {
   }
 }
 
-
-function addConfig(c) {
+function addConfig (c) {
   configs.set(`${c.vendorId}/${c.productId}`, c)
 }
 
 const cache = new Map<string, Gamepad>()
 
-type IPosition = {
+interface IPosition {
   x: number
   y: number
 }
 
 class GamepadRoot implements IGamepadRoot {
-  getGamepads(): Gamepad[] {
+  getGamepads (): Gamepad[] {
     const devices = HID.devices()
     const gamepadsOrNull = devices.map(d => {
       const c = configs.get(`${d.vendorId}/${d.productId}`)
@@ -79,12 +78,12 @@ class Gamepad implements IGamepad {
   private usb: HID.HID | null
   private lastUpdated: number
 
-  private jStates = new Map<string, IPosition>()
-  private bStates = new Set<string>()
+  private readonly jStates = new Map<string, IPosition>()
+  private readonly bStates = new Set<string>()
 
   private standardButtons: Button[] | undefined
 
-  constructor(path: string, config: Config) {
+  constructor (path: string, config: Config) {
     this.path = path
     this.config = config
     this.usb = new HID.HID(path)
@@ -93,21 +92,21 @@ class Gamepad implements IGamepad {
     process.on('exit', this.disconnect.bind(this))
   }
 
-  disconnect() {
+  disconnect () {
     if (this.usb) {
-        this.usb.close()
-        this.usb = null
+      this.usb.close()
+      this.usb = null
     }
     cache.delete(this.path)
   }
 
-  private onUsbFrame(data) {
+  private onUsbFrame (data) {
     this.processJoysticks(data)
     this.processButtons(data)
     this.lastUpdated = Date.now()
   }
 
-  private processJoysticks(data) {
+  private processJoysticks (data) {
     if (!this.config.joysticks) { return }
 
     this.config.joysticks.forEach(j => {
@@ -115,11 +114,11 @@ class Gamepad implements IGamepad {
       let y = data[j.yPin]
       x = (x - 127) / 128
       y = (y - 127) / 128
-      this.jStates.set(j.name, {x, y})
+      this.jStates.set(j.name, { x, y })
     })
   }
 
-  private processButtons(data) {
+  private processButtons (data) {
     this.config.buttons.forEach(b => {
       const v = data[b.pin]
       let newState
@@ -130,7 +129,7 @@ class Gamepad implements IGamepad {
       } else if (b.clearBit !== undefined) {
         // This is used by the PS4 Controller's DPAD_UP key
         const cbitNum = 1 << b.clearBit
-        let noDpad = (v & cbitNum) === cbitNum
+        const noDpad = (v & cbitNum) === cbitNum
         if (noDpad) {
           newState = false
         } else {
@@ -147,18 +146,17 @@ class Gamepad implements IGamepad {
       // Diagonal buttons should only turn ON the dPad, never turn them off.
       // This is because the player could be pressing DPAD_UP and that still needs to be true
       if (b.names.length === 1 || newState) {
-        b.names.forEach(n => { if (newState) { this.bStates.add(n) } else { this.bStates.delete(n)} } )
+        b.names.forEach(n => { if (newState) { this.bStates.add(n) } else { this.bStates.delete(n) } })
       }
-
     })
     this.lastUpdated = Date.now()
   }
 
-  isButtonPressed(btn: BUTTON_TYPE) {
+  isButtonPressed (btn: BUTTON_TYPE) {
     return this.bStates.has(btn)
   }
 
-  getStickCoordinates(stick: STICK_TYPE) {
+  getStickCoordinates (stick: STICK_TYPE) {
     return this.jStates.get(stick) || null
   }
 
@@ -167,7 +165,7 @@ class Gamepad implements IGamepad {
   // See https://developer.mozilla.org/en-US/docs/Web/API/Gamepad
   // ------------------------------------
 
-  get buttons() {
+  get buttons () {
     let s = this.standardButtons
     if (!s) {
       s = this.config.standard.buttons.map(name => new Button(this.bStates, name))
@@ -176,51 +174,51 @@ class Gamepad implements IGamepad {
     return this.standardButtons
   }
 
-  get axes() {
+  get axes () {
     return this.config.standard.axes.map(([name, xy]) => {
-      return (this.jStates.get(name) || {x: 0, y: 0})[xy]
+      return (this.jStates.get(name) || { x: 0, y: 0 })[xy]
     })
   }
 
-  get mapping() {
+  get mapping () {
     return this.config.standard ? 'standard' : ''
   }
 
-  get timestamp() {
+  get timestamp () {
     return this.lastUpdated
   }
 }
 
 class Button {
-  private bStates: Set<string>
-  private name: string
-  constructor(bStates: Set<string>, name: string) {
+  private readonly bStates: Set<string>
+  private readonly name: string
+  constructor (bStates: Set<string>, name: string) {
     this.bStates = bStates
     this.name = name
   }
 
-  get pressed() {
+  get pressed () {
     return this.bStates.has(name)
   }
-  get value() {
+
+  get value () {
     return this.pressed ? 1.0 : 0.0
   }
 }
-
 
 const KEY_REPEAT_WITHIN = 110 // MacOS seems to repeat at 80ms (up to 102ms)
 
 export class KeyboardGamepad implements IGamepad {
   timestamp = Date.now()
   private curPressed: string
-  private keyConfig
+  private readonly keyConfig
 
   // Gamepad API. TODO: Actually map it (not too hard)
   buttons: []
   axes: []
   mapping: 'none'
 
-  constructor(keyConfig) {
+  constructor (keyConfig) {
     this.curPressed = ''
     this.keyConfig = keyConfig
 
@@ -228,7 +226,7 @@ export class KeyboardGamepad implements IGamepad {
     if (process.stdin.setRawMode) {
       process.stdin.setRawMode(true)
     } else {
-        throw new Error(`ERROR: stdin does not allow setting setRawMode (we need that for keyboard input`)
+      throw new Error('ERROR: stdin does not allow setting setRawMode (we need that for keyboard input')
     }
     process.stdin.resume()
     process.stdin.setEncoding('utf8')
@@ -236,38 +234,37 @@ export class KeyboardGamepad implements IGamepad {
     // https://stackoverflow.com/a/30687420
     process.stdin.on('data', async (key: string) => {
       if (this.timestamp > 0) debug('Time since last keystroke detected:', Date.now() - this.timestamp)
-        this.timestamp = Date.now()
-        
-        switch (key) {
-            case '\u0003': // Ctrl+C
-            case '\u001B': // Escape
-                return process.exit(1)
-            default:
-              this.curPressed = key
-        }
+      this.timestamp = Date.now()
+
+      switch (key) {
+        case '\u0003': // Ctrl+C
+        case '\u001B': // Escape
+          return process.exit(1)
+        default:
+          this.curPressed = key
+      }
     })
   }
-  isButtonPressed(btn: BUTTON_TYPE) {
+
+  isButtonPressed (btn: BUTTON_TYPE) {
     const c = this.keyConfig[btn]
     return c ? c.indexOf(this.getCurPressed()) >= 0 : false
   }
 
-  getStickCoordinates(stick: STICK_TYPE) {
+  getStickCoordinates (stick: STICK_TYPE) {
     return null
   }
 
-  private getCurPressed() {
+  private getCurPressed () {
     if (this.timestamp + KEY_REPEAT_WITHIN < Date.now()) {
       this.curPressed = ''
     }
     return this.curPressed
   }
-  
 }
 
-
 export class OrGamepad implements IGamepad {
-  private pads: IGamepad[]
+  private readonly pads: IGamepad[]
 
   // Gamepad API. TODO: Implement (not hard)
   buttons: []
@@ -275,22 +272,22 @@ export class OrGamepad implements IGamepad {
   mapping: 'none'
   timestamp: 0
 
-  constructor(pads: IGamepad[]) {
+  constructor (pads: IGamepad[]) {
     this.pads = pads
   }
 
-  isButtonPressed(btn: BUTTON_TYPE) {
+  isButtonPressed (btn: BUTTON_TYPE) {
     for (const pad of this.pads) {
       if (pad.isButtonPressed(btn)) { return true }
     }
     return false
   }
 
-  getStickCoordinates(stick: STICK_TYPE) {
+  getStickCoordinates (stick: STICK_TYPE) {
     const farthest = new Map<number, IPosition>()
     let max = -1
     for (const pad of this.pads) {
-      const c = pad.getStickCoordinates(stick) || {x: 0, y: 0}
+      const c = pad.getStickCoordinates(stick) || { x: 0, y: 0 }
       const distance = Math.abs(c.x) + Math.abs(c.y)
       max = Math.max(max, distance)
       farthest.set(distance, c)
@@ -298,7 +295,7 @@ export class OrGamepad implements IGamepad {
     if (max > 0) {
       return farthest.get(max)
     }
-    return {x: 0, y: 0}
+    return { x: 0, y: 0 }
   }
 }
 
@@ -312,11 +309,11 @@ export class AnyGamepad implements IGamepad {
   axes: []
   mapping: 'none'
 
-  constructor(pollingInterval: number) {
+  constructor (pollingInterval: number) {
     this.polling = pollingInterval
   }
 
-  isButtonPressed(btn: BUTTON_TYPE) {
+  isButtonPressed (btn: BUTTON_TYPE) {
     if (this.timestamp + this.polling < Date.now()) {
       this.pads = gamepadRoot.getGamepads()
       this.timestamp = Date.now()
@@ -327,11 +324,11 @@ export class AnyGamepad implements IGamepad {
     return false
   }
 
-  getStickCoordinates(stick: STICK_TYPE) {
+  getStickCoordinates (stick: STICK_TYPE) {
     const farthest = new Map<number, IPosition>()
     let max = -1
     for (const pad of this.pads) {
-      const c = pad.getStickCoordinates(stick) || {x: 0, y: 0}
+      const c = pad.getStickCoordinates(stick) || { x: 0, y: 0 }
       const distance = Math.abs(c.x) + Math.abs(c.y)
       max = Math.max(max, distance)
       farthest.set(distance, c)
@@ -339,7 +336,6 @@ export class AnyGamepad implements IGamepad {
     if (max > 0) {
       return farthest.get(max)
     }
-    return {x: 0, y: 0}
+    return { x: 0, y: 0 }
   }
-
 }

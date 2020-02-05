@@ -9,8 +9,7 @@ const CAMERA_SIZE = {
 }
 
 export class MyGame implements Game {
-
-  load(gamepad: IGamepad, sprites: SpriteController) {
+  load (gamepad: IGamepad, sprites: SpriteController) {
     // gamepad.listenTo([BUTTON_TYPE.ARROW_LEFT, BUTTON_TYPE.ARROW_RIGHT, BUTTON_TYPE.ARROW_DOWN, BUTTON_TYPE.ARROW_UP, BUTTON_TYPE.CLUSTER_BOTTOM])
 
     const images = new DefiniteMap<Image>()
@@ -50,7 +49,7 @@ export class MyGame implements Game {
       [z, w, w, w, w, w, W, z],
       [z, z, W, w, w, w, z, z],
       [z, z, W, w, w, w, z, z],
-      [z, z, W, z, z, W, z, z],
+      [z, z, W, z, z, W, z, z]
     ]))
 
     images.add('playerIdle1', new Image([ // 033 & 049
@@ -70,7 +69,7 @@ export class MyGame implements Game {
       [z, w, w, w, w, w, W, z],
       [z, z, W, w, K, w, z, z],
       [z, z, W, w, w, w, z, z],
-      [z, z, W, z, z, W, z, z],
+      [z, z, W, z, z, W, z, z]
     ]))
 
     images.add('playerIdle2', new Image([ // 034 & 050
@@ -90,7 +89,7 @@ export class MyGame implements Game {
       [z, w, w, w, w, w, W, z],
       [z, z, W, w, w, w, z, z],
       [z, z, W, w, w, w, z, z],
-      [z, z, W, z, z, W, z, z],
+      [z, z, W, z, z, W, z, z]
     ]))
 
     images.add('playerWalk1', new Image([ // 035 & 051
@@ -110,7 +109,7 @@ export class MyGame implements Game {
       [z, w, W, w, w, w, W, z],
       [z, z, w, w, w, w, z, z],
       [z, z, z, z, z, w, z, z],
-      [z, z, z, z, z, W, z, z],
+      [z, z, z, z, z, W, z, z]
     ]))
 
     images.add('playerWalk2', new Image([ // 036 & 052
@@ -130,7 +129,7 @@ export class MyGame implements Game {
       [z, z, w, w, w, w, z, z],
       [z, z, W, z, W, w, z, z],
       [z, z, z, z, z, z, z, z],
-      [z, z, z, z, z, z, z, z],
+      [z, z, z, z, z, z, z, z]
     ]))
 
     images.add('playerWalk3', new Image([ // 037 & 053
@@ -150,9 +149,8 @@ export class MyGame implements Game {
       [z, z, W, w, w, w, z, z],
       [z, z, w, w, w, w, z, z],
       [z, z, W, w, W, z, z, z],
-      [z, z, z, W, z, z, z, z],
+      [z, z, z, W, z, z, z, z]
     ]))
-
 
     images.add('playerWalk4', new Image([ // 038 & 054
       [z, z, z, z, z, z, z, z],
@@ -171,7 +169,7 @@ export class MyGame implements Game {
       [z, w, w, w, w, w, W, z],
       [z, z, W, w, w, w, z, z],
       [z, z, w, w, w, W, z, z],
-      [z, z, W, z, z, z, z, z],
+      [z, z, W, z, z, z, z, z]
     ]))
 
     images.add('playerWalk5', new Image([ // 039 & 055
@@ -191,7 +189,7 @@ export class MyGame implements Game {
       [z, z, w, W, w, w, z, z],
       [z, z, W, w, w, w, W, z],
       [z, z, w, z, z, z, z, z],
-      [z, z, W, z, z, z, z, z],
+      [z, z, W, z, z, z, z, z]
     ]))
 
     images.add('playerWalk6', new Image([ // 040 & 056
@@ -211,9 +209,8 @@ export class MyGame implements Game {
       [z, z, w, w, w, w, w, z],
       [z, W, w, z, z, z, W, z],
       [z, z, z, z, z, z, z, z],
-      [z, z, z, z, z, z, z, z],
+      [z, z, z, z, z, z, z, z]
     ]))
-
 
     images.add('playerWalk7', new Image([ // 041 & 057
       [z, z, z, z, z, z, z, z],
@@ -232,7 +229,7 @@ export class MyGame implements Game {
       [z, z, w, w, w, w, z, z],
       [z, W, w, w, w, w, z, z],
       [z, z, z, z, z, W, w, z],
-      [z, z, z, z, z, z, W, z],
+      [z, z, z, z, z, z, W, z]
     ]))
 
     images.add('playerWalk8', new Image([ // 042 & 058
@@ -252,7 +249,7 @@ export class MyGame implements Game {
       [z, z, w, w, w, w, z, z],
       [z, z, W, W, w, w, z, z],
       [z, z, W, w, w, w, z, z],
-      [z, z, z, z, z, w, z, z],
+      [z, z, z, z, z, w, z, z]
     ]))
 
     sprites.add('playerWalking', new Sprite(1, [
@@ -263,9 +260,8 @@ export class MyGame implements Game {
       images.get('playerWalk5'),
       images.get('playerWalk6'),
       images.get('playerWalk7'),
-      images.get('playerWalk8'),
+      images.get('playerWalk8')
     ]))
-
 
     images.add('playerJumping', new Image([ // 044 & 060
       [z, z, z, z, z, z, z, z],
@@ -284,7 +280,7 @@ export class MyGame implements Game {
       [z, w, w, w, w, w, W, z],
       [z, z, W, w, w, w, z, z],
       [z, z, W, w, w, w, z, z],
-      [z, z, W, z, z, W, z, z],
+      [z, z, W, z, z, W, z, z]
     ]))
 
     images.add('playerFalling', new Image([ // 045 & 061
@@ -304,7 +300,7 @@ export class MyGame implements Game {
       [z, z, w, w, w, w, z, z],
       [z, z, W, w, w, w, z, z],
       [z, W, W, w, w, w, W, z],
-      [z, z, z, z, z, z, z, z],
+      [z, z, z, z, z, z, z, z]
     ]))
 
     images.add('floorOrange1', new Image([ // 001
@@ -315,7 +311,7 @@ export class MyGame implements Game {
       [Y, o, o, o, o, o, o, k],
       [Y, o, o, o, o, o, o, k],
       [Y, o, o, o, o, o, o, k],
-      [Y, Y, Y, Y, Y, Y, o, o],
+      [Y, Y, Y, Y, Y, Y, o, o]
     ]))
 
     images.add('floorOrange2', new Image([ // 002
@@ -326,9 +322,8 @@ export class MyGame implements Game {
       [Y, o, o, o, o, o, o, k],
       [Y, o, o, o, o, o, o, k],
       [Y, o, o, o, o, o, o, k],
-      [Y, Y, Y, Y, Y, Y, o, o],
+      [Y, Y, Y, Y, Y, Y, o, o]
     ]))
-
 
     images.add('floorWhite1', new Image([ // 003
       [g, g, g, g, g, g, g, g],
@@ -338,7 +333,7 @@ export class MyGame implements Game {
       [W, k, k, k, k, k, k, w],
       [W, k, k, k, k, k, k, w],
       [W, k, k, k, k, k, k, w],
-      [W, W, W, W, W, W, k, k],
+      [W, W, W, W, W, W, k, k]
     ]))
 
     images.add('floorWhite2', new Image([ // 004
@@ -349,7 +344,7 @@ export class MyGame implements Game {
       [W, k, k, k, k, k, k, w],
       [W, k, k, k, k, k, k, w],
       [W, k, k, k, k, k, k, w],
-      [W, W, W, W, W, W, k, k],
+      [W, W, W, W, W, W, k, k]
     ]))
 
     images.add('floorLedge', new Image([ // 007
@@ -360,9 +355,8 @@ export class MyGame implements Game {
       [z, z, z, P, P, z, z, z],
       [z, z, z, P, P, z, z, z],
       [z, z, z, P, P, z, z, z],
-      [z, z, z, z, z, z, z, z],
+      [z, z, z, z, z, z, z, z]
     ]))
-
 
     images.add('treeBottom', new Image([ // 014
       [g, g, g, g, g, g, g, g],
@@ -372,7 +366,7 @@ export class MyGame implements Game {
       [g, g, g, g, g, g, g, g],
       [g, g, g, g, g, g, g, g],
       [G, G, g, G, G, g, g, G],
-      [G, G, G, G, G, G, G, G],
+      [G, G, G, G, G, G, G, G]
     ]))
 
     images.add('treeTrunkLeft', new Image([ // 016
@@ -383,7 +377,7 @@ export class MyGame implements Game {
       [z, z, z, z, z, z, z, z],
       [z, z, z, z, R, R, R, R],
       [z, z, z, R, R, R, p, p],
-      [z, z, z, R, R, p, R, p],
+      [z, z, z, R, R, p, R, p]
     ]))
 
     images.add('treeTrunkRight', new Image([ // 017
@@ -394,7 +388,7 @@ export class MyGame implements Game {
       [z, z, R, p, R, R, z, z],
       [R, R, R, p, R, R, z, z],
       [p, p, p, R, R, z, z, z],
-      [p, R, R, R, z, z, z, z],
+      [p, R, R, R, z, z, z, z]
     ]))
 
     images.add('treeTopLeft', new Image([ // 008
@@ -405,7 +399,7 @@ export class MyGame implements Game {
       [g, g, g, G, g, g, g, g],
       [g, g, g, g, g, g, g, g],
       [g, g, g, g, g, g, g, g],
-      [g, g, g, g, g, g, g, g],
+      [g, g, g, g, g, g, g, g]
     ]))
 
     images.add('treeTopRight', new Image([ // 009
@@ -416,10 +410,8 @@ export class MyGame implements Game {
       [g, g, g, g, g, g, g, g],
       [g, g, g, G, g, g, g, g],
       [g, g, G, g, G, g, g, g],
-      [g, g, g, G, g, g, g, g],
+      [g, g, g, G, g, g, g, g]
     ]))
-
-
 
     images.add('wallOrange', new Image([ // 010
       [o, k, k, k, k, k, k, k],
@@ -429,7 +421,7 @@ export class MyGame implements Game {
       [R, o, o, o, o, o, o, k],
       [R, o, o, o, o, o, o, k],
       [R, o, o, o, o, o, o, k],
-      [R, R, R, R, R, R, o, o],
+      [R, R, R, R, R, R, o, o]
     ]))
 
     images.add('wallWhite', new Image([ // 011
@@ -440,7 +432,7 @@ export class MyGame implements Game {
       [W, k, k, k, k, k, k, w],
       [W, k, k, k, k, k, k, w],
       [W, k, k, k, k, k, k, w],
-      [W, W, W, W, W, W, k, k],
+      [W, W, W, W, W, W, k, k]
     ]))
 
     images.add('wallCyan', new Image([ // 012
@@ -451,7 +443,7 @@ export class MyGame implements Game {
       [P, c, c, c, c, c, c, W],
       [P, c, c, c, c, c, c, W],
       [P, c, c, c, c, c, c, W],
-      [P, P, P, P, P, P, c, c],
+      [P, P, P, P, P, P, c, c]
     ]))
 
     images.add('wallBrown', new Image([ // 013
@@ -462,9 +454,8 @@ export class MyGame implements Game {
       [P, Y, Y, Y, Y, Y, Y, c],
       [P, Y, Y, Y, Y, Y, Y, c],
       [P, Y, Y, Y, Y, Y, Y, c],
-      [P, P, P, P, P, P, Y, Y],
+      [P, P, P, P, P, P, Y, Y]
     ]))
-
 
     images.add('door', new Image([ // 236 & 252
       [K, K, K, K, K, K, K, K],
@@ -483,9 +474,8 @@ export class MyGame implements Game {
       [R, R, R, R, R, R, R, R],
       [K, Y, Y, K, K, Y, Y, K],
       [K, K, Y, K, K, Y, Y, K],
-      [K, K, K, K, K, K, K, K],
+      [K, K, K, K, K, K, K, K]
     ]))
-
 
     images.add('caveOpenLeft', new Image([ // 172 & 188
       [c, W, c, W, c, W, W, W],
@@ -504,7 +494,7 @@ export class MyGame implements Game {
       [c, W, W, W, K, K, K, K],
       [P, c, c, W, K, K, K, K],
       [P, c, c, W, K, K, K, K],
-      [P, P, P, c, K, K, K, K],
+      [P, P, P, c, K, K, K, K]
     ]))
 
     images.add('caveOpenRight', new Image([ // 173 & 189
@@ -524,7 +514,7 @@ export class MyGame implements Game {
       [K, K, K, K, c, W, W, W],
       [K, K, K, K, P, c, c, W],
       [K, K, K, K, P, c, c, W],
-      [K, K, K, K, P, P, P, c],
+      [K, K, K, K, P, P, P, c]
     ]))
 
     images.add('caveCloseLeft', new Image([ // 172 & 188
@@ -544,7 +534,7 @@ export class MyGame implements Game {
       [c, W, W, W, c, c, c, c],
       [P, c, c, W, c, c, c, c],
       [P, c, c, W, c, c, c, c],
-      [P, P, P, c, c, c, c, c],
+      [P, P, P, c, c, c, c, c]
     ]))
 
     images.add('caveCloseRight', new Image([ // 173 & 189
@@ -564,7 +554,7 @@ export class MyGame implements Game {
       [c, c, c, c, c, W, W, W],
       [c, c, c, c, P, c, c, W],
       [c, c, c, c, P, c, c, W],
-      [c, c, c, c, P, P, P, c],
+      [c, c, c, c, P, P, P, c]
     ]))
 
     // Add all the images as single-image sprites too.
@@ -573,7 +563,7 @@ export class MyGame implements Game {
     }
   }
 
-  init(sprites: SpriteController, instances: InstanceController) {
+  init (sprites: SpriteController, instances: InstanceController) {
     const player = instances.factory('player', sprites.get('playerStanding'), playerUpdateFn)
     const floor1 = instances.simple(sprites, 'floorOrange1')
     const floor2 = instances.simple(sprites, 'floorOrange2')
@@ -595,7 +585,7 @@ export class MyGame implements Game {
     const treeTrunkRight = instances.simple(sprites, 'treeTrunkRight')
 
     const validator = {}
-    function g(item: GameObject<any, any>, pos: IPosition, zIndex: number) {
+    function g (item: GameObject<any, any>, pos: IPosition, zIndex: number) {
       const key = `${pos.x}, ${pos.y}, ${zIndex}`
       if (validator[key]) {
         throw new Error(`BUG: 2 voxels in the same spot: ${key}`)
@@ -605,13 +595,12 @@ export class MyGame implements Game {
       // convert from grid coordinates to pixels
       const o = item.new({
         x: (pos.x - 6) * 8,
-        y: pos.y * 8,
+        y: pos.y * 8
       })
 
       o.zIndex = zIndex - 2
       return o
     }
-
 
     g(floor1, { x: 5, y: 6 }, 2)
     g(floor2, { x: 6, y: 6 }, 2)
@@ -620,7 +609,6 @@ export class MyGame implements Game {
     g(floor2, { x: 9, y: 7 }, 2)
     g(floor2, { x: 10, y: 7 }, 2)
     g(floor1, { x: 11, y: 7 }, 2)
-
 
     g(wallO, { x: 5, y: 7 }, 2)
     g(wallO, { x: 6, y: 7 }, 2)
@@ -651,7 +639,6 @@ export class MyGame implements Game {
     g(ledge, { x: 11, y: 10 }, 3)
     g(ledge, { x: 6, y: 9 }, 1)
     g(ledge, { x: 10, y: 9 }, 1)
-
 
     g(treeTopLeft, { x: 8, y: 4 }, 4)
     g(treeTopRight, { x: 9, y: 4 }, 5)
@@ -688,13 +675,11 @@ export class MyGame implements Game {
     // g(wallC,  {x:  9, y: 10}, 4)
     g(ledge, { x: 10, y: 10 }, 4)
 
-
     // left side
     g(caveCloseLeft, { x: 6, y: 9 }, 3)
     g(caveCloseRight, { x: 6, y: 9 }, 4)
     g(wallC, { x: 6, y: 8 }, 5)
     g(wallC, { x: 6, y: 9 }, 5)
-
 
     // back side
     g(wall2, { x: 8, y: 8 }, 3)
@@ -704,20 +689,16 @@ export class MyGame implements Game {
     // g(wallC, {x:  7, y: 11}, 3)
     g(wallC, { x: 6, y: 11 }, 2)
 
-
-
-
     g(player, { x: 11, y: 2 }, 1)
 
-
-    const x = g(wall2, {x: -1, y: -1}, -4)
-    const y = g(wall2, {x: -1, y: -1}, -1)
+    const x = g(wall2, { x: -1, y: -1 }, -4)
+    const y = g(wall2, { x: -1, y: -1 }, -1)
     if (zIndexComparator(x, y) >= 0) {
       throw new Error(`BUG. x compared to y should be < 0 but it was ${zIndexComparator(x, y)}`)
     }
   }
 
-  drawBackground(tiles: ObjectInstance<any, any>[], camera: Camera, drawPixelsFn: DrawPixelsFn) {
+  drawBackground (tiles: Array<ObjectInstance<any, any>>, camera: Camera, drawPixelsFn: DrawPixelsFn) {
     const bbox = camera.toBBox()
     const color = '#29ADFF' // (light blue)
 
@@ -726,22 +707,22 @@ export class MyGame implements Game {
     drawPixelsFn({ x: 0, y: 0 }, pixels, false, false)
   }
 
-  drawOverlay(drawPixelsFn: DrawPixelsFn, drawTextFn: DrawTextFn, fields: SimpleObject) {
+  drawOverlay (drawPixelsFn: DrawPixelsFn, drawTextFn: DrawTextFn, fields: SimpleObject) {
     const cubeCount = fields.cubeCount || 0
     const cubeCountStr = `${cubeCount}`
-    const cubeCountPos = {x: CAMERA_SIZE.width - 10 - cubeCountStr.length * 5, y: 2}
+    const cubeCountPos = { x: CAMERA_SIZE.width - 10 - cubeCountStr.length * 5, y: 2 }
     drawTextFn(cubeCountPos, cubeCountStr, '#000000')
 
     const canvas = new DoubleArray<string>()
-    drawRect(canvas, {x: 0, y: 0}, {x: 6, y: 6}, '#000000')
-    drawRect(canvas, {x: 1, y: 1}, {x: 5, y: 5}, '#FFF024') // yellow
-    drawRect(canvas, {x: 2, y: 2}, {x: 4, y: 4}, '#FFF024') // yellow
-    drawRect(canvas, {x: 3, y: 3}, {x: 3, y: 3}, '#FFF024') // yellow
-    
+    drawRect(canvas, { x: 0, y: 0 }, { x: 6, y: 6 }, '#000000')
+    drawRect(canvas, { x: 1, y: 1 }, { x: 5, y: 5 }, '#FFF024') // yellow
+    drawRect(canvas, { x: 2, y: 2 }, { x: 4, y: 4 }, '#FFF024') // yellow
+    drawRect(canvas, { x: 3, y: 3 }, { x: 3, y: 3 }, '#FFF024') // yellow
+
     drawPixelsFn({ x: CAMERA_SIZE.width - 2 - 8, y: 1 }, canvas.asArray(), false, false)
   }
 
-  drawDialog(message: string, drawPixelsFn: DrawPixelsFn, drawTextFn: DrawTextFn, elapsedMs: number, target: Opt<IPosition>, additional: Opt<SimpleObject>) {
+  drawDialog (message: string, drawPixelsFn: DrawPixelsFn, drawTextFn: DrawTextFn, elapsedMs: number, target: Opt<IPosition>, additional: Opt<SimpleObject>) {
     const canvas = new DoubleArray<string>()
 
     const len = (message.length * 4) + 6 // padding
@@ -750,8 +731,6 @@ export class MyGame implements Game {
 
     const tl = { x: Math.round(mid - len / 2), y: 4 }
     const br = { x: Math.round(mid + len / 2), y: 7 + 8 } // 1 line of text
-
-
 
     for (let y = tl.y; y < br.y; y++) {
       for (let x = tl.x; x < br.x; x++) {
@@ -772,26 +751,25 @@ export class MyGame implements Game {
       const y = 7 + 8
       let x = Math.min(target.x, br.x - 4)
       x = Math.max(x, tl.x + 4)
-      drawLine(canvas, {x: x - 2, y: y + 0}, {x: x + 2, y: y + 0}, '#000000')
-      drawLine(canvas, {x: x - 1, y: y + 1}, {x: x + 1, y: y + 1}, '#000000')
-      drawLine(canvas, {x: x - 0, y: y + 2}, {x: x + 0, y: y + 2}, '#000000')
+      drawLine(canvas, { x: x - 2, y: y + 0 }, { x: x + 2, y: y + 0 }, '#000000')
+      drawLine(canvas, { x: x - 1, y: y + 1 }, { x: x + 1, y: y + 1 }, '#000000')
+      drawLine(canvas, { x: x - 0, y: y + 2 }, { x: x + 0, y: y + 2 }, '#000000')
     }
 
     drawPixelsFn({ x: 0, y: 0 }, canvas.asArray(), false, false)
 
-    drawTextFn({x: tl.x + 3, y: tl.y + 3}, message, '#FFF1E8')
+    drawTextFn({ x: tl.x + 3, y: tl.y + 3 }, message, '#FFF1E8')
   }
-
 }
 
 const EVERYTHING_BBOX = {
   minX: -1000,
   maxX: 1000,
   minY: -1000,
-  maxY: 1000,
+  maxY: 1000
 }
 
-type PlayerProps = {
+interface PlayerProps {
   zreal: number
   xreal: number
   yreal: number
@@ -838,7 +816,7 @@ type PlayerProps = {
   tick: number // just used for local testing
 }
 
-function playerUpdateFn(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, showDialog: ShowDialogFn, overlayState: SimpleObject) {
+function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, showDialog: ShowDialogFn, overlayState: SimpleObject) {
   const floors = [
     sprites.get('treeTopLeft'),
     sprites.get('treeTopRight'),
@@ -846,7 +824,7 @@ function playerUpdateFn(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, 
     sprites.get('floorOrange2'),
     sprites.get('floorWhite1'),
     sprites.get('floorWhite2'),
-    sprites.get('floorLedge'),
+    sprites.get('floorLedge')
   ]
 
   // initialize the props
@@ -864,7 +842,6 @@ function playerUpdateFn(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, 
     p.reswait = 0
     p.z = 0 // ???
     p.jump = 13
-
 
     p.landed = true
     p.lwait = 0
@@ -898,7 +875,7 @@ function playerUpdateFn(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, 
   }
 
   p.tick += 1
-  let mult = 200
+  const mult = 200
   let msg = 'GOMEZ...'
   if (p.tick >= mult * 1) { msg = 'SOMETHING WENT WRONG.' }
   if (p.tick >= mult * 2) { msg = 'THE WARP GATE BROKE!' }
@@ -908,11 +885,8 @@ function playerUpdateFn(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, 
   if (p.tick >= mult * 6) { msg = '' }
 
   if (msg) {
-    showDialog(msg, {x: o.pos.x + 4 /*mid-sprite*/, y: o.pos.y - 16 /*player is 2sprites tall*/}, null)
+    showDialog(msg, { x: o.pos.x + 4 /* mid-sprite */, y: o.pos.y - 16 /* player is 2sprites tall */ }, null)
   }
-
-
-
 
   if (p.r_wait > 10) { // ignore player movement & collision detection while rotating
     move_player(o, gamepad, collisionChecker, sprites, instances, camera, floors)
@@ -936,8 +910,7 @@ function playerUpdateFn(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, 
 
 let lastRender: [number, number] = [0, 0]
 
-
-function move_player(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, floors: Sprite[]) {
+function move_player (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, floors: Sprite[]) {
   const p = o.props
 
   const n1 = -1 // negativeOne just to reduce tokens
@@ -970,7 +943,7 @@ function move_player(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, col
       if (gamepad.isButtonPressed(BUTTON_TYPE.DPAD_LEFT)) { dp -= 1 }
       if (gamepad.isButtonPressed(BUTTON_TYPE.DPAD_RIGHT)) { dp += 1 }
       if (dp < 0) {
-      p.mir = true
+        p.mir = true
       } else if (dp > 0) { p.mir = false }
 
       p.dpos = dp
@@ -1006,42 +979,39 @@ function move_player(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, col
   pzmove(o, gamepad, collisionChecker, sprites, instances, camera, floors)
 }
 
+function sfx (id: number) { }
 
-
-function sfx(id: number) { }
-
-function incmod(n1: number, n2: number) {
+function incmod (n1: number, n2: number) {
   return (n1 + 1) % n2
 }
 
-function flr(n: number) {
+function flr (n: number) {
   return Math.floor(n)
 }
 
-function pgetpos(o: ObjectInstance<PlayerProps, any>) {
+function pgetpos (o: ObjectInstance<PlayerProps, any>) {
   o.props.x = from_real(o.props.xreal)
   o.props.y = from_real(o.props.yreal)
   o.props.z = from_real(o.props.zreal)
 }
 
-function from_real(n: number) {
+function from_real (n: number) {
   return flr(n / 8)
 }
 
-function to_real(n: number) {
+function to_real (n: number) {
   return n * 8
 }
 
-function savelast(p: PlayerProps) {
+function savelast (p: PlayerProps) {
   p.xlast = p.xreal
   p.ylast = p.yreal
   p.zlast = p.zreal
 }
 
-function find_floor(layer: number, o: ObjectInstance<PlayerProps, any>, collisionChecker: CollisionChecker, floors: Sprite[]) {
-
+function find_floor (layer: number, o: ObjectInstance<PlayerProps, any>, collisionChecker: CollisionChecker, floors: Sprite[]) {
   const p = o.props
-  let bbox = o.toBBox()
+  const bbox = o.toBBox()
   const x = Math.round((bbox.maxX + bbox.minX) / 2)
 
   // Find out if there are walls in front of us
@@ -1067,7 +1037,7 @@ function find_floor(layer: number, o: ObjectInstance<PlayerProps, any>, collisio
     minX: x,
     maxX: x,
     minY: bbox.maxY + 1, // chose these because jumping does not result in mid-air player
-    maxY: bbox.maxY + 7,
+    maxY: bbox.maxY + 7
   })
     .filter(item => item !== o) // exclude the player (include walls & floors)
     .sort(zIndexComparator)
@@ -1106,14 +1076,11 @@ function find_floor(layer: number, o: ObjectInstance<PlayerProps, any>, collisio
   return false
 }
 
-function ismid(x: number, a: number, z: number) {
+function ismid (x: number, a: number, z: number) {
   return a <= x && x <= z
 }
 
-
-
-
-function pzmove(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, floors: Sprite[]) {
+function pzmove (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, floors: Sprite[]) {
   const p = o.props
 
   const n1 = -1 // negativeOne just to reduce tokens
@@ -1138,7 +1105,7 @@ function pzmove(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisio
   if (p.dz <= 0) {
     // if floor approaching
     if (p.floor) {
-      let znext = from_real(p.zreal + flr(p.dz / 3))
+      const znext = from_real(p.zreal + flr(p.dz / 3))
       if (znext < p.z) {
         // land
         p.zreal = checkNaN(p.z * 8)
@@ -1172,7 +1139,7 @@ function pzmove(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisio
         }
         p.dropwait, p.floor, p.landed, p.coyote = 0, false, false, 0
       } else {
-      p.dz = 0
+        p.dz = 0
       }
     }
   }
@@ -1212,14 +1179,7 @@ function pzmove(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisio
   }
 }
 
-
-
-
-
-
-
-
-function draw_player(front: boolean, o: ObjectInstance<any, any>, sprites: SpriteController) {
+function draw_player (front: boolean, o: ObjectInstance<any, any>, sprites: SpriteController) {
   const atrans = 0
   const happy = false
 
@@ -1242,10 +1202,7 @@ function draw_player(front: boolean, o: ObjectInstance<any, any>, sprites: Sprit
   }
   let sp = playerStanding
   // if happy > 0) { sp = happySprite }
-  /*else*/ if (p.dz > 0 || istalk()) { sp = playerJumping }
-  else if (p.floor == false) { sp = playerFalling }
-  else if (p.dpos != 0) { sp = playerWalking }
-
+  /* else */ if (p.dz > 0 || istalk()) { sp = playerJumping } else if (p.floor == false) { sp = playerFalling } else if (p.dpos != 0) { sp = playerWalking }
 
   o.setSprite(sp)
 
@@ -1254,10 +1211,9 @@ function draw_player(front: boolean, o: ObjectInstance<any, any>, sprites: Sprit
   // pal()
 }
 
-function istalk() { return false }
+function istalk () { return false }
 
-
-function draw_player_head(front: boolean, o: ObjectInstance<any, any>) {
+function draw_player_head (front: boolean, o: ObjectInstance<any, any>) {
   const p = o.props
 
   const cur_x = 0
@@ -1290,22 +1246,17 @@ function draw_player_head(front: boolean, o: ObjectInstance<any, any>) {
   }
 }
 
-
-function checkNaN(n: number) {
+function checkNaN (n: number) {
   if (Number.isNaN(n)) {
     throw new Error('Expected number to not be NaN but failed')
   }
   return n
 }
 
-
-
-function rotate_world(o: ObjectInstance<PlayerProps, any>, collisionChecker: CollisionChecker) {
+function rotate_world (o: ObjectInstance<PlayerProps, any>, collisionChecker: CollisionChecker) {
   const p = o.props
   if (p.r_wait <= 10) {
-    if (p.r_wait < 5) { p.r_factor = p.r_wait * p.r_dir / 2 }
-    else if (p.r_wait < 10) { p.r_factor = (p.r_wait - 10) * p.r_dir / 2 }
-    else p.r_factor = 0
+    if (p.r_wait < 5) { p.r_factor = p.r_wait * p.r_dir / 2 } else if (p.r_wait < 10) { p.r_factor = (p.r_wait - 10) * p.r_dir / 2 } else p.r_factor = 0
 
     if (p.r_wait === 5) { p.side = (p.side + p.r_dir + 4) % 4 }
 
@@ -1341,55 +1292,49 @@ function rotate_world(o: ObjectInstance<PlayerProps, any>, collisionChecker: Col
       }
       ob.moveTo({
         x,
-        y: to_real(y),
+        y: to_real(y)
       })
       ob.zIndex = z
     })
     o.zIndex = -1000 // player is always on top
-
   }
 }
 
-
-
-
 // Refer to: http://rosettacode.org/wiki/Bitmap/Bresenham's_line_algorithm#JavaScript
-function bline(x0: number, y0: number, x1: number, y1: number, setPixel: (x: number, y: number) => void) {
-  var dx = Math.abs(x1 - x0),
-    sx = x0 < x1 ? 1 : -1;
-  var dy = Math.abs(y1 - y0),
-    sy = y0 < y1 ? 1 : -1;
-  var err = (dx > dy ? dx : -dy) / 2;
+function bline (x0: number, y0: number, x1: number, y1: number, setPixel: (x: number, y: number) => void) {
+  var dx = Math.abs(x1 - x0)
+  var sx = x0 < x1 ? 1 : -1
+  var dy = Math.abs(y1 - y0)
+  var sy = y0 < y1 ? 1 : -1
+  var err = (dx > dy ? dx : -dy) / 2
   while (true) {
-    setPixel(x0, y0);
-    if (x0 === x1 && y0 === y1) break;
-    var e2 = err;
+    setPixel(x0, y0)
+    if (x0 === x1 && y0 === y1) break
+    var e2 = err
     if (e2 > -dx) {
-      err -= dy;
-      x0 += sx;
+      err -= dy
+      x0 += sx
     }
     if (e2 < dy) {
-      err += dx;
-      y0 += sy;
+      err += dx
+      y0 += sy
     }
   }
 }
 
 // from https://www.cc.gatech.edu/grads/m/Aaron.E.McClennen/Bresenham/code.html
-function drawLine(canvas: DoubleArray<string>, start: IPosition, end: IPosition, color: string) {
+function drawLine (canvas: DoubleArray<string>, start: IPosition, end: IPosition, color: string) {
   bline(start.x, start.y, end.x, end.y, (x, y) => canvas.set({ x, y }, color))
 }
 
-function drawRect(canvas: DoubleArray<string>, start: IPosition, end: IPosition, color: string) {
+function drawRect (canvas: DoubleArray<string>, start: IPosition, end: IPosition, color: string) {
   drawLine(canvas, { x: start.x, y: start.y }, { x: end.x, y: start.y }, color)
   drawLine(canvas, { x: start.x, y: end.y }, { x: end.x, y: end.y }, color)
   drawLine(canvas, { x: start.x, y: start.y }, { x: start.x, y: end.y }, color)
   drawLine(canvas, { x: end.x, y: start.y }, { x: end.x, y: end.y }, color)
 }
 
-
-function dialogOne(message: string[], camera: Camera, startTick: number, currentTick: number, drawPixelsFn: DrawPixelsFn) {
-
+function dialogOne (message: string[], camera: Camera, startTick: number, currentTick: number, drawPixelsFn: DrawPixelsFn) {
   const canvas = new DoubleArray<string>()
 
   const tl = { x: 4, y: 4 }
@@ -1416,12 +1361,9 @@ function dialogOne(message: string[], camera: Camera, startTick: number, current
   lines.forEach((line, rowNum) => {
     // drawTextFn({x: tl.x + 2, y: tl.y + 2}, line, '#FFF1E8'
   })
-
 }
 
-
-function dialogTwo(message: string[], camera: Camera, startTick: number, currentTick: number, drawPixelsFn: DrawPixelsFn) {
-
+function dialogTwo (message: string[], camera: Camera, startTick: number, currentTick: number, drawPixelsFn: DrawPixelsFn) {
   const canvas = new DoubleArray<string>()
 
   const len = (message[0].length * 4) + 6 // padding
@@ -1431,8 +1373,6 @@ function dialogTwo(message: string[], camera: Camera, startTick: number, current
 
   const tl = { x: Math.round(mid - len / 2), y: 4 }
   const br = { x: Math.round(mid + len / 2), y: 7 + 8 } // 1 line of text
-
-
 
   for (let y = tl.y; y < br.y; y++) {
     for (let x = tl.x; x < br.x; x++) {

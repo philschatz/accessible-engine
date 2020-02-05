@@ -24,3 +24,46 @@ I tried multiple gamepad libraries but they had the following problems:
 
 
 There is a large database of game controllers but this is the [only description of the file format I have found](https://github.com/Vladar4/sdl2_nim/blob/7f3422cd5480ba0961a1f8922ed7609326215656/sdl2/private/gamecontroller.nim#L77)
+
+
+
+# Notes
+
+Zelda-like game needs:
+
+# abstraction for providing a sequence of things that happen over time (generator)
+
+- optional cancellable method (with its own animation? or is it always immediate?)
+- 
+
+# Sprites
+
+- sprite groups & their z-indexes or something so you can walk behind a tree
+- sprites that have a set of boolean flags
+- maybe some sprites can be a "vertical wall" which is useful for both Z-index calculation _and_ for hookshot/arrow shooting
+- multi-height sprites (e.g. the player is tall w/ a hat)
+
+
+# Maps
+
+- tile maps (maybe multiple tiles per square for like a bridge over land & water, Big-square sprites for like a roof)
+
+
+# Messaging
+
+- popup speech bubbles (with more than just text... maybe controller keys)
+- message windows (e.g. 1 at a time, optional title, require keypress)
+
+
+# Items
+
+- inventory
+- binding weapon(s) to keys
+
+
+# Controller
+
+- keyboard/controller is abstracted out (game registers which keys it wants to listen to)
+- multiplayer (game registers for it)
+- remapping config
+
