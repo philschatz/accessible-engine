@@ -169,18 +169,18 @@ function setFgColor (hex: string) {
     return ansiStyles.color.ansi256.hex(hex)
   }
 }
-function writeBgColor (hex: string) {
-  process.stdout.write(setBgColor(hex))
-}
-function writeFgColor (hex: string) {
-  process.stdout.write(setFgColor(hex))
-}
 export function setMoveTo (x: number, y: number) {
   return ansiEscapes.cursorTo(x, y)
 }
-function setShowCursor () {
-  return ansiEscapes.cursorShow
-}
-function clearScreen () {
-  process.stdout.write(ansiEscapes.clearScreen)
-}
+// function writeBgColor (hex: string) {
+//   process.stdout.write(setBgColor(hex))
+// }
+// function writeFgColor (hex: string) {
+//   process.stdout.write(setFgColor(hex))
+// }
+// function setShowCursor () {
+//   return ansiEscapes.cursorShow
+// }
+// function clearScreen () {
+//   process.stdout.write(ansiEscapes.clearScreen)
+// }

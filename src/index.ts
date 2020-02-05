@@ -19,17 +19,6 @@ import { KeyboardGamepad, AnyGamepad, OrGamepad } from './gamepad/implementation
 import { MyGame } from './myGame'
 import { BUTTON_TYPE } from './gamepad/api'
 
-function setUnion<T> (set1: Iterable<T>, set2: Iterable<T>) {
-  const s: Set<T> = new Set()
-  for (const o of set1) {
-    s.add(o)
-  }
-  for (const o of set2) {
-    s.add(o)
-  }
-  return s
-}
-
 const keyConfig = {}
 keyConfig[BUTTON_TYPE.DPAD_UP] = ['W', 'w', '\u001B\u005B\u0041']
 keyConfig[BUTTON_TYPE.DPAD_DOWN] = ['S', 's', '\u001B\u005B\u0042']

@@ -735,10 +735,10 @@ export class MyGame implements Game {
     for (let y = tl.y; y < br.y; y++) {
       for (let x = tl.x; x < br.x; x++) {
         // skip the corners
-        if (x === tl.x && y === tl.y ||
-          x === tl.x && y === br.y - 1 ||
-          x === br.x - 1 && y === br.y - 1 ||
-          x === br.x - 1 && y === tl.y
+        if ((x === tl.x && y === tl.y) ||
+          (x === tl.x && y === br.y - 1) ||
+          (x === br.x - 1 && y === br.y - 1) ||
+          (x === br.x - 1 && y === tl.y)
         ) {
           continue
         }
@@ -960,8 +960,8 @@ function move_player (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, co
     }
   }
   // animate
-  if (p.dpos == 0) {
-    if (p.still == 0) {
+  if (p.dpos === 0) {
+    if (p.still === 0) {
       p.frame = 0
     } else if (p.still > 200) {
       p.frame += 1
@@ -1109,7 +1109,7 @@ function pzmove (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisi
       if (znext < p.z) {
         // land
         p.zreal = checkNaN(p.z * 8)
-        if (p.zreal % 8 == 0 && !p.landed) {
+        if (p.zreal % 8 === 0 && !p.landed) {
           p.landed = true
           p.lwait = 3
           p.dz = 0
@@ -1121,7 +1121,7 @@ function pzmove (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisi
     }
   }
   // jump/drop if (landed
-  if (intro >= 85 && talkline == 0 && (p.landed || p.coyote > 0)) {
+  if (intro >= 85 && talkline === 0 && (p.landed || p.coyote > 0)) {
     if (p.lwait <= 0) {
       // drop down
       if (gamepad.isButtonPressed(BUTTON_TYPE.DPAD_DOWN) && p.usewait <= 0) {
@@ -1202,7 +1202,7 @@ function draw_player (front: boolean, o: ObjectInstance<any, any>, sprites: Spri
   }
   let sp = playerStanding
   // if happy > 0) { sp = happySprite }
-  /* else */ if (p.dz > 0 || istalk()) { sp = playerJumping } else if (p.floor == false) { sp = playerFalling } else if (p.dpos != 0) { sp = playerWalking }
+  /* else */ if (p.dz > 0 || istalk()) { sp = playerJumping } else if (p.floor === false) { sp = playerFalling } else if (p.dpos !== 0) { sp = playerWalking }
 
   o.setSprite(sp)
 
@@ -1224,7 +1224,7 @@ function draw_player_head (front: boolean, o: ObjectInstance<any, any>) {
   const sback = o.props.side === 2
   const sright = o.props.side === 3
 
-  if (front || (p.x == cur_x && p.y == cur_y && p.z + 1 == cur_z)) {
+  if (front || (p.x === cur_x && p.y === cur_y && p.z + 1 === cur_z)) {
     let zz = 112 - p.zreal
     let xx = p.xreal + Math.round(p.r_factor * (p.yreal / 8 - 4))
     if (p.usewait <= 0 &&
@@ -1332,63 +1332,4 @@ function drawRect (canvas: DoubleArray<string>, start: IPosition, end: IPosition
   drawLine(canvas, { x: start.x, y: end.y }, { x: end.x, y: end.y }, color)
   drawLine(canvas, { x: start.x, y: start.y }, { x: start.x, y: end.y }, color)
   drawLine(canvas, { x: end.x, y: start.y }, { x: end.x, y: end.y }, color)
-}
-
-function dialogOne (message: string[], camera: Camera, startTick: number, currentTick: number, drawPixelsFn: DrawPixelsFn) {
-  const canvas = new DoubleArray<string>()
-
-  const tl = { x: 4, y: 4 }
-  const br = { x: 124, y: 5 + (5 + 2) * message.length } // 2 lines of text
-
-  // draw diagonal shadow grid
-  for (let y = tl.y; y < br.y; y++) {
-    for (let x = tl.x; x < br.x; x++) {
-      if ((x + y) % 2 === 0) {
-        canvas.set({ x, y }, '#1D2B53') // dark blue
-      }
-    }
-  }
-
-  drawRect(canvas, tl, br, '#FFF1E8') // white
-  // shadow
-  drawLine(canvas, { x: tl.x + 1, y: br.y + 1 }, { x: br.x + 1, y: br.y + 1 }, '#1D2B53') // blue
-  drawLine(canvas, { x: br.x + 1, y: tl.y + 1 }, { x: br.x + 1, y: br.y + 1 }, '#1D2B53') // blue
-
-  drawPixelsFn({ x: 0, y: 0 }, canvas.asArray(), false, false)
-
-  // convert the lines of text to characters
-  const lines = message
-  lines.forEach((line, rowNum) => {
-    // drawTextFn({x: tl.x + 2, y: tl.y + 2}, line, '#FFF1E8'
-  })
-}
-
-function dialogTwo (message: string[], camera: Camera, startTick: number, currentTick: number, drawPixelsFn: DrawPixelsFn) {
-  const canvas = new DoubleArray<string>()
-
-  const len = (message[0].length * 4) + 6 // padding
-
-  const cameraBbox = camera.toBBox()
-  const mid = camera.size().width / 2 // (cameraBbox.maxX + cameraBbox.minX) / 2
-
-  const tl = { x: Math.round(mid - len / 2), y: 4 }
-  const br = { x: Math.round(mid + len / 2), y: 7 + 8 } // 1 line of text
-
-  for (let y = tl.y; y < br.y; y++) {
-    for (let x = tl.x; x < br.x; x++) {
-      // skip the corners
-      if (x === tl.x && y === tl.y ||
-        x === tl.x && y === br.y - 1 ||
-        x === br.x - 1 && y === br.y - 1 ||
-        x === br.x - 1 && y === tl.y
-      ) {
-        continue
-      }
-      canvas.set({ x, y }, '#000000')
-    }
-  }
-
-  drawPixelsFn({ x: 0, y: 0 }, canvas.asArray(), false, false)
-
-  // drawLettersFn({x: tl.x + 3, y: tl.y + 3}, message, '#FFF1E8')
 }

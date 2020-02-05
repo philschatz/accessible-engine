@@ -232,7 +232,7 @@ export class KeyboardGamepad implements IGamepad {
     process.stdin.setEncoding('utf8')
 
     // https://stackoverflow.com/a/30687420
-    process.stdin.on('data', async (key: string) => {
+    process.stdin.on('data', (key: string) => {
       if (this.timestamp > 0) debug('Time since last keystroke detected:', Date.now() - this.timestamp)
       this.timestamp = Date.now()
 
