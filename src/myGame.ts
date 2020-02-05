@@ -741,7 +741,7 @@ export class MyGame implements Game {
     drawPixelsFn({ x: CAMERA_SIZE.width - 2 - 8, y: 1 }, canvas.asArray(), false, false)
   }
 
-  drawDialog(message: string, drawPixelsFn: DrawPixelsFn, drawTextFn: DrawTextFn, elapsedMs: number, target: null, additional: Opt<SimpleObject>) {
+  drawDialog(message: string, drawPixelsFn: DrawPixelsFn, drawTextFn: DrawTextFn, elapsedMs: number, target: Opt<IPosition>, additional: Opt<SimpleObject>) {
     const canvas = new DoubleArray<string>()
 
     const len = (message.length * 4) + 6 // padding
@@ -767,10 +767,19 @@ export class MyGame implements Game {
       }
     }
 
+    // draw a speech-bubble caret if the dialog is coming from a person
+    if (target) {
+      const y = 7 + 8
+      let x = Math.min(target.x, br.x - 4)
+      x = Math.max(x, tl.x + 4)
+      drawLine(canvas, {x: x - 2, y: y + 0}, {x: x + 2, y: y + 0}, '#000000')
+      drawLine(canvas, {x: x - 1, y: y + 1}, {x: x + 1, y: y + 1}, '#000000')
+      drawLine(canvas, {x: x - 0, y: y + 2}, {x: x + 0, y: y + 2}, '#000000')
+    }
+
     drawPixelsFn({ x: 0, y: 0 }, canvas.asArray(), false, false)
 
     drawTextFn({x: tl.x + 3, y: tl.y + 3}, message, '#FFF1E8')
-
   }
 
 }
@@ -899,7 +908,7 @@ function playerUpdateFn(o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, 
   if (p.tick >= mult * 6) { msg = '' }
 
   if (msg) {
-    showDialog(msg, null)
+    showDialog(msg, {x: o.pos.x + 4 /*mid-sprite*/, y: o.pos.y - 16 /*player is 2sprites tall*/}, null)
   }
 
 

@@ -225,7 +225,7 @@ export class Engine {
   private readonly camera: Camera
   private readonly gamepad: IGamepad
   private overlayState: SimpleObject
-  private pendingDialog: Opt<{message: string, startTick: number, additional: Opt<SimpleObject>}>
+  private pendingDialog: Opt<{message: string, startTick: number, target: Opt<IPosition>, additional: Opt<SimpleObject>}>
 
   constructor(game: Game, renderer: IRenderer, gamepad: IGamepad) {
     this.bush = new MyRBush()
@@ -293,7 +293,8 @@ export class Engine {
     this.game.drawOverlay(this.drawPixels, this.drawText, this.overlayState)
 
     if (this.pendingDialog) {
-      this.game.drawDialog(this.pendingDialog.message, this.drawPixels, this.drawText, this.curTick - this.pendingDialog.startTick, null, this.pendingDialog.additional)
+      const target = this.pendingDialog.target ? relativeTo(this.pendingDialog.target, this.camera.topLeft()): null
+      this.game.drawDialog(this.pendingDialog.message, this.drawPixels, this.drawText, this.curTick - this.pendingDialog.startTick, target, this.pendingDialog.additional)
       this.pendingDialog = null
     }
 
@@ -340,10 +341,11 @@ export class Engine {
     }
   }
 
-  showDialog(message: string, additional: SimpleObject) {
+  showDialog(message: string, target: Opt<IPosition>, additional: Opt<SimpleObject>) {
     if (!this.pendingDialog || this.pendingDialog.message !== message) {
       this.pendingDialog = {
         message,
+        target,
         additional,
         startTick: this.curTick
       }
@@ -372,7 +374,7 @@ export interface Game {
   init(sprites: SpriteController, instances: InstanceController)
   drawBackground(tiles: ObjectInstance<any, any>[], camera: Camera, drawPixelsFn: DrawPixelsFn)
   drawOverlay(drawPixelsFn: DrawPixelsFn, drawTextFn: DrawTextFn, additional: SimpleObject)
-  drawDialog(message: string, drawPixelsFn: DrawPixelsFn, drawTextFn: DrawTextFn, elapsedMs: number, target: null, additional: Opt<SimpleObject>)
+  drawDialog(message: string, drawPixelsFn: DrawPixelsFn, drawTextFn: DrawTextFn, elapsedMs: number, target: Opt<IPosition>, additional: Opt<SimpleObject>)
 }
 
 export class Camera {
@@ -433,7 +435,7 @@ function boxNudge(source: number, target: number, leashLength: number | null) {
 }
 
 
-export type ShowDialogFn = (message: string, additional: Opt<SimpleObject>) => void
+export type ShowDialogFn = (message: string, target: Opt<IPosition>, additional: Opt<SimpleObject>) => void
 export type UpdateFn<P, S> = (o: ObjectInstance<P, S>, gamepad: IGamepad, collisionCheker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, showDialogFn: ShowDialogFn, overlayState: SimpleObject) => void
 
 export class InstanceController {
