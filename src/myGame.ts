@@ -1,6 +1,5 @@
-import { Game, Camera, SpriteController, Image, DefiniteMap, Sprite, InstanceController, DPAD, ObjectInstance, CollisionChecker, IPosition, GameObject, zIndexComparator, IPixel, DrawPixelsFn, ShowDialogFn, SimpleObject, Opt, DrawTextFn } from './engine'
+import { Game, Camera, SpriteController, Image, DefiniteMap, Sprite, InstanceController, ObjectInstance, CollisionChecker, IPosition, GameObject, zIndexComparator, DrawPixelsFn, ShowDialogFn, SimpleObject, Opt, DrawTextFn } from './engine'
 import { setMoveTo, DoubleArray } from './terminal'
-import { BBox } from 'rbush'
 import { IGamepad, BUTTON_TYPE } from './gamepad/api'
 
 const CAMERA_SIZE = {
@@ -25,9 +24,9 @@ export class MyGame implements Game {
     const w = '#FFF1E8' // (light grey)
     const r = '#FF004D' // (light red)
     const o = '#FFA300' // (orange?)
-    const y = '#FFF024' // (yellow aka light brown)
+    // const y = '#FFF024' // (yellow aka light brown)
     const g = '#00E756' // (light green)
-    const b = '#29ADFF' // (light blue)
+    // const b = '#29ADFF' // (light blue)
     const c = '#83769C' // (light cyan?)
     const p = '#FF77A8' // (light purple)
     const k = '#FFCCAA' // (light brown)
@@ -902,7 +901,7 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
   const diff = process.hrtime(lastRender)
   lastRender = now
   const seconds = diff[0] + diff[1] / (1000 * 1000 * 1000)
-  console.log(`Player: grid=(${o.props.x},${o.props.y},${o.props.z}H) win=(${o.pos.x},${o.pos.y}) Real=(${o.props.xreal},${o.props.yreal},${o.props.zreal}H) side=${o.props.side} FPS:${(new Number(1 / seconds)).toFixed(1)}     `)
+  console.log(`Player: grid=(${o.props.x},${o.props.y},${o.props.z}H) win=(${o.pos.x},${o.pos.y}) Real=(${o.props.xreal},${o.props.yreal},${o.props.zreal}H) side=${o.props.side} FPS:${(1 / seconds).toFixed(1)}     `)
 
   // Show something in the overlay
   overlayState.cubeCount = o.props.x
@@ -966,20 +965,24 @@ function move_player (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, co
     } else if (p.still > 200) {
       p.frame += 1
       if (p.frame > 5) {
-        p.still, p.frame = 0, 0
+        p.still = 0
+        p.frame = 0
       }
     }
     p.still += 1
   } else {
     if (p.still > 0) {
-      p.still, p.frame = 0, 0
+      p.still = 0
+      p.frame = 0
     }
     p.frame = incmod(p.frame, 24)
   }
   pzmove(o, gamepad, collisionChecker, sprites, instances, camera, floors)
 }
 
-function sfx (id: number) { }
+function sfx (id: number) {
+  // This is a no-op for now since we do not have sounds
+}
 
 function incmod (n1: number, n2: number) {
   return (n1 + 1) % n2
@@ -1020,7 +1023,6 @@ function find_floor (layer: number, o: ObjectInstance<PlayerProps, any>, collisi
     .sort(zIndexComparator)
 
   let hasWallsInFront = false
-  let hasWallsBehind = false
   if (walls.length > 0) {
     const front = walls[0]
     switch (p.side) {
@@ -1029,7 +1031,6 @@ function find_floor (layer: number, o: ObjectInstance<PlayerProps, any>, collisi
       case 1: hasWallsInFront = front.props.x < p.x; break // left
       case 3: hasWallsInFront = front.props.x > p.x; break // right
     }
-    hasWallsBehind = !hasWallsInFront
   }
 
   // check if there is a floor below
@@ -1076,23 +1077,19 @@ function find_floor (layer: number, o: ObjectInstance<PlayerProps, any>, collisi
   return false
 }
 
-function ismid (x: number, a: number, z: number) {
-  return a <= x && x <= z
-}
-
 function pzmove (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, floors: Sprite[]) {
   const p = o.props
 
-  const n1 = -1 // negativeOne just to reduce tokens
+  // const n1 = -1 // negativeOne just to reduce tokens
   // only 1 of these is true
-  const sfront = o.props.side === 0
-  const sleft = o.props.side === 1
-  const sback = o.props.side === 2
-  const sright = o.props.side === 3
+  // const sfront = o.props.side === 0
+  // const sleft = o.props.side === 1
+  // const sback = o.props.side === 2
+  // const sright = o.props.side === 3
   const intro = 85
 
   const talkline = 0
-  let side = 0 // front,left,right,back or something
+  // let side = 0 // front,left,right,back or something
 
   pgetpos(o)
   // vertical movement
@@ -1137,7 +1134,10 @@ function pzmove (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisi
           p.dz = p.jump
           sfx(8)
         }
-        p.dropwait, p.floor, p.landed, p.coyote = 0, false, false, 0
+        p.dropwait = 0
+        p.floor = false
+        p.landed = false
+        p.coyote = 0
       } else {
         p.dz = 0
       }
@@ -1169,7 +1169,7 @@ function pzmove (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisi
         p.xreal = p.xlast
         p.yreal = p.ylast
         p.zreal = checkNaN(p.zlast)
-        side = p.slast
+        // side = p.slast
         p.open = p.olast
         p.landed = true
         p.dz = 0
@@ -1181,7 +1181,7 @@ function pzmove (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisi
 
 function draw_player (front: boolean, o: ObjectInstance<any, any>, sprites: SpriteController) {
   const atrans = 0
-  const happy = false
+  // const happy = false
 
   const playerStanding = sprites.get('playerStanding')
   const playerWalking = sprites.get('playerWalking')
@@ -1213,13 +1213,13 @@ function draw_player (front: boolean, o: ObjectInstance<any, any>, sprites: Spri
 
 function istalk () { return false }
 
-function draw_player_head (front: boolean, o: ObjectInstance<any, any>) {
+function draw_player_head (front: boolean, o: ObjectInstance<PlayerProps, any>) {
   const p = o.props
 
   const cur_x = 0
   const cur_y = 0
   const cur_z = 0
-  const sfront = o.props.side === 0
+  // const sfront = o.props.side === 0
   const sleft = o.props.side === 1
   const sback = o.props.side === 2
   const sright = o.props.side === 3
