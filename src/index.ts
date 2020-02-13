@@ -16,7 +16,8 @@
 import { Engine } from './engine'
 import { TerminalRenderer } from './terminal'
 import { KeyboardGamepad, AnyGamepad, OrGamepad } from './gamepad/implementation'
-import { MyGame } from './myGame'
+// import { MyGame } from './fuzGame'
+import { MyGame } from './akurraGame'
 import { BUTTON_TYPE } from './gamepad/api'
 
 const keyConfig = {}

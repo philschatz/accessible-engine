@@ -313,8 +313,8 @@ export class Engine {
       const width = row.length
       let relX = 0
       for (const pixel of row) {
-        const x = screenPos.x + (hFlip ? width - relX : relX)
-        const y = screenPos.y + (vFlip ? height - relY : relY)
+        const x = screenPos.x + (hFlip ? width - 1 - relX : relX)
+        const y = screenPos.y + (vFlip ? height - 1 - relY : relY)
         if (pixel !== null && pixel !== undefined && x >= 0 && y >= 0) {
           const pos = { x, y }
           this.renderer.drawPixel(pos, pixel)
@@ -380,7 +380,7 @@ export interface Game {
 
 export class Camera {
   public pos: IPosition
-  private readonly dim: Size
+  private dim: Size
 
   constructor (dim: Size) {
     this.dim = dim
@@ -388,6 +388,7 @@ export class Camera {
   }
 
   public size () { return this.dim }
+  public resize (dim: Size) { this.dim = dim }
 
   public toBBox (): BBox {
     const { width, height } = this.dim
