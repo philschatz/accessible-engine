@@ -72,12 +72,6 @@ export class MyGame implements Game {
 
     const validator = {}
     function g (item: GameObject<any, any>, pos: IPosition) {
-      const key = `${pos.x}, ${pos.y}`
-      if (validator[key]) {
-        throw new Error(`BUG: 2 voxels in the same spot: ${key}`)
-      }
-      validator[key] = true
-
       // convert from grid coordinates to pixels
       const o = item.new({
         x: pos.x * 16,
@@ -266,7 +260,9 @@ export class MyGame implements Game {
     g(WallTopUpDown, { x: 2, y })
     g(Rock, { x: 3, y })
     g(Sand, { x: 4, y })
+    g(Sand, { x: 5, y })
     g(Box, { x: 5, y })
+    g(Sand, { x: 6, y })
     g(Box, { x: 6, y })
     g(Sand, { x: 7, y })
     g(Sand, { x: 8, y })
@@ -299,6 +295,7 @@ export class MyGame implements Game {
     g(Sand, { x: 8, y })
     g(Sand, { x: 9, y })
     g(Sand, { x: 10, y })
+    g(Sand, { x: 11, y })
     g(player, { x: 11, y })
     g(Sand, { x: 12, y })
     g(Sand, { x: 13, y })
