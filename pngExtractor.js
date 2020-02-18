@@ -67,30 +67,30 @@ fs.createReadStream('akurra-tiles.png')
     console.log(`END MAP_KEYS_COUNT=${[...map.keys()].length}`)
     console.log(`END MAP_VALUES_COUNT=${[...new Set(map.values())].length}`)
 
-    // Clean up the PNG file so that the colorspace is smaller
-    for (var y = 0; y < this.height; y++) {
-      for (var x = 0; x < this.width; x++) {
-          var idx = (this.width * y + x) << 2;
-          const alpha = this.data[idx+3]
-          if (alpha === 0) {
-          } else {
-              const r = this.data[idx]
-              const g = this.data[idx+1]
-              const b = this.data[idx+2]
+  //   // Clean up the PNG file so that the colorspace is smaller
+  //   for (var y = 0; y < this.height; y++) {
+  //     for (var x = 0; x < this.width; x++) {
+  //         var idx = (this.width * y + x) << 2;
+  //         const alpha = this.data[idx+3]
+  //         if (alpha === 0) {
+  //         } else {
+  //             const r = this.data[idx]
+  //             const g = this.data[idx+1]
+  //             const b = this.data[idx+2]
 
-              let rawHex = rgbToHex(r, g, b)
-              if (map.has(rawHex)) {
-                rawHex = map.get(rawHex)
-              }
+  //             let rawHex = rgbToHex(r, g, b)
+  //             if (map.has(rawHex)) {
+  //               rawHex = map.get(rawHex)
+  //             }
 
-              const rgb = hexToRgb(rawHex)
+  //             const rgb = hexToRgb(rawHex)
 
-              this.data[idx+0] = rgb.r
-              this.data[idx+1] = rgb.g
-              this.data[idx+2] = rgb.b
-          }
-      }
-  }
+  //             this.data[idx+0] = rgb.r
+  //             this.data[idx+1] = rgb.g
+  //             this.data[idx+2] = rgb.b
+  //         }
+  //     }
+  // }
 
   this.pack().pipe(fs.createWriteStream('akurra-tiles-reduced.png'))
 
@@ -99,10 +99,12 @@ fs.createReadStream('akurra-tiles.png')
 
   // Output code for each of the sprites. Use single-letter variables (lower/uppercase) for the colors
   const sprites = [
-    ['Sand', 'Rock', 'Bush', 'GongDisabled', 'WallTopRightDown'],
-    ['SandEdge', 'Box', 'GongRed', 'PillarRed', 'WallTopUpDown', 'Key'],
-    ['Land', 'Lock', 'ArrowLeft', 'WallTopLeftRight', 'WallTopUpLeft', 'Pedestal'],
-    ['LandCorner', 'LandBottom', 'ArrowLeftDisabled', 'Wall', 'WallVert', 'PlayerStandDown']
+    ['Sand', 'Rock', 'Bush', 'GongDisabled', 'WallTopRightDown', 'Key'],
+    ['SandEdge', 'Box', 'GongRed', 'PillarRed', 'WallTopUpDown', 'Pedestal'],
+    ['Land', 'Lock', 'ArrowLeft', 'WallTopLeftRight', 'WallTopUpLeft'],
+    ['LandCorner', 'LandBottom', 'ArrowLeftDisabled', 'Wall', 'WallVert'],
+    ['Water0', 'Water1', 'Water2', 'Water3', 'Water4', 'TreeTop'],
+    ['PlayerStandDown', null, null, null, null, 'TreeBottom'],
   ]
   const letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXY' // Z is null
 
@@ -114,6 +116,9 @@ fs.createReadStream('akurra-tiles.png')
 
   sprites.forEach((spriteRow, yy) => {
     spriteRow.forEach((spriteName, xx) => {
+      if (spriteName === null) {
+        return
+      }
       const out = [`images.add('${spriteName}', new Image([`]
 
       for (let y = 0; y < 16; y++) {

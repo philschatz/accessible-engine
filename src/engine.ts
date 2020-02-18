@@ -60,7 +60,7 @@ export class ObjectInstance<P, S> {
   }
 
   toBBox (): BBox {
-    return { minX: this.pos.x, minY: this.pos.y, maxX: this.pos.x + 7, maxY: this.pos.y + 7 }
+    return { minX: this.pos.x, minY: this.pos.y, maxX: this.pos.x + 15, maxY: this.pos.y + 15 }
   }
 
   setSprite (sprite: Sprite) {
@@ -138,6 +138,9 @@ export class Sprite {
   images: Image[]
 
   constructor (playbackRate: number, images: Image[]) {
+    if (Math.floor(playbackRate) !== playbackRate || playbackRate < 0) {
+      throw new Error('The rate is the number of ticks to wait before moving to the next sprite. It should be a whole non-negative number')
+    }
     this._name = ''
     this.playbackRate = playbackRate
     this.images = images
