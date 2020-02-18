@@ -2,6 +2,7 @@
   "scripts": {
     "build": "tsc",
     "lint": "eslint . --fix --ext .ts,.tsx",
+    "png": "node ./pngExtractor.js",
     "test": "npm run-script build && npm run-script start",
     "test:debug": "npm run-script build && npm run-script start:debug",
     "start": "node -r source-map-support/register ./src/index.js",
