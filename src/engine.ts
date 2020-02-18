@@ -33,7 +33,7 @@ export type Opt<T> = null | T
 
 export class ObjectInstance<P, S> {
   public pos: IPosition
-  public zIndex: number | undefined // lower is on top
+  _zIndex: Opt<number>
 
   public static: GameObject<P, S>
   sprite: Sprite
@@ -43,6 +43,7 @@ export class ObjectInstance<P, S> {
   public hFlip: boolean
 
   constructor (t: GameObject<P, S>, pos: IPosition, props: P) {
+    this._zIndex = null
     this.sprite = t.sprite
     this.static = t
     this.pos = pos
@@ -74,18 +75,24 @@ export class ObjectInstance<P, S> {
   setMask (hexColor: Opt<string>) {
     this.maskColor = hexColor
   }
+
+  zIndex() {
+    return this._zIndex === null ? this.static.zIndex : this._zIndex
+  }
 }
 
 export class GameObject<P = {}, S = {}> {
   private readonly bush: RBush<ObjectInstance<{}, {}>>
   readonly sprite: Sprite
+  readonly zIndex: Opt<number>
   readonly instances: Set<ObjectInstance<any, any>> = new Set()
   readonly updateFn: UpdateFn<P, S>
   public props: S
 
-  constructor (bush: RBush<ObjectInstance<{}, {}>>, sprite: Sprite, updateFn: UpdateFn<P, S>) {
+  constructor (bush: RBush<ObjectInstance<{}, {}>>, sprite: Sprite, zIndex: Opt<number>, updateFn: UpdateFn<P, S>) {
     this.bush = bush
     this.sprite = sprite
+    this.zIndex = zIndex
     this.updateFn = updateFn
   }
 
@@ -263,7 +270,7 @@ export class Engine {
     // Update each object
     // TODO: Only update objects in view or ones that have an alwaysUpdate=true flag set (TBD)
     this.bush.all().forEach(i => {
-      i.static.updateFn(i, this.gamepad, this.collisionChecker, this.sprites, this.instances, this.camera, this.showDialog, this.overlayState)
+      i.static.updateFn(i, this.gamepad, this.collisionChecker, this.sprites, this.instances, this.camera, this.showDialog, this.overlayState, this.curTick)
     })
 
     this.draw()
@@ -440,7 +447,7 @@ function boxNudge (source: number, target: number, leashLength: number | null) {
 }
 
 export type ShowDialogFn = (message: string, target: Opt<IPosition>, additional: Opt<SimpleObject>) => void
-export type UpdateFn<P, S> = (o: ObjectInstance<P, S>, gamepad: IGamepad, collisionCheker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, showDialogFn: ShowDialogFn, overlayState: SimpleObject) => void
+export type UpdateFn<P, S> = (o: ObjectInstance<P, S>, gamepad: IGamepad, collisionCheker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, showDialogFn: ShowDialogFn, overlayState: SimpleObject, currentTick: number) => void
 
 export class InstanceController {
   private readonly bush: RBush<ObjectInstance<any, any>>
@@ -450,14 +457,14 @@ export class InstanceController {
     this.bush = bush
   }
 
-  simple (sprites: SpriteController, name: string) {
-    return this.factory(name, sprites.get(name), () => null)
+  simple (sprites: SpriteController, name: string, zIndex: Opt<number>) {
+    return this.factory(name, sprites.get(name), zIndex, () => null)
   }
 
-  factory (name: String, sprite: Sprite, fnUpdate: UpdateFn<any, any>) {
+  factory (name: String, sprite: Sprite, zIndex: Opt<number>, fnUpdate: UpdateFn<any, any>) {
     let i = this.instances.get(name)
     if (i === undefined) {
-      i = new GameObject(this.bush, sprite, fnUpdate)
+      i = new GameObject(this.bush, sprite, zIndex, fnUpdate)
       this.instances.set(name, i)
       return i
     }
@@ -506,13 +513,17 @@ export enum DPAD {
 }
 
 export function zIndexComparator (a: ObjectInstance<any, any>, b: ObjectInstance<any, any>) {
-  if (a.zIndex === undefined && b.zIndex === undefined) {
+  const az = a.zIndex()
+  const bz = b.zIndex()
+  const aNull = az == undefined || az === null
+  const bNull = bz == undefined || bz === null
+  if (aNull && bNull) {
     return 0
-  } else if (b.zIndex === undefined) {
+  } else if (bNull) {
     return 1
-  } else if (a.zIndex === undefined) {
+  } else if (aNull) {
     return -1
   } else {
-    return a.zIndex - b.zIndex
+    return az - bz
   }
 }

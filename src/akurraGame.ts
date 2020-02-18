@@ -1,6 +1,8 @@
 import { Game, Camera, SpriteController, Image, DefiniteMap, Sprite, InstanceController, ObjectInstance, CollisionChecker, IPosition, GameObject, zIndexComparator, DrawPixelsFn, ShowDialogFn, SimpleObject, Opt, DrawTextFn } from './engine'
 import { setMoveTo, DoubleArray } from './terminal'
 import { IGamepad, BUTTON_TYPE } from './gamepad/api'
+import { loadImages } from './akurraImages'
+import { BBox } from 'rbush'
 
 // https://stackoverflow.com/questions/521295/seeding-the-random-number-generator-in-javascript/47593316#47593316
 var LCG = (s: number) => () => (2 ** 31 - 1 & (s = Math.imul(48271, s))) / 2 ** 31
@@ -9,581 +11,7 @@ export class MyGame implements Game {
   load (gamepad: IGamepad, sprites: SpriteController) {
     // gamepad.listenTo([BUTTON_TYPE.ARROW_LEFT, BUTTON_TYPE.ARROW_RIGHT, BUTTON_TYPE.ARROW_DOWN, BUTTON_TYPE.ARROW_UP, BUTTON_TYPE.CLUSTER_BOTTOM])
 
-    const images = new DefiniteMap<Image>()
-
-    const Z = null // transparent
-    const a = '#73c2b4'
-    const b = '#c2ffeb'
-    const c = '#06353b'
-    const d = '#dec78f'
-    const e = '#306387'
-    const f = '#ffffe2'
-    const g = '#000000'
-    const h = '#93c453'
-    const i = '#6a0009'
-    const j = '#6b241b'
-    const k = '#fd9150'
-    const l = '#fed4a3'
-    const m = '#e72e3d'
-    const n = '#139dec'
-    const o = '#3f6d54'
-    const p = '#c09d53'
-    const q = '#213531'
-    const r = '#599388'
-    const s = '#ffffff'
-    const t = '#fc7953'
-    const u = '#fffff2'
-    images.add('Sand', new Image([
-      [a, a, b, a, b, b, b, b, b, b, b, b, b, b, a, a],
-      [a, a, a, b, a, b, b, b, b, b, b, b, b, b, b, a],
-      [a, a, a, a, b, a, b, b, b, b, b, b, b, b, b, b],
-      [b, a, a, a, a, b, a, b, a, b, b, b, b, b, b, b],
-      [b, b, a, a, a, a, a, a, b, a, b, b, b, b, b, b],
-      [b, b, b, a, a, a, a, a, a, b, a, a, b, b, b, b],
-      [b, b, b, b, b, a, a, a, a, a, a, b, a, a, b, b],
-      [b, b, b, b, b, b, b, b, a, a, a, a, a, b, a, b],
-      [b, b, b, b, b, b, b, b, b, a, a, a, a, a, b, b],
-      [b, b, b, b, b, b, b, b, b, b, b, a, a, a, a, b],
-      [b, b, b, b, b, b, b, b, b, b, b, b, a, a, a, a],
-      [b, b, b, b, b, b, b, b, b, b, b, b, a, a, a, b],
-      [b, b, b, b, b, b, b, b, b, b, b, b, b, a, a, a],
-      [b, b, b, b, b, b, b, b, b, b, b, b, b, a, a, a],
-      [a, b, b, b, b, b, b, b, b, b, b, b, b, a, a, a],
-      [a, a, b, b, b, b, b, b, b, b, b, b, b, b, a, a]
-    ]))
-    images.add('Rock', new Image([
-      [b, b, b, b, b, b, c, c, c, c, b, b, b, b, b, b],
-      [b, b, b, c, c, c, a, a, a, a, c, c, b, b, b, b],
-      [b, b, c, a, b, b, a, b, b, b, a, a, c, b, b, b],
-      [b, c, a, b, b, e, a, b, b, b, b, b, a, c, b, b],
-      [b, c, a, a, b, e, e, a, b, b, b, a, a, b, c, b],
-      [b, c, a, a, a, b, e, e, a, a, a, e, a, a, c, b],
-      [b, c, a, a, a, a, a, e, a, a, a, e, e, c, c, b],
-      [b, c, c, e, a, a, a, a, a, a, a, e, e, b, c, c],
-      [b, a, c, c, e, a, a, a, a, a, e, e, b, b, b, c],
-      [b, a, c, b, a, a, a, b, b, a, a, a, a, a, b, c],
-      [a, c, b, a, b, e, a, a, a, b, c, e, a, a, a, c],
-      [a, c, e, a, a, b, c, e, a, b, c, e, a, a, a, c],
-      [a, c, e, e, a, b, c, e, a, a, c, c, e, a, a, c],
-      [a, c, c, c, e, e, c, c, e, c, c, c, c, e, c, b],
-      [a, a, c, c, c, c, a, a, a, a, a, c, c, c, b, b],
-      [b, a, a, a, a, a, a, b, b, a, a, a, a, a, b, b]
-    ]))
-    images.add('Bush', new Image([
-      [b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b],
-      [b, b, b, b, b, b, b, c, c, b, b, b, b, b, b, b],
-      [b, b, b, b, c, c, c, d, c, c, c, c, b, b, b, b],
-      [b, b, b, c, d, c, c, d, d, c, c, b, c, b, b, b],
-      [b, b, c, c, c, d, c, d, b, c, b, c, c, c, b, b],
-      [b, c, d, d, c, c, d, d, d, b, c, c, d, d, c, b],
-      [b, b, c, d, d, c, c, c, c, c, c, d, d, c, b, b],
-      [b, b, c, d, c, d, c, c, d, c, d, c, b, c, b, b],
-      [e, b, c, c, c, c, c, d, b, c, c, c, c, c, b, e],
-      [b, c, d, c, c, d, d, d, d, d, b, c, c, b, c, b],
-      [d, c, d, d, c, c, d, d, d, d, c, c, b, b, c, b],
-      [d, c, c, d, d, c, c, c, c, c, c, d, d, c, c, b],
-      [b, d, c, c, c, c, d, d, d, b, c, c, c, c, b, b],
-      [b, d, d, c, c, c, c, c, c, c, c, c, c, b, b, b],
-      [b, b, d, d, d, d, c, c, c, c, d, d, d, b, b, b],
-      [b, b, b, d, d, d, d, d, d, d, d, b, b, b, b, b]
-    ]))
-    images.add('GongDisabled', new Image([
-      [Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z],
-      [Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z],
-      [Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z],
-      [Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z],
-      [Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z],
-      [Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z],
-      [Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z],
-      [Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z],
-      [Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z],
-      [Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z],
-      [Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z],
-      [Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z],
-      [Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z],
-      [Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z],
-      [Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z],
-      [Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z]
-    ]))
-    images.add('WallTopRightDown', new Image([
-      [b, b, a, c, c, c, c, c, c, c, c, c, c, c, c, c],
-      [b, a, c, c, c, c, c, c, c, c, c, c, c, c, c, c],
-      [a, c, c, c, a, a, a, a, a, a, a, a, a, a, a, a],
-      [c, c, c, a, a, a, a, a, a, a, a, a, a, a, a, a],
-      [c, c, a, a, a, a, a, a, a, a, a, a, a, a, a, a],
-      [c, c, a, a, a, a, a, a, a, a, a, a, a, a, a, a],
-      [c, c, a, a, a, a, a, c, c, c, c, c, c, c, c, c],
-      [c, c, a, a, a, a, c, c, c, c, c, c, c, c, c, c],
-      [c, c, a, a, a, a, c, c, c, c, c, c, c, c, c, c],
-      [c, c, a, a, a, a, c, c, c, c, b, b, b, b, b, c],
-      [c, c, a, a, a, a, c, c, c, b, b, b, b, b, b, c],
-      [c, c, a, a, a, a, c, c, c, b, b, b, b, a, a, c],
-      [c, c, a, a, a, a, c, c, c, b, b, b, a, a, a, c],
-      [c, c, a, a, a, a, c, c, c, b, b, a, a, a, c, c],
-      [c, c, a, a, a, a, c, c, c, b, b, a, a, c, c, c],
-      [c, c, a, a, a, a, c, c, c, c, c, c, c, c, c, c]
-    ]))
-    images.add('Key', new Image([
-      [Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z],
-      [Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z],
-      [Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z],
-      [Z, Z, Z, Z, Z, Z, f, f, f, f, Z, Z, Z, Z, Z, Z],
-      [Z, Z, Z, Z, Z, f, g, g, g, g, f, Z, Z, Z, Z, Z],
-      [Z, Z, Z, Z, f, g, f, f, f, f, g, f, Z, Z, Z, Z],
-      [Z, Z, Z, Z, f, g, h, g, g, f, g, f, Z, Z, Z, Z],
-      [Z, Z, Z, Z, f, g, h, g, g, f, g, f, Z, Z, Z, Z],
-      [Z, Z, Z, Z, f, g, h, h, h, h, g, f, Z, Z, Z, Z],
-      [Z, Z, Z, Z, Z, f, g, g, h, g, f, Z, Z, Z, Z, Z],
-      [Z, Z, Z, Z, Z, f, g, Z, h, g, f, Z, Z, Z, Z, Z],
-      [Z, Z, Z, Z, Z, f, g, g, h, g, f, Z, Z, Z, Z, Z],
-      [Z, Z, Z, Z, Z, f, g, h, h, g, f, Z, Z, Z, Z, Z],
-      [Z, Z, Z, Z, Z, Z, h, g, g, h, Z, Z, Z, Z, Z, Z],
-      [Z, Z, Z, Z, Z, Z, Z, h, h, Z, Z, Z, Z, Z, Z, Z],
-      [Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z]
-    ]))
-    images.add('SandEdge', new Image([
-      [a, a, a, b, b, b, b, b, b, b, b, b, b, b, a, a],
-      [a, a, a, a, b, b, b, b, b, b, b, b, b, b, b, a],
-      [b, a, a, a, a, b, b, b, b, b, b, b, b, b, b, b],
-      [b, b, a, a, a, a, a, b, a, b, a, b, b, b, b, b],
-      [b, b, b, a, a, a, a, a, a, a, b, a, b, b, b, b],
-      [b, b, b, b, a, a, a, a, a, a, a, a, a, a, a, b],
-      [b, b, b, b, b, b, b, b, a, a, a, a, a, b, b, b],
-      [b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b],
-      [b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b],
-      [b, b, b, b, b, b, a, a, a, a, a, a, a, a, b, b],
-      [a, a, a, n, n, n, n, n, n, n, n, n, n, n, a, a],
-      [n, n, n, n, b, b, b, b, b, b, b, b, n, n, n, n],
-      [n, n, b, b, b, b, a, n, a, n, a, b, b, b, b, n],
-      [n, a, b, a, n, a, n, a, n, a, n, a, n, a, n, a],
-      [a, n, a, n, a, n, n, n, n, n, n, n, a, n, a, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n]
-    ]))
-    images.add('Box', new Image([
-      [a, g, g, g, g, g, g, g, g, g, g, g, g, g, g, a],
-      [g, g, j, k, k, k, k, k, k, k, k, k, k, j, g, g],
-      [g, j, j, g, g, g, g, g, g, g, g, g, g, j, j, g],
-      [g, k, g, g, k, j, k, k, k, k, k, k, g, g, k, g],
-      [g, k, g, k, k, j, k, j, j, j, j, k, k, g, k, g],
-      [g, k, g, k, k, j, j, j, j, k, j, k, k, g, k, g],
-      [g, k, g, g, k, k, k, k, k, k, j, k, g, g, k, g],
-      [g, j, j, g, g, g, g, g, g, g, g, g, g, j, j, g],
-      [g, g, j, k, k, k, k, k, k, k, k, k, k, j, g, g],
-      [g, j, g, g, g, g, g, g, g, g, g, g, g, g, j, g],
-      [g, g, j, j, j, j, j, g, g, j, j, j, j, j, g, g],
-      [g, j, g, g, g, g, j, g, g, j, g, g, g, g, j, g],
-      [g, j, g, j, j, g, j, g, g, j, g, j, j, g, j, g],
-      [g, j, g, g, j, g, j, g, g, j, g, j, g, g, j, g],
-      [g, g, j, j, j, g, j, j, j, j, g, j, j, j, g, g],
-      [a, g, g, g, g, g, g, g, g, g, g, g, g, g, g, a]
-    ]))
-    images.add('GongRed', new Image([
-      [i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i],
-      [i, l, l, l, l, l, l, i, i, l, l, l, l, l, l, i],
-      [b, i, i, i, i, i, i, i, i, i, i, i, i, i, i, b],
-      [b, i, m, i, b, b, i, i, i, i, b, b, i, l, i, b],
-      [b, i, m, i, b, i, i, l, l, i, i, b, i, l, i, b],
-      [b, i, m, i, b, i, m, m, l, l, i, b, i, l, i, b],
-      [b, i, m, i, b, i, m, i, i, l, i, b, i, l, i, b],
-      [b, i, m, i, b, i, i, m, m, i, i, b, i, l, i, b],
-      [i, m, l, i, b, i, m, i, i, l, i, b, i, m, l, i],
-      [i, m, l, i, b, i, i, m, m, i, i, b, i, m, l, i],
-      [i, m, l, i, b, i, m, i, i, l, i, b, i, m, m, i],
-      [i, m, m, i, b, b, i, i, i, i, b, b, i, m, m, i],
-      [i, m, m, i, b, b, b, b, b, b, b, b, i, m, m, i],
-      [i, m, m, i, b, i, i, i, i, b, b, b, i, m, m, i],
-      [i, m, m, i, b, b, b, i, i, i, i, b, i, m, m, i],
-      [b, i, i, b, b, b, b, b, b, b, b, b, b, i, i, b]
-    ]))
-    images.add('PillarRed', new Image([
-      [b, b, b, b, b, b, i, i, i, i, b, b, b, b, b, b],
-      [b, b, b, b, i, i, l, l, l, l, i, i, b, b, b, b],
-      [b, b, b, i, l, l, l, l, l, l, l, l, i, b, b, b],
-      [b, b, b, i, l, m, l, l, l, l, m, l, i, b, b, b],
-      [b, b, i, m, i, m, l, l, l, l, m, i, l, i, b, b],
-      [b, b, i, m, i, m, m, l, l, m, m, i, m, i, b, b],
-      [b, b, i, i, m, m, m, m, m, m, m, m, m, i, b, b],
-      [b, b, i, i, i, m, m, m, m, m, m, m, i, i, b, b],
-      [b, b, i, i, m, m, m, i, i, m, m, i, l, i, b, b],
-      [b, b, i, i, m, m, i, m, m, i, m, l, m, i, b, b],
-      [b, m, i, i, m, m, m, i, i, m, m, m, i, i, b, b],
-      [b, m, i, i, i, m, m, m, m, m, m, i, l, i, b, b],
-      [b, m, i, i, m, i, i, i, i, i, i, l, i, i, b, b],
-      [b, m, m, i, i, m, m, m, m, m, m, i, i, b, b, b],
-      [b, b, m, m, i, i, i, i, i, i, i, i, m, b, b, b],
-      [b, b, b, m, m, m, m, m, m, m, m, m, b, b, b, b]
-    ]))
-    images.add('WallTopUpDown', new Image([
-      [c, c, c, a, a, c, c, c, c, c, c, c, c, c, c, c],
-      [c, c, a, a, a, a, c, c, c, c, b, b, c, c, c, c],
-      [c, c, a, a, a, a, c, c, c, b, b, a, a, c, c, c],
-      [c, c, a, a, a, a, c, c, c, b, b, a, a, a, c, c],
-      [c, c, a, a, a, a, c, c, c, b, b, a, a, a, c, c],
-      [c, c, a, a, a, a, c, c, c, b, b, b, a, a, c, c],
-      [c, c, a, a, a, a, c, c, c, c, c, c, a, a, c, c],
-      [c, c, a, a, a, a, c, c, c, c, c, c, c, a, c, c],
-      [c, c, a, a, a, a, c, c, c, c, b, c, c, c, c, c],
-      [c, c, a, a, a, a, c, c, c, c, b, b, c, c, c, c],
-      [c, c, a, a, a, a, c, c, c, c, b, a, a, c, c, c],
-      [c, c, a, a, a, a, c, c, c, b, b, a, a, c, c, c],
-      [c, c, a, a, a, a, c, c, c, b, b, a, a, a, c, c],
-      [c, c, a, a, a, a, c, c, c, b, b, a, a, a, c, c],
-      [c, c, a, a, a, a, c, c, c, c, c, b, a, a, c, c],
-      [c, c, c, a, a, c, c, c, c, c, c, c, c, a, c, c]
-    ]))
-    images.add('Pedestal', new Image([
-      [Z, Z, e, e, e, e, e, e, e, e, e, e, e, Z, Z, Z],
-      [Z, e, a, a, a, a, a, a, a, a, a, a, a, e, Z, Z],
-      [e, e, b, e, e, e, e, e, e, e, e, e, a, e, e, Z],
-      [e, e, b, e, a, e, a, a, b, e, a, e, a, e, e, Z],
-      [e, e, b, e, e, a, a, a, a, b, e, e, a, e, e, Z],
-      [e, e, b, e, a, a, a, a, a, a, b, e, a, e, e, Z],
-      [e, e, b, e, a, a, a, a, a, a, a, e, a, e, e, Z],
-      [e, e, b, e, e, a, a, a, a, a, e, e, a, e, e, Z],
-      [e, e, b, e, a, e, a, a, a, e, a, e, a, e, e, Z],
-      [e, e, b, e, e, e, e, e, e, e, e, e, a, e, e, Z],
-      [e, e, b, b, b, b, b, b, b, b, b, b, b, e, e, a],
-      [e, e, a, a, a, a, a, a, a, a, a, a, b, e, e, a],
-      [e, a, e, e, e, e, e, e, e, e, e, e, e, b, e, a],
-      [e, a, a, a, a, a, a, a, a, a, a, a, a, a, e, a],
-      [a, e, e, e, e, e, e, e, e, e, e, e, e, e, a, a],
-      [Z, a, a, a, a, a, a, a, a, a, a, a, a, a, Z, Z]
-    ]))
-    images.add('Land', new Image([
-      [b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b],
-      [b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b],
-      [b, b, b, b, b, b, b, b, d, b, b, b, b, b, b, b],
-      [b, b, b, b, b, b, d, b, d, b, d, b, b, b, b, b],
-      [b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b],
-      [b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b],
-      [b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b],
-      [b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b],
-      [b, b, d, b, d, b, b, b, b, b, b, b, b, b, b, b],
-      [b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b],
-      [b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b],
-      [b, b, b, b, b, b, b, b, b, b, b, b, d, b, b, b],
-      [b, b, b, b, b, b, b, b, b, b, d, b, d, b, d, b],
-      [b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b],
-      [b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b],
-      [b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b]
-    ]))
-    images.add('Lock', new Image([
-      [f, g, g, g, g, g, g, g, g, g, g, g, g, g, g, f],
-      [g, o, o, f, f, f, f, h, o, f, f, f, f, o, o, g],
-      [g, o, o, o, o, o, o, o, o, o, o, o, o, o, f, g],
-      [g, o, o, o, h, h, h, h, h, h, h, h, o, f, f, g],
-      [g, o, o, o, h, h, f, g, g, h, h, h, o, f, f, g],
-      [g, o, o, o, h, f, g, g, g, g, h, h, o, f, f, g],
-      [g, o, o, o, h, f, g, g, g, g, h, h, o, f, f, g],
-      [g, o, h, o, h, h, f, g, g, h, h, h, o, o, f, g],
-      [g, h, o, o, h, h, f, g, g, h, h, h, o, f, o, g],
-      [g, o, o, o, h, h, h, f, f, h, h, h, o, f, f, g],
-      [g, o, o, o, h, h, h, h, h, h, h, h, o, f, f, g],
-      [g, o, o, o, o, o, o, o, o, o, o, o, o, f, f, g],
-      [g, o, o, h, h, h, h, f, o, h, h, h, h, o, f, g],
-      [g, o, h, h, h, h, h, f, o, h, h, h, h, h, o, g],
-      [g, h, h, h, h, h, h, f, o, h, h, h, h, h, h, g],
-      [f, g, g, g, g, g, g, g, g, g, g, g, g, g, g, f]
-    ]))
-    images.add('ArrowLeft', new Image([
-      [f, g, g, g, g, g, g, g, g, g, g, g, g, g, g, f],
-      [g, o, o, f, f, f, f, f, f, f, f, f, f, o, o, g],
-      [g, o, o, o, o, o, o, o, o, o, o, o, o, o, f, g],
-      [g, o, o, o, h, h, h, g, g, g, g, h, o, f, f, g],
-      [g, o, o, o, h, g, g, f, f, f, g, h, o, f, f, g],
-      [g, o, o, o, g, f, f, f, f, g, h, h, o, f, f, g],
-      [g, o, o, o, g, o, o, o, o, g, h, h, o, f, f, g],
-      [g, o, o, o, o, g, g, o, o, o, g, h, o, f, f, g],
-      [g, o, o, o, h, o, o, g, g, g, g, h, o, f, f, g],
-      [g, o, o, o, h, h, h, o, o, o, o, h, o, f, f, g],
-      [g, o, o, o, h, h, h, h, h, h, h, h, o, f, f, g],
-      [g, o, o, o, o, o, o, o, o, o, o, o, o, f, f, g],
-      [g, o, o, h, h, h, h, h, h, h, h, h, h, o, f, g],
-      [g, o, h, o, o, h, o, o, o, o, h, o, o, h, o, g],
-      [g, h, o, h, o, o, o, h, h, o, o, o, h, o, h, g],
-      [f, g, g, g, g, g, g, g, g, g, g, g, g, g, g, f]
-    ]))
-    images.add('WallTopLeftRight', new Image([
-      [c, c, c, c, c, c, c, c, c, c, c, c, c, c, c, c],
-      [c, c, c, c, c, c, c, c, c, c, c, c, c, c, c, c],
-      [c, a, a, a, a, a, a, a, a, a, a, a, a, a, a, c],
-      [a, a, a, a, a, a, a, a, a, a, a, a, a, a, a, a],
-      [a, a, a, a, a, a, a, a, a, a, a, a, a, a, a, a],
-      [c, a, a, a, a, a, a, a, a, a, a, a, a, a, a, c],
-      [c, c, c, c, c, c, c, c, c, c, c, c, c, c, c, c],
-      [c, c, c, c, c, c, c, c, c, c, c, c, c, c, c, c],
-      [c, c, c, c, c, c, c, c, c, c, c, c, c, c, c, c],
-      [c, b, b, b, b, b, c, c, c, b, b, b, b, b, c, c],
-      [b, b, b, b, b, b, b, c, b, b, b, b, b, b, b, c],
-      [a, a, a, a, b, b, b, c, a, b, b, a, a, a, a, c],
-      [c, a, a, a, a, a, c, c, a, a, a, a, a, a, c, c],
-      [c, c, a, a, a, c, c, c, c, c, a, a, a, c, c, c],
-      [c, c, c, c, c, c, c, c, c, c, c, c, c, c, c, c],
-      [c, c, c, c, c, c, c, c, c, c, c, c, c, c, c, c]
-    ]))
-    images.add('WallTopUpLeft', new Image([
-      [c, c, a, a, a, a, c, c, c, c, c, c, c, c, c, c],
-      [c, a, a, a, a, a, c, c, c, c, b, b, c, c, c, c],
-      [a, a, a, a, a, c, c, c, c, b, b, a, a, c, c, c],
-      [a, a, a, a, a, c, c, c, c, b, b, a, a, c, c, c],
-      [a, a, a, a, c, c, c, c, c, b, b, b, a, c, c, c],
-      [a, a, c, c, c, c, c, c, c, b, b, a, a, a, c, c],
-      [c, c, c, c, c, c, c, c, c, b, b, a, a, a, c, c],
-      [c, c, c, c, c, c, c, c, c, c, b, a, a, a, c, c],
-      [c, c, c, c, c, c, b, b, c, c, c, a, a, a, c, c],
-      [c, c, b, b, b, b, b, b, b, c, c, a, a, c, c, c],
-      [c, b, b, b, b, b, b, a, a, c, c, a, c, c, c, c],
-      [c, b, b, b, a, a, a, a, a, c, c, c, c, c, c, c],
-      [c, a, a, a, a, a, a, a, a, c, c, c, c, c, c, c],
-      [c, a, a, a, a, a, a, a, c, c, c, c, c, b, c, c],
-      [c, c, c, c, c, c, c, c, c, c, c, c, b, b, c, c],
-      [c, c, c, c, c, c, c, c, c, c, c, b, b, b, c, c]
-    ]))
-    images.add('LandCorner', new Image([
-      [p, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b],
-      [b, p, d, d, b, b, b, b, b, b, b, b, b, b, b, b],
-      [b, p, d, d, b, b, b, b, b, b, b, b, b, b, b, b],
-      [p, d, d, b, b, b, b, b, b, b, b, d, b, b, b, b],
-      [p, d, d, d, b, b, b, b, b, b, b, d, b, d, b, b],
-      [p, d, b, b, b, b, b, b, b, b, b, b, b, b, b, b],
-      [p, d, d, b, b, b, b, b, b, b, b, b, b, b, b, b],
-      [b, p, d, d, b, b, b, d, b, b, b, b, b, b, b, b],
-      [b, p, d, d, d, b, b, b, b, b, b, b, b, b, b, b],
-      [p, d, d, b, b, b, b, b, b, b, b, b, b, b, b, b],
-      [p, d, b, b, b, b, b, b, b, b, b, b, b, b, b, b],
-      [p, d, d, b, b, b, b, b, d, b, b, b, b, d, b, b],
-      [p, d, d, d, b, d, b, d, d, d, b, d, b, d, d, b],
-      [b, p, d, d, d, d, d, d, d, d, b, d, d, d, d, b],
-      [b, b, p, d, d, d, d, p, p, d, d, d, d, p, p, d],
-      [b, b, b, p, p, p, p, b, b, p, p, p, p, b, b, p]
-    ]))
-    images.add('LandBottom', new Image([
-      [b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b],
-      [b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b],
-      [b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b],
-      [b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b],
-      [b, b, b, b, b, b, b, b, b, b, b, d, b, d, b, b],
-      [b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b],
-      [b, b, b, b, b, d, b, b, b, b, b, b, b, b, b, b],
-      [b, b, b, d, b, d, b, d, b, b, b, b, b, b, b, b],
-      [b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b],
-      [b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b],
-      [b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b],
-      [b, b, b, b, b, b, b, b, d, b, b, b, b, d, b, b],
-      [b, d, d, b, d, b, b, d, d, d, b, d, b, d, d, b],
-      [b, d, d, d, d, b, d, d, d, d, b, d, d, d, d, b],
-      [d, p, p, d, d, d, d, p, p, d, d, d, d, p, p, d],
-      [p, b, b, p, p, p, p, b, b, p, p, p, p, b, b, p]
-    ]))
-    images.add('ArrowLeftDisabled', new Image([
-      [a, q, q, q, q, q, q, q, q, q, q, q, q, q, q, a],
-      [q, r, r, a, a, a, a, a, a, a, a, a, a, r, r, q],
-      [q, r, r, r, r, r, r, r, r, r, r, r, r, r, a, q],
-      [q, r, r, r, a, a, a, q, q, q, q, a, r, a, a, q],
-      [q, r, r, r, a, q, q, a, a, a, q, a, r, a, a, q],
-      [q, r, r, r, q, a, a, a, a, q, a, a, r, a, a, q],
-      [q, r, r, r, q, r, r, r, r, q, a, a, r, a, a, q],
-      [q, r, r, r, r, q, q, r, r, r, q, a, r, a, a, q],
-      [q, r, r, r, a, r, r, q, q, q, q, a, r, a, a, q],
-      [q, r, r, r, a, a, a, r, r, r, r, a, r, a, a, q],
-      [q, r, r, r, a, a, a, a, a, a, a, a, r, a, a, q],
-      [q, r, r, r, r, r, r, r, r, r, r, r, r, a, a, q],
-      [q, r, r, a, a, a, a, a, a, a, a, a, a, r, a, q],
-      [q, r, a, r, r, a, r, r, r, r, a, r, r, a, r, q],
-      [q, a, r, a, r, r, r, a, a, r, r, r, a, r, a, q],
-      [a, q, q, q, q, q, q, q, q, q, q, q, q, q, q, a]
-    ]))
-    images.add('Wall', new Image([
-      [b, b, b, b, b, b, c, c, c, c, b, b, b, b, b, b],
-      [b, a, a, a, a, b, b, c, c, a, a, a, a, b, b, b],
-      [a, a, a, a, a, a, b, c, a, a, a, a, a, a, a, a],
-      [a, a, a, c, c, a, a, c, a, a, a, a, a, a, c, a],
-      [a, a, a, a, a, a, a, c, c, a, a, c, c, a, a, a],
-      [a, a, c, a, a, a, c, c, c, c, a, a, a, a, a, a],
-      [c, c, c, c, c, c, c, c, c, c, c, c, c, c, c, c],
-      [c, c, c, c, c, c, c, c, c, c, c, c, c, c, c, c],
-      [c, c, b, b, b, b, b, b, b, b, b, b, b, b, c, c],
-      [c, a, a, a, a, a, a, a, b, b, b, a, b, b, b, c],
-      [c, a, a, a, b, a, a, a, a, a, a, a, a, b, b, c],
-      [c, a, a, a, a, a, a, a, a, a, a, c, a, a, b, c],
-      [c, a, a, a, a, c, c, a, a, a, a, a, a, a, b, c],
-      [c, c, a, a, a, a, a, a, c, c, a, a, a, a, c, c],
-      [c, c, c, c, c, c, c, c, c, c, c, c, c, c, c, c],
-      [c, c, c, c, c, c, c, c, c, c, c, c, c, c, c, c]
-    ]))
-    images.add('WallVert', new Image([
-      [b, b, b, b, c, c, c, c, c, c, b, a, a, b, c, c],
-      [a, b, b, b, b, c, c, c, c, b, a, a, a, a, c, c],
-      [a, a, a, a, b, b, c, c, a, a, a, a, a, c, c, c],
-      [a, a, a, a, a, b, c, c, a, a, c, a, c, c, c, c],
-      [a, a, c, c, a, a, c, c, a, a, a, c, c, b, c, c],
-      [a, a, a, a, a, c, c, c, a, a, c, c, c, b, c, c],
-      [c, c, c, c, c, c, c, c, c, c, c, c, b, b, c, c],
-      [c, c, c, c, c, c, c, c, c, c, c, b, b, b, c, c],
-      [c, c, b, b, b, b, b, b, c, c, c, b, a, b, c, c],
-      [c, c, a, a, a, a, a, a, b, c, c, a, a, a, c, c],
-      [c, a, c, a, a, a, b, a, a, b, c, a, a, a, c, c],
-      [c, a, a, a, c, c, a, a, a, a, c, a, a, c, c, c],
-      [c, a, a, a, a, a, a, a, c, a, c, c, c, c, c, c],
-      [c, a, a, a, a, a, a, a, a, c, c, c, c, b, c, c],
-      [c, c, c, c, c, c, c, c, c, c, c, c, b, b, c, c],
-      [c, c, c, c, c, c, c, c, c, c, c, b, b, b, c, c]
-    ]))
-    images.add('Water0', new Image([
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n]
-    ]))
-    images.add('Water1', new Image([
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, s, n, s, s, n, n, n, s, s, s, s, n, s, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n]
-    ]))
-    images.add('Water2', new Image([
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, s, s, n, n, n, n, n, n, n, n, n, n],
-      [n, n, s, s, s, s, s, s, s, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, s, s, s, n, n],
-      [n, n, n, n, n, n, n, n, n, s, s, s, s, s, s, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n]
-    ]))
-    images.add('Water3', new Image([
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, s, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, s, s, s, n, n, n, n, n, n, n, n, n, n],
-      [n, n, s, s, n, s, s, n, n, n, n, n, n, n, n, n],
-      [s, s, n, n, n, n, s, s, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, s, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, s, s, s, s, n, n, n],
-      [n, n, n, n, n, n, n, s, s, s, s, n, s, s, n, n],
-      [n, n, n, n, n, s, s, s, n, n, n, n, n, s, s, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n]
-    ]))
-    images.add('Water4', new Image([
-      [n, n, n, n, n, n, s, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, s, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, s, s, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, s, s, n, s, s, n, n, n, n, n, n, n, n, n],
-      [n, s, s, n, n, n, n, s, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, s, n, s, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, s, n, s, n, n],
-      [n, n, n, n, n, n, n, n, n, n, s, s, s, n, n, n],
-      [n, n, n, n, n, n, n, n, s, s, n, n, s, s, n, n],
-      [n, n, n, n, n, n, s, s, s, n, n, n, n, n, s, n],
-      [n, n, n, n, s, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n],
-      [n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n]
-    ]))
-    images.add('TreeTop', new Image([
-      [b, b, b, b, b, c, c, c, b, b, c, c, c, b, b, b],
-      [b, b, b, c, c, c, a, a, c, c, a, a, a, c, b, b],
-      [b, b, c, c, a, a, c, a, a, a, c, c, a, a, c, b],
-      [b, b, c, a, a, c, a, a, c, a, a, c, c, c, a, c],
-      [b, c, c, a, c, c, a, a, c, c, a, a, c, c, c, c],
-      [b, c, c, a, c, a, a, c, a, c, c, c, a, c, b, c],
-      [b, c, c, c, c, a, a, c, c, a, c, c, c, c, b, b],
-      [b, c, c, c, c, c, a, c, c, a, a, c, c, c, c, b],
-      [b, c, c, b, c, c, c, c, c, c, a, c, b, c, c, b],
-      [b, c, c, b, c, c, c, c, c, c, c, c, b, b, c, b],
-      [b, b, c, b, c, c, c, c, c, c, c, c, c, b, b, b],
-      [b, b, b, b, c, c, c, c, d, c, b, c, c, c, b, b],
-      [b, b, b, b, c, b, c, d, c, c, b, b, b, b, b, b],
-      [b, b, b, b, b, b, c, c, b, c, b, b, b, b, b, b],
-      [b, b, b, b, b, b, c, c, c, c, b, b, b, b, b, b],
-      [b, b, b, b, b, b, c, c, b, c, b, b, b, b, b, b]
-    ]))
-    images.add('PlayerStandDown', new Image([
-      [Z, Z, Z, Z, Z, g, g, g, g, g, g, g, g, Z, Z, Z],
-      [Z, Z, g, g, g, g, g, t, u, g, g, g, Z, Z, Z, Z],
-      [Z, g, g, g, g, t, g, t, u, g, u, g, g, g, Z, Z],
-      [Z, Z, g, g, g, g, g, g, g, g, g, g, g, g, Z, Z],
-      [Z, g, g, g, g, g, g, t, t, g, g, g, g, g, g, Z],
-      [g, g, g, u, g, u, u, t, t, u, u, g, u, g, g, Z],
-      [Z, g, g, u, g, u, g, t, t, g, u, g, u, g, g, g],
-      [g, g, g, g, g, t, t, t, t, t, t, g, g, s, t, g],
-      [g, g, t, t, t, g, t, t, t, t, g, g, t, s, t, g],
-      [g, u, t, t, g, t, g, g, g, g, g, t, t, t, g, Z],
-      [g, t, u, g, g, t, t, t, t, t, t, g, g, g, Z, Z],
-      [g, t, t, g, g, s, t, t, t, t, s, g, Z, Z, Z, Z],
-      [Z, g, g, g, u, g, u, u, u, u, g, u, g, Z, Z, Z],
-      [Z, Z, g, t, g, u, g, u, g, u, g, g, g, Z, Z, Z],
-      [Z, Z, g, t, t, g, g, g, g, g, t, t, t, g, Z, Z],
-      [Z, Z, g, g, g, Z, Z, Z, Z, Z, g, g, g, Z, Z, Z]
-    ]))
-    images.add('TreeBottom', new Image([
-      [b, b, b, b, b, b, c, d, c, c, b, b, b, b, b, b],
-      [b, b, b, b, b, b, c, c, c, b, c, b, b, b, b, b],
-      [b, b, b, b, b, b, c, d, d, b, c, b, b, c, b, b],
-      [b, b, b, b, b, b, c, d, c, c, c, b, c, c, b, b],
-      [b, b, c, b, b, b, c, c, c, c, b, c, c, b, c, b],
-      [b, c, c, b, c, b, c, d, d, d, b, c, a, c, c, b],
-      [b, c, b, c, b, c, d, d, d, c, c, c, a, c, b, c],
-      [c, a, a, a, b, c, c, c, c, c, c, b, c, a, c, b],
-      [c, a, c, a, c, c, a, c, d, c, d, c, b, c, c, b],
-      [b, c, a, c, c, a, a, c, c, d, c, c, c, a, c, c],
-      [c, a, a, c, c, a, c, a, c, c, c, d, c, c, a, c],
-      [b, c, c, c, c, c, a, c, c, c, c, c, c, a, a, c],
-      [b, b, c, c, a, c, c, c, c, c, c, c, a, c, c, b],
-      [b, b, b, a, a, b, c, c, a, a, a, a, b, b, b, b],
-      [b, b, b, b, b, b, b, b, a, a, b, b, b, b, b, b],
-      [b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b]
-    ]))
-
-    // sprites.add('playerWalking', new Sprite(1, [
-    //   images.get('playerWalk1'),
-    //   images.get('playerWalk2'),
-    //   images.get('playerWalk3'),
-    //   images.get('playerWalk4'),
-    //   images.get('playerWalk5'),
-    //   images.get('playerWalk6'),
-    //   images.get('playerWalk7'),
-    //   images.get('playerWalk8')
-    // ]))
+    const images = loadImages()
 
     sprites.add('Water', new Sprite(20, [
       images.get('Water0'),
@@ -609,33 +37,36 @@ export class MyGame implements Game {
   }
 
   init (sprites: SpriteController, instances: InstanceController) {
-    const player = instances.factory('player', sprites.get('PlayerStandDown'), playerUpdateFn)
+    const player = instances.factory('player', sprites.get('PlayerStoppedDown'), -1000, playerUpdateFn)
 
-    const Sand = instances.simple(sprites, 'Sand')
-    const Rock = instances.simple(sprites, 'Rock')
-    const Bush = instances.simple(sprites, 'Bush')
-    const GongDisabled = instances.simple(sprites, 'GongDisabled')
-    const WallTopRightDown = instances.simple(sprites, 'WallTopRightDown')
-    const SandEdge = instances.simple(sprites, 'SandEdge')
-    const Box = instances.simple(sprites, 'Box')
-    const GongRed = instances.simple(sprites, 'GongRed')
-    const PillarRed = instances.simple(sprites, 'PillarRed')
-    const WallTopUpDown = instances.simple(sprites, 'WallTopUpDown')
-    const Key = instances.simple(sprites, 'Key')
-    const Land = instances.simple(sprites, 'Land')
-    const Lock = instances.simple(sprites, 'Lock')
-    const ArrowLeft = instances.simple(sprites, 'ArrowLeft')
-    const WallTopLeftRight = instances.simple(sprites, 'WallTopLeftRight')
-    const WallTopUpLeft = instances.simple(sprites, 'WallTopUpLeft')
-    const Pedestal = instances.simple(sprites, 'Pedestal')
-    const LandCorner = instances.simple(sprites, 'LandCorner')
-    const LandBottom = instances.simple(sprites, 'LandBottom')
-    const ArrowLeftDisabled = instances.simple(sprites, 'ArrowLeftDisabled')
-    const Wall = instances.simple(sprites, 'Wall')
-    const WallVert = instances.simple(sprites, 'WallVert')
-    const TreeTop = instances.simple(sprites, 'TreeTop')
-    const TreeBottom = instances.simple(sprites, 'TreeBottom')
-    const Water = instances.simple(sprites, 'Water')
+    const bgZ = 100
+    const obZ = 0
+    const hoverZ = -1
+
+    const Sand = instances.simple(sprites, 'Sand', bgZ)
+    const Rock = instances.simple(sprites, 'Rock', obZ)
+    const Bush = instances.simple(sprites, 'Bush', obZ)
+    const WallTopRightDown = instances.simple(sprites, 'WallTopRightDown', obZ)
+    const SandEdge = instances.simple(sprites, 'SandEdge', bgZ)
+    const Box = instances.simple(sprites, 'Box', obZ)
+    const GongRed = instances.simple(sprites, 'GongRed', obZ)
+    const PillarRed = instances.simple(sprites, 'PillarRed', obZ)
+    const WallTopUpDown = instances.simple(sprites, 'WallTopUpDown', obZ)
+    const Key = instances.simple(sprites, 'Key', hoverZ)
+    const Land = instances.simple(sprites, 'Land', bgZ)
+    const Lock = instances.simple(sprites, 'Lock', obZ)
+    const ArrowLeft = instances.simple(sprites, 'ArrowLeft', obZ)
+    const WallTopLeftRight = instances.simple(sprites, 'WallTopLeftRight', obZ)
+    const WallTopUpLeft = instances.simple(sprites, 'WallTopUpLeft', obZ)
+    const Pedestal = instances.simple(sprites, 'Pedestal', obZ)
+    const LandCorner = instances.simple(sprites, 'LandCorner', bgZ)
+    const LandBottom = instances.simple(sprites, 'LandBottom', bgZ)
+    const ArrowLeftDisabled = instances.simple(sprites, 'ArrowLeftDisabled', obZ)
+    const Wall = instances.simple(sprites, 'Wall', obZ)
+    const WallVert = instances.simple(sprites, 'WallVert', obZ)
+    const TreeTop = instances.simple(sprites, 'TreeTop', hoverZ)
+    const TreeBottom = instances.simple(sprites, 'TreeBottom', obZ)
+    const Water = instances.simple(sprites, 'Water', obZ)
 
     const Grass = Land // Just because we do not have all the sprites
 
@@ -652,8 +83,6 @@ export class MyGame implements Game {
         x: pos.x * 16,
         y: pos.y * 16
       })
-
-      o.zIndex = 0
 
       return o
     }
@@ -794,7 +223,7 @@ export class MyGame implements Game {
     g(LandCorner, { x: 14, y }).hFlip = true
     g(Sand, { x: 15, y })
     g(Rock, { x: 16, y })
-    g(Key, { x: 17 - 1 / 16, y: y - 5 / 16 }).zIndex = -1000
+    g(Key, { x: 17 - 1 / 16, y: y - 5 / 16 })
     g(Pedestal, { x: 17, y })
     g(Rock, { x: 18, y })
     g(Sand, { x: 19, y })
@@ -870,7 +299,7 @@ export class MyGame implements Game {
     g(Sand, { x: 8, y })
     g(Sand, { x: 9, y })
     g(Sand, { x: 10, y })
-    g(player, { x: 11, y }).zIndex = -1000
+    g(player, { x: 11, y })
     g(Sand, { x: 12, y })
     g(Sand, { x: 13, y })
     g(Sand, { x: 14, y })
@@ -1011,28 +440,39 @@ export class MyGame implements Game {
 
 enum PLAYER_STATE {
   STOPPED = 'STOPPED',
-  WALKING = 'WALKING',
   PUSHING = 'PUSHING'
 }
 
+enum PLAYER_DIR {
+  RIGHT = 0,
+  UP = 1,
+  LEFT = 2,
+  DOWN = 3,
+}
+
 interface PlayerProps {
-  direction: number
+  dir: PLAYER_DIR
   state: PLAYER_STATE
   stateStart: number
 }
 
-function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, showDialog: ShowDialogFn, overlayState: SimpleObject) {
+function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, showDialog: ShowDialogFn, overlayState: SimpleObject, curTick: number) {
   // Follow the player for now
   camera.track(o.pos)
 
-  const wallSprites = [
-    sprites.get('Rock'),
+  const StoppedDown = sprites.get('PlayerStoppedDown')
+  const PushingRight = sprites.get('PlayerPushingRight')
+  const PushingUp = sprites.get('PlayerPushingUp')
+  const PushingDown = sprites.get('PlayerPushingDown')
 
+  const pushableSprites = [
+    sprites.get('Box'),
+  ]
+
+  const wallSprites = [...pushableSprites,
     sprites.get('Rock'),
     sprites.get('Bush'),
-    sprites.get('GongDisabled'),
     sprites.get('WallTopRightDown'),
-    sprites.get('Box'),
     sprites.get('GongRed'),
     sprites.get('PillarRed'),
     sprites.get('WallTopUpDown'),
@@ -1048,8 +488,9 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
 
   // initialize the props
   const p = o.props
-  if (p.direction === undefined) {
-    p.direction = 3 // down
+  if (p.state === undefined) {
+    p.dir = PLAYER_DIR.DOWN
+    p.state = PLAYER_STATE.STOPPED
   }
 
   let dy = 0
@@ -1067,6 +508,12 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
     dy += 1
   }
 
+  // Change the player's direction if something is pressed
+  if (dy < 0) { p.dir = PLAYER_DIR.UP }
+  else if (dy > 0) { p.dir = PLAYER_DIR.DOWN }
+  else if (dx < 0) { p.dir = PLAYER_DIR.LEFT }
+  else if (dx > 0) { p.dir = PLAYER_DIR.RIGHT }
+
   const oldPos = o.pos
   const newPos = {
     x: o.pos.x + dx * 4,
@@ -1076,10 +523,64 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
   o.moveTo(newPos)
 
   // If there is a collision then move the player back
-  const hasWall = !!collisionChecker.searchBBox(o.toBBox())
+  const neighbor = collisionChecker.searchBBox(o.toBBox())
     .find((obj) => wallSprites.includes(obj.sprite))
 
-  if (hasWall) {
+  if (!!neighbor) {
     o.moveTo(oldPos)
+    p.state = PLAYER_STATE.PUSHING
+
+    if (pushableSprites.includes(neighbor.sprite)) {
+      // start pushing the box. Just immediately push it for now (if it is empty behind it)
+      let neighborOld = neighbor.pos
+
+      let newNeighborPos: IPosition
+
+      switch (p.dir) {
+        case PLAYER_DIR.UP:    newNeighborPos = {x: neighbor.pos.x, y: neighbor.pos.y - 16}; break
+        case PLAYER_DIR.DOWN:  newNeighborPos = {x: neighbor.pos.x, y: neighbor.pos.y + 16}; break
+        case PLAYER_DIR.LEFT:  newNeighborPos = {x: neighbor.pos.x - 16, y: neighbor.pos.y}; break
+        case PLAYER_DIR.RIGHT: newNeighborPos = {x: neighbor.pos.x + 16, y: neighbor.pos.y}; break
+        default: throw new Error(`BUG: Invalid direction ${p.dir}`)
+      }
+
+      const isBehindNeighborFilled = collisionChecker.searchBBox(spriteToBBox(newNeighborPos, neighbor.sprite))
+        .find((obj) => wallSprites.includes(obj.sprite))
+
+      if (isBehindNeighborFilled === neighbor) {
+        throw new Error('Should have .... oh, we already moved the neighbor... grrr')
+      }
+
+      if (!isBehindNeighborFilled) {
+        // move the box, and move the player
+        o.moveTo(neighborOld)
+        neighbor.moveTo(newNeighborPos)
+      } else {
+        
+      }
+    }
+  } else {
+    p.state = PLAYER_STATE.STOPPED // Should be walking if moving
   }
+
+  o.hFlip = false
+  switch (p.state) {
+    case PLAYER_STATE.STOPPED: o.sprite = StoppedDown; break
+    case PLAYER_STATE.PUSHING: 
+      switch (p.dir) {
+        case PLAYER_DIR.RIGHT: o.sprite = PushingRight; break
+        case PLAYER_DIR.UP: o.sprite = PushingUp; break
+        case PLAYER_DIR.LEFT: o.sprite = PushingRight; o.hFlip = true; break
+        case PLAYER_DIR.DOWN: o.sprite = PushingDown; break
+        default: throw new Error(`BUG: Invalid direction ${p.dir}`)
+      }
+      break
+    default: throw new Error(`BUG: Invalid state ${p.state}`)
+  }
+}
+
+
+function spriteToBBox(pos: IPosition, sprite: Sprite): BBox {
+  const dim = sprite.tick(0, 0).getDimension()
+  return { minX: pos.x, minY: pos.y, maxX: pos.x + dim.width - 1, maxY: pos.y + dim.height - 1 }
 }

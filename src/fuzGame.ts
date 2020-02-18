@@ -563,25 +563,27 @@ export class MyGame implements Game {
   }
 
   init (sprites: SpriteController, instances: InstanceController) {
-    const player = instances.factory('player', sprites.get('playerStanding'), playerUpdateFn)
-    const floor1 = instances.simple(sprites, 'floorOrange1')
-    const floor2 = instances.simple(sprites, 'floorOrange2')
-    const floor3 = instances.simple(sprites, 'floorWhite1')
-    const ledge = instances.simple(sprites, 'floorLedge')
-    const wallO = instances.simple(sprites, 'wallOrange')
-    const wallC = instances.simple(sprites, 'wallCyan')
-    const wall2 = instances.simple(sprites, 'wallBrown')
-    const door = instances.simple(sprites, 'door')
-    const caveOpenLeft = instances.simple(sprites, 'caveOpenLeft')
-    const caveOpenRight = instances.simple(sprites, 'caveOpenRight')
-    const caveCloseLeft = instances.simple(sprites, 'caveCloseLeft')
-    const caveCloseRight = instances.simple(sprites, 'caveCloseRight')
+    const zDef = null // default zIndex
 
-    const treeTopLeft = instances.simple(sprites, 'treeTopLeft')
-    const treeTopRight = instances.simple(sprites, 'treeTopRight')
-    const treeBottom = instances.simple(sprites, 'treeBottom')
-    const treeTrunkLeft = instances.simple(sprites, 'treeTrunkLeft')
-    const treeTrunkRight = instances.simple(sprites, 'treeTrunkRight')
+    const player = instances.factory('player', sprites.get('playerStanding'), -1000, playerUpdateFn)
+    const floor1 = instances.simple(sprites, 'floorOrange1', zDef)
+    const floor2 = instances.simple(sprites, 'floorOrange2', zDef)
+    const floor3 = instances.simple(sprites, 'floorWhite1', zDef)
+    const ledge = instances.simple(sprites, 'floorLedge', zDef)
+    const wallO = instances.simple(sprites, 'wallOrange', zDef)
+    const wallC = instances.simple(sprites, 'wallCyan', zDef)
+    const wall2 = instances.simple(sprites, 'wallBrown', zDef)
+    const door = instances.simple(sprites, 'door', zDef)
+    const caveOpenLeft = instances.simple(sprites, 'caveOpenLeft', zDef)
+    const caveOpenRight = instances.simple(sprites, 'caveOpenRight', zDef)
+    const caveCloseLeft = instances.simple(sprites, 'caveCloseLeft', zDef)
+    const caveCloseRight = instances.simple(sprites, 'caveCloseRight', zDef)
+
+    const treeTopLeft = instances.simple(sprites, 'treeTopLeft', zDef)
+    const treeTopRight = instances.simple(sprites, 'treeTopRight', zDef)
+    const treeBottom = instances.simple(sprites, 'treeBottom', zDef)
+    const treeTrunkLeft = instances.simple(sprites, 'treeTrunkLeft', zDef)
+    const treeTrunkRight = instances.simple(sprites, 'treeTrunkRight', zDef)
 
     const validator = {}
     function g (item: GameObject<any, any>, pos: IPosition, zIndex: number) {
@@ -597,7 +599,7 @@ export class MyGame implements Game {
         y: pos.y * 8
       })
 
-      o.zIndex = zIndex - 2
+      o._zIndex = zIndex - 2
       return o
     }
 
@@ -866,11 +868,11 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
       .forEach(ob => {
         ob.props.x = from_real(ob.pos.x)
         ob.props.y = from_real(ob.pos.y)
-        ob.props.z = checkNaN(ob.zIndex)
+        ob.props.z = checkNaN(ob.zIndex())
       })
 
     // the player is always in front
-    o.zIndex = -1000
+    o._zIndex = -1000
   }
 
   p.tick += 1
@@ -1294,9 +1296,9 @@ function rotate_world (o: ObjectInstance<PlayerProps, any>, collisionChecker: Co
         x,
         y: to_real(y)
       })
-      ob.zIndex = z
+      ob._zIndex = z
     })
-    o.zIndex = -1000 // player is always on top
+    o._zIndex = -1000 // player is always on top
   }
 }
 

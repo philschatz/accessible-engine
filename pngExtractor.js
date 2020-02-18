@@ -99,19 +99,24 @@ fs.createReadStream('akurra-tiles.png')
 
   // Output code for each of the sprites. Use single-letter variables (lower/uppercase) for the colors
   const sprites = [
-    ['Sand', 'Rock', 'Bush', 'GongDisabled', 'WallTopRightDown', 'Key'],
-    ['SandEdge', 'Box', 'GongRed', 'PillarRed', 'WallTopUpDown', 'Pedestal'],
-    ['Land', 'Lock', 'ArrowLeft', 'WallTopLeftRight', 'WallTopUpLeft'],
-    ['LandCorner', 'LandBottom', 'ArrowLeftDisabled', 'Wall', 'WallVert'],
+    ['Sand', 'Rock', 'Bush', 'Pedestal', 'WallTopRightDown', 'Key'],
+    ['SandEdge', 'Box', 'GongRed', 'PillarRed', 'WallTopUpDown', 'PlayerPushingRight'],
+    ['Land', 'Lock', 'ArrowLeft', 'WallTopLeftRight', 'WallTopUpLeft', 'PlayerPushingUp'],
+    ['LandCorner', 'LandBottom', 'ArrowLeftDisabled', 'Wall', 'WallVert', 'PlayerPushingDown'],
     ['Water0', 'Water1', 'Water2', 'Water3', 'Water4', 'TreeTop'],
-    ['PlayerStandDown', null, null, null, null, 'TreeBottom'],
+    ['PlayerStoppedDown', null, null, null, null, 'TreeBottom'],
   ]
   const letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXY' // Z is null
 
-  console.log(`const Z = null // transparent`)
+  console.log(`import { DefiniteMap, Image } from "./engine"
+
+export function loadImages() {
+  const images = new DefiniteMap<Image>()
+  const Z = null // transparent
+`)
   colors.forEach((hex, index) => {
     const letter = letters[index]
-    console.log(`const ${letter} = '${hex}'`)
+    console.log(`  const ${letter} = '${hex}'`)
   })
 
   sprites.forEach((spriteRow, yy) => {
@@ -119,7 +124,7 @@ fs.createReadStream('akurra-tiles.png')
       if (spriteName === null) {
         return
       }
-      const out = [`images.add('${spriteName}', new Image([`]
+      const out = [`  images.add('${spriteName}', new Image([`]
 
       for (let y = 0; y < 16; y++) {
         let row = '  ['
@@ -145,6 +150,11 @@ fs.createReadStream('akurra-tiles.png')
       console.log(out.join('\n'))
     })
   })
+
+  console.log(`
+  return images
+}
+`)
 });
 
 
