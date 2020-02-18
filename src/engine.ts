@@ -39,6 +39,7 @@ export class ObjectInstance<P, S> {
   sprite: Sprite
   startTick: number = 0
   maskColor: Opt<string>
+  isGrayscale: boolean
   public props: P
   public hFlip: boolean
 
@@ -72,8 +73,9 @@ export class ObjectInstance<P, S> {
     }
   }
 
-  setMask (hexColor: Opt<string>) {
+  setMask (hexColor: Opt<string>, isGrayscale: boolean = false) {
     this.maskColor = hexColor
+    this.isGrayscale = isGrayscale
   }
 
   zIndex() {
@@ -297,6 +299,9 @@ export class Engine {
       let pixels = image.pixels
       if (t.maskColor) {
         pixels = pixels.map(row => row.map(c => c === null ? null : t.maskColor))
+      }
+      if (t.isGrayscale) {
+        pixels = pixels.map(row => row.map(c => c === null ? null : toGrayscale(c)))
       }
       this.drawPixels(screenPos, pixels, t.hFlip, false)
     }
@@ -526,4 +531,29 @@ export function zIndexComparator (a: ObjectInstance<any, any>, b: ObjectInstance
   } else {
     return az - bz
   }
+}
+
+
+function componentToHex(c: number) {
+  var hex = c.toString(16);
+  return hex.length == 1 ? "0" + hex : hex
+}
+
+function rgbToHex(r: number, g: number, b: number) {
+  return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b)
+}
+
+function hexToRgb(hex: string) {
+  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : null
+}
+
+function toGrayscale(hex: string) {
+  const rgb = hexToRgb(hex)
+  const avg = Math.round((rgb.r + rgb.g + rgb.b) / 3)
+  return rgbToHex(avg, avg, avg)
 }

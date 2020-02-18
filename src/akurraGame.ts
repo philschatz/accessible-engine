@@ -7,6 +7,13 @@ import { BBox } from 'rbush'
 // https://stackoverflow.com/questions/521295/seeding-the-random-number-generator-in-javascript/47593316#47593316
 var LCG = (s: number) => () => (2 ** 31 - 1 & (s = Math.imul(48271, s))) / 2 ** 31
 
+const EVERYTHING_BBOX = {
+  minX: -1000,
+  maxX: 1000,
+  minY: -1000,
+  maxY: 1000
+}
+
 export class MyGame implements Game {
   load (gamepad: IGamepad, sprites: SpriteController) {
     // gamepad.listenTo([BUTTON_TYPE.ARROW_LEFT, BUTTON_TYPE.ARROW_RIGHT, BUTTON_TYPE.ARROW_DOWN, BUTTON_TYPE.ARROW_UP, BUTTON_TYPE.CLUSTER_BOTTOM])
@@ -184,9 +191,13 @@ export class MyGame implements Game {
     g(Wall, { x: x++, y })
     g(Wall, { x: x++, y })
     g(WallVert, { x: x++, y })
+    g(Land, { x, y })
     g(ArrowLeftDisabled, { x: x++, y })
+    g(Land, { x, y })
     g(ArrowLeftDisabled, { x: x++, y })
+    g(Land, { x, y })
     g(ArrowLeft, { x: x++, y })
+    g(Land, { x, y })
     g(Lock, { x: x++, y })
     g(WallVert, { x: x++, y }).hFlip = true
     g(Wall, { x: x++, y })
@@ -218,8 +229,8 @@ export class MyGame implements Game {
     g(LandCorner, { x: x++, y }).hFlip = true
     g(Sand, { x: x++, y })
     g(Rock, { x: x++, y })
-    g(Pedestal, { x: x++, y })
     g(Key, { x: x - 1 / 16, y: y - 5 / 16 })
+    g(Pedestal, { x: x++, y })
     g(Rock, { x: x++, y })
     g(Sand, { x: x++, y })
     g(WallTopUpDown, { x: x++, y }).hFlip = true
@@ -246,6 +257,7 @@ export class MyGame implements Game {
     g(Sand, { x: x++, y })
     g(Sand, { x: x++, y })
     g(Rock, { x: x++, y })
+    g(Sand, { x, y })
     g(PillarRed, { x: x++, y })
     g(Rock, { x: x++, y })
     g(Sand, { x: x++, y })
@@ -452,6 +464,7 @@ interface PlayerProps {
   dir: PLAYER_DIR
   state: PLAYER_STATE
   stateStart: number
+  keyCount: number
 }
 
 function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, showDialog: ShowDialogFn, overlayState: SimpleObject, curTick: number) {
@@ -467,18 +480,25 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
     sprites.get('Crate'),
   ]
 
+  const GongRed = sprites.get('GongRed')
+  const PillarRed = sprites.get('PillarRed')
+  const Key = sprites.get('Key')
+  const Lock = sprites.get('Lock')
+  const ArrowLeft = sprites.get('ArrowLeft')
+  const ArrowLeftDisabled = sprites.get('ArrowLeftDisabled')
+
   const wallSprites = [...pushableSprites,
+    GongRed,
+    PillarRed,
+    Lock,
+    ArrowLeft,
+    ArrowLeftDisabled,
     sprites.get('Rock'),
     sprites.get('Bush'),
     sprites.get('WallTopRightDown'),
-    sprites.get('GongRed'),
-    sprites.get('PillarRed'),
     sprites.get('WallTopUpDown'),
-    sprites.get('Lock'),
-    sprites.get('ArrowLeft'),
     sprites.get('WallTopLeftRight'),
     sprites.get('WallTopUpLeft'),
-    sprites.get('ArrowLeftDisabled'),
     sprites.get('Wall'),
     sprites.get('WallVert'),
     sprites.get('Water')
@@ -489,6 +509,7 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
   if (p.state === undefined) {
     p.dir = PLAYER_DIR.DOWN
     p.state = PLAYER_STATE.STOPPED
+    p.keyCount = 0
   }
 
   let dy = 0
@@ -521,44 +542,77 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
   o.moveTo(newPos)
 
   // If there is a collision then move the player back
-  const neighbor = collisionChecker.searchBBox(o.toBBox())
+  const neighborSprites = collisionChecker.searchBBox(o.toBBox())
+  const wallNeighbor = neighborSprites
     .find((obj) => wallSprites.includes(obj.sprite))
 
-  if (!!neighbor) {
+  if (!!wallNeighbor) {
     o.moveTo(oldPos)
     p.state = PLAYER_STATE.PUSHING
 
-    if (pushableSprites.includes(neighbor.sprite)) {
+    if (GongRed === wallNeighbor.sprite) {
+      // remove all the pillars
+      const pillars = collisionChecker.searchBBox(EVERYTHING_BBOX).filter(t => t.sprite === PillarRed)
+      pillars.forEach(p => p.destroy())
+      wallNeighbor.setMask(null, true)
+
+    } else if (pushableSprites.includes(wallNeighbor.sprite)) {
       // start pushing the box. Just immediately push it for now (if it is empty behind it)
-      let neighborOld = neighbor.pos
+      let neighborOld = wallNeighbor.pos
 
       let newNeighborPos: IPosition
 
       switch (p.dir) {
-        case PLAYER_DIR.UP:    newNeighborPos = {x: neighbor.pos.x, y: neighbor.pos.y - 16}; break
-        case PLAYER_DIR.DOWN:  newNeighborPos = {x: neighbor.pos.x, y: neighbor.pos.y + 16}; break
-        case PLAYER_DIR.LEFT:  newNeighborPos = {x: neighbor.pos.x - 16, y: neighbor.pos.y}; break
-        case PLAYER_DIR.RIGHT: newNeighborPos = {x: neighbor.pos.x + 16, y: neighbor.pos.y}; break
+        case PLAYER_DIR.UP:    newNeighborPos = {x: wallNeighbor.pos.x, y: wallNeighbor.pos.y - 16}; break
+        case PLAYER_DIR.DOWN:  newNeighborPos = {x: wallNeighbor.pos.x, y: wallNeighbor.pos.y + 16}; break
+        case PLAYER_DIR.LEFT:  newNeighborPos = {x: wallNeighbor.pos.x - 16, y: wallNeighbor.pos.y}; break
+        case PLAYER_DIR.RIGHT: newNeighborPos = {x: wallNeighbor.pos.x + 16, y: wallNeighbor.pos.y}; break
         default: throw new Error(`BUG: Invalid direction ${p.dir}`)
       }
 
-      const isBehindNeighborFilled = collisionChecker.searchBBox(spriteToBBox(newNeighborPos, neighbor.sprite))
+      const isBehindNeighborFilled = collisionChecker.searchBBox(spriteToBBox(newNeighborPos, wallNeighbor.sprite))
         .find((obj) => wallSprites.includes(obj.sprite))
 
-      if (isBehindNeighborFilled === neighbor) {
+      if (isBehindNeighborFilled === wallNeighbor) {
         throw new Error('Should have .... oh, we already moved the neighbor... grrr')
       }
 
       if (!isBehindNeighborFilled) {
         // move the box, and move the player
         o.moveTo(neighborOld)
-        neighbor.moveTo(newNeighborPos)
+        wallNeighbor.moveTo(newNeighborPos)
       } else {
         
       }
     }
   } else {
     p.state = PLAYER_STATE.STOPPED // Should be walking if moving
+  }
+
+  // Pick up a key
+  const maybeKey = neighborSprites.find(obj => obj.sprite === Key)
+  if (maybeKey) {
+    p.keyCount++
+    maybeKey.destroy() // TODO: animate it moving to the overlay
+  }
+
+  // Unlock a lock
+  const maybeLock = neighborSprites.find(obj => obj.sprite === Lock)
+  if (maybeLock && p.keyCount > 0) {
+    p.keyCount--
+    maybeLock.destroy()
+  }
+
+  // Unlock the arrow locks when pushing the correct direction
+  const maybeArrowLeft = neighborSprites.find(obj => obj.sprite === ArrowLeft)
+  if (maybeArrowLeft && p.dir === PLAYER_DIR.LEFT) {
+    // loop and delete all the disabled arrowlefts
+    let cur = maybeArrowLeft
+    while (cur) {
+      const pos = cur.pos
+      cur.destroy()
+      cur = collisionChecker.searchPoint({x: pos.x - 16, y: pos.y}).find(obj => obj.sprite === ArrowLeftDisabled)
+    }
   }
 
   o.hFlip = false
