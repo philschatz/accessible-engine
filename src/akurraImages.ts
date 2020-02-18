@@ -1,10 +1,9 @@
 import { DefiniteMap, Image } from "./engine"
 
 export function loadImages() {
-
   const images = new DefiniteMap<Image>()
-
   const Z = null // transparent
+
   const a = '#73c2b4'
   const b = '#c2ffeb'
   const c = '#06353b'
@@ -602,6 +601,7 @@ export function loadImages() {
     [ b, b, b, b, b, b, b, b, a, a, b, b, b, b, b, b, ],
     [ b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, ],
   ]))
-  
+
   return images
 }
+

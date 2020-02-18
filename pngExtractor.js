@@ -35,7 +35,6 @@ fs.createReadStream('akurra-tiles.png')
         pixels.push(row)
     }
 
-    console.log(`UNIQUE_COLORS_COUNT=${colors.length}`)
     colors.forEach(c1 => {
       const rgb1 = hexToRgb(c1)
 
@@ -63,9 +62,6 @@ fs.createReadStream('akurra-tiles.png')
       })
 
     })
-
-    console.log(`END MAP_KEYS_COUNT=${[...map.keys()].length}`)
-    console.log(`END MAP_VALUES_COUNT=${[...new Set(map.values())].length}`)
 
   //   // Clean up the PNG file so that the colorspace is smaller
   //   for (var y = 0; y < this.height; y++) {
@@ -127,7 +123,7 @@ export function loadImages() {
       const out = [`  images.add('${spriteName}', new Image([`]
 
       for (let y = 0; y < 16; y++) {
-        let row = '  ['
+        let row = '    ['
         for (let x = 0; x < 16; x++) {
           const colorIndex = pixels[yy * 16 + y][xx * 16 + x]
           let letter
@@ -145,7 +141,7 @@ export function loadImages() {
         
         out.push(row)
       }
-      out.push(']))')
+      out.push('  ]))')
 
       console.log(out.join('\n'))
     })
