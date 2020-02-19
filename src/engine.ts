@@ -33,6 +33,7 @@ export type Opt<T> = null | T
 
 export class ObjectInstance<P, S> {
   public pos: IPosition
+  offsetPos: IPosition
   _zIndex: Opt<number>
 
   public static: GameObject<P, S>
@@ -50,6 +51,7 @@ export class ObjectInstance<P, S> {
     this.pos = pos
     this.props = props
     this.hFlip = false
+    this.offsetPos = {x: 0, y: 0}
   }
 
   destroy () {
@@ -80,6 +82,10 @@ export class ObjectInstance<P, S> {
 
   zIndex() {
     return this._zIndex === null ? this.static.zIndex : this._zIndex
+  }
+
+  getPixelPos() {
+    return posAdd(this.pos, this.offsetPos)
   }
 }
 
@@ -302,7 +308,8 @@ export class Engine {
       if (t.startTick === 0) { t.startTick = this.curTick }
       const image = t.sprite.tick(t.startTick, this.curTick)
       if (!image) { throw new Error('BUG: Could not find image for the sprite.') }
-      const screenPos = relativeTo({ x: t.pos.x, y: t.pos.y - image.pixels.length + 1 /* Shift the image up because it might not be a 8x8 sprite, like if it is a tall person */ }, this.camera.topLeft())
+      const pixelPos = t.getPixelPos()
+      const screenPos = relativeTo({ x: pixelPos.x, y: pixelPos.y - image.pixels.length + 1 /* Shift the image up because it might not be a 8x8 sprite, like if it is a tall person */ }, this.camera.topLeft())
 
       let pixels = image.pixels
       if (t.maskColor) {
@@ -564,4 +571,11 @@ function toGrayscale(hex: string) {
   const rgb = hexToRgb(hex)
   const avg = Math.round((rgb.r + rgb.g + rgb.b) / 3)
   return rgbToHex(avg, avg, avg)
+}
+
+export function posAdd(pos1: IPosition, pos2: IPosition): IPosition {
+  return {
+    x: pos1.x + pos2.x,
+    y: pos1.y + pos2.y,
+  }
 }

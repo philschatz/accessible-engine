@@ -474,9 +474,9 @@ interface PlayerProps {
 
 function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, showDialog: ShowDialogFn, overlayState: SimpleObject, curTick: number) {
   // Follow the player for now
-  camera.track(o.pos)
+  camera.nudge(o.pos, 32, 0)
+  // camera.track(o.pos)
 
-  const StoppedDown = sprites.get('PlayerStoppedDown')
   const PlayerWalkingUp = sprites.get('PlayerWalkingUp')
   const PlayerWalkingDown = sprites.get('PlayerWalkingDown')
   const PlayerWalkingRight = sprites.get('PlayerWalkingRight')
@@ -521,6 +521,21 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
     p.keyCount = 0
   }
 
+  function reduce(i: number) {
+    if (i < 0) { return i + 1 }
+    else if (i > 0) { return i - 1 }
+    else { return 0 }
+  }
+
+  if (o.offsetPos.x !== 0 || o.offsetPos.y !== 0) {
+    // slowly move the sprite
+    o.offsetPos = {
+      x: reduce(o.offsetPos.x),
+      y: reduce(o.offsetPos.y),
+    }
+    return
+  }
+
   let dy = 0
   let dx = 0
   if (gamepad.isButtonPressed(BUTTON_TYPE.DPAD_LEFT)) {
@@ -544,10 +559,14 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
 
   const oldPos = o.pos
   const newPos = {
-    x: o.pos.x + dx * 4,
-    y: o.pos.y + dy * 4 // 16/4 just to move faster
+    x: o.pos.x + dx * 16,
+    y: o.pos.y + dy * 16
   }
 
+  o.offsetPos = {
+    x: dx * -15,
+    y: dy * -15
+  }
   o.moveTo(newPos)
 
   // If there is a collision then move the player back
@@ -560,6 +579,7 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
     p.state = PLAYER_STATE.PUSHING
 
     if (GongRed === wallNeighbor.sprite) {
+      o.offsetPos = { x: 0, y: 0 }
       // remove all the pillars
       const pillars = collisionChecker.searchBBox(EVERYTHING_BBOX).filter(t => t.sprite === PillarRed)
       pillars.forEach(p => p.destroy())
