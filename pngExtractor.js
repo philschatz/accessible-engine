@@ -88,9 +88,9 @@ fs.createReadStream('akurra-tiles.png')
   //     }
   // }
 
-  this.pack().pipe(fs.createWriteStream('akurra-tiles-reduced.png'))
+  // this.pack().pipe(fs.createWriteStream('akurra-tiles-reduced.png'))
 
-  fs.writeFileSync('pixels.json', JSON.stringify({colors, pixels}))
+  // fs.writeFileSync('pixels.json', JSON.stringify({colors, pixels}))
 
 
   // Output code for each of the sprites. Use single-letter variables (lower/uppercase) for the colors
@@ -100,7 +100,7 @@ fs.createReadStream('akurra-tiles.png')
     ['Land', 'Lock', 'ArrowLeft', 'WallTopLeftRight', 'WallTopUpLeft', 'PlayerPushingUp'],
     ['LandCorner', 'LandBottom', 'ArrowLeftDisabled', 'Wall', 'WallVert', 'PlayerPushingDown'],
     ['Water0', 'Water1', 'Water2', 'Water3', 'Water4', 'TreeTop'],
-    ['PlayerStoppedDown', null, null, null, null, 'TreeBottom'],
+    ['PlayerStoppedDown', 'PlayerWalkingRight1', 'PlayerWalkingRight2', 'PlayerWalkingUp', 'PlayerWalkingDown', 'TreeBottom'],
   ]
   const letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXY' // Z is null
 

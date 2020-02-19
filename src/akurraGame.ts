@@ -20,7 +20,7 @@ export class MyGame implements Game {
 
     const images = loadImages()
 
-    sprites.add('Water', new Sprite(20, [
+    sprites.add('Water', new Sprite(20, true, [
       images.get('Water0'),
       images.get('Water0'),
       images.get('Water0'),
@@ -35,6 +35,11 @@ export class MyGame implements Game {
       images.get('Water2'),
       images.get('Water3'),
       images.get('Water4')
+    ]))
+
+    sprites.add('PlayerWalkingRight', new Sprite(1, true, [
+      images.get('PlayerWalkingRight1'),
+      images.get('PlayerWalkingRight2'),
     ]))
 
     // Add all the images as single-image sprites too.
@@ -472,6 +477,10 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
   camera.track(o.pos)
 
   const StoppedDown = sprites.get('PlayerStoppedDown')
+  const PlayerWalkingUp = sprites.get('PlayerWalkingUp')
+  const PlayerWalkingDown = sprites.get('PlayerWalkingDown')
+  const PlayerWalkingRight = sprites.get('PlayerWalkingRight')
+  
   const PushingRight = sprites.get('PlayerPushingRight')
   const PushingUp = sprites.get('PlayerPushingUp')
   const PushingDown = sprites.get('PlayerPushingDown')
@@ -617,17 +626,30 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
 
   o.hFlip = false
   switch (p.state) {
-    case PLAYER_STATE.STOPPED: o.sprite = StoppedDown; break
+    case PLAYER_STATE.STOPPED: 
+      switch (p.dir) {
+        case PLAYER_DIR.UP: o.setSprite(PlayerWalkingUp); break
+        case PLAYER_DIR.DOWN: o.setSprite(PlayerWalkingDown); break
+        case PLAYER_DIR.RIGHT: o.setSprite(PlayerWalkingRight); break
+        case PLAYER_DIR.LEFT: o.setSprite(PlayerWalkingRight); o.hFlip = true; break
+      }
+      break
     case PLAYER_STATE.PUSHING: 
       switch (p.dir) {
-        case PLAYER_DIR.RIGHT: o.sprite = PushingRight; break
-        case PLAYER_DIR.UP: o.sprite = PushingUp; break
-        case PLAYER_DIR.LEFT: o.sprite = PushingRight; o.hFlip = true; break
-        case PLAYER_DIR.DOWN: o.sprite = PushingDown; break
+        case PLAYER_DIR.RIGHT: o.setSprite(PushingRight); break
+        case PLAYER_DIR.UP: o.setSprite(PushingUp); break
+        case PLAYER_DIR.LEFT: o.setSprite(PushingRight); o.hFlip = true; break
+        case PLAYER_DIR.DOWN: o.setSprite(PushingDown); break
         default: throw new Error(`BUG: Invalid direction ${p.dir}`)
       }
       break
     default: throw new Error(`BUG: Invalid state ${p.state}`)
+  }
+
+  if (dx !== 0 || dy !== 0) {
+    o.sprite.loop = true
+  } else {
+    o.sprite.loop = false
   }
 }
 

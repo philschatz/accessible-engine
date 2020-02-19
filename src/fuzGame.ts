@@ -251,7 +251,7 @@ export class MyGame implements Game {
       [z, z, z, z, z, w, z, z]
     ]))
 
-    sprites.add('playerWalking', new Sprite(1, [
+    sprites.add('playerWalking', new Sprite(1, true, [
       images.get('playerWalk1'),
       images.get('playerWalk2'),
       images.get('playerWalk3'),

@@ -145,12 +145,14 @@ export class Sprite {
   _name: string
   readonly playbackRate: number // 1 == every tick. 30 = every 30 ticks (1/2 a second)
   images: Image[]
+  loop: boolean
 
-  constructor (playbackRate: number, images: Image[]) {
+  constructor (playbackRate: number, loop: boolean, images: Image[]) {
     if (Math.floor(playbackRate) !== playbackRate || playbackRate < 0) {
       throw new Error('The rate is the number of ticks to wait before moving to the next sprite. It should be a whole non-negative number')
     }
     this._name = ''
+    this.loop = loop
     this.playbackRate = playbackRate
     this.images = images
     // validate the images are not null
@@ -160,7 +162,7 @@ export class Sprite {
   }
 
   static forSingleImage (s: Image) {
-    return new Sprite(1, [s])
+    return new Sprite(1, false, [s])
   }
 
   tick (startTick: number, curTick: number) {
@@ -168,9 +170,15 @@ export class Sprite {
       throw new Error('BUG: Could not find sprite since there should only be one')
     }
     const i = Math.round((curTick - startTick) / this.playbackRate)
-    const ret = this.images[i % this.images.length]
-    if (!ret) { throw new Error(`BUG: Could not find sprite with index i=${i} . len=${this.images.length}`) }
+    let ret: Image
 
+    if (this.loop) { 
+      ret = this.images[i % this.images.length] 
+    } else { 
+      ret = this.images[Math.min(i, this.images.length - 1)]
+    }
+
+    if (!ret) { throw new Error(`BUG: Could not find sprite with index i=${i} . len=${this.images.length}`) }
     return ret
   }
 }
