@@ -13,7 +13,8 @@
 
 // ---------
 
-import { Engine, VisualOutputter } from './engine'
+import { Engine } from './engine'
+import { VisualOutputter } from './visual'
 import { TerminalRenderer } from './terminal'
 import { KeyboardGamepad, AnyGamepad, OrGamepad } from './gamepad/implementation'
 // import { MyGame } from './fuzGame'
@@ -29,7 +30,8 @@ keyConfig[BUTTON_TYPE.CLUSTER_DOWN] = ['X', 'x', ' ', '\u000D']
 keyConfig[BUTTON_TYPE.BUMPER_TOP_LEFT] = ['Q', 'q']
 keyConfig[BUTTON_TYPE.BUMPER_TOP_RIGHT] = ['E', 'e']
 
-const engine = new Engine(new MyGame(), new VisualOutputter(new TerminalRenderer()), new OrGamepad([new KeyboardGamepad(keyConfig), new AnyGamepad(1000)]))
+const outputter = new VisualOutputter(new TerminalRenderer())
+const engine = new Engine(new MyGame(), outputter, new OrGamepad([new KeyboardGamepad(keyConfig), new AnyGamepad(1000)]))
 
 const sleep = async (ms: number) => new Promise((resolve, reject) => {
   setTimeout(resolve, ms)

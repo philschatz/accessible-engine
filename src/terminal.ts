@@ -1,6 +1,7 @@
 import ansiEscapes from 'ansi-escapes'
 import ansiStyles from 'ansi-styles'
-import { IPosition, IRenderer, IPixel } from './engine'
+import { IPosition, IPixel } from './engine'
+import { IRenderer } from './visual'
 
 export class DoubleArray<T> {
   private ary: T[][] = []
