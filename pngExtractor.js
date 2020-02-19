@@ -95,12 +95,15 @@ fs.createReadStream('akurra-tiles.png')
 
   // Output code for each of the sprites. Use single-letter variables (lower/uppercase) for the colors
   const sprites = [
-    ['Sand', 'Rock', 'Bush', 'Pedestal', 'WallTopRightDown', 'Key'],
+    ['Sand', 'Rock', 'Bush', 'Pedestal', 'WallTopRightDown', 'Background'],
     ['SandEdge', 'Crate', 'GongRed', 'PillarRed', 'WallTopUpDown', 'PlayerPushingRight'],
     ['Land', 'Lock', 'ArrowLeft', 'WallTopLeftRight', 'WallTopUpLeft', 'PlayerPushingUp'],
     ['LandCorner', 'LandBottom', 'ArrowLeftDisabled', 'Wall', 'WallVert', 'PlayerPushingDown'],
     ['Water0', 'Water1', 'Water2', 'Water3', 'Water4', 'TreeTop'],
     ['PlayerStoppedDown', 'PlayerWalkingRight1', 'PlayerWalkingRight2', 'PlayerWalkingUp', 'PlayerWalkingDown', 'TreeBottom'],
+    ['GongDisabled1', 'GongDisabled2', 'GongDisabled3', 'GongDisabled4', 'GongDisabled5', 'GongDisabled6'],
+    ['Key1', 'Key2', 'Key3', 'Key4', 'Key5', 'Key6'],
+    ['FloorSquareDone', 'FloorDiamondDone', 'FloorPoof1', 'FloorPoof2', 'FloorPoof3Diamond', 'FloorPoof3Square'],
   ]
   const letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXY' // Z is null
 

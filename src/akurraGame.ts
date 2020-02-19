@@ -37,14 +37,76 @@ export class MyGame implements Game {
       images.get('Water4')
     ]))
 
+    sprites.add('Key', new Sprite(1, true, [
+      images.get('Key1'),
+      images.get('Key1'),
+      images.get('Key1'),
+      images.get('Key1'),
+      images.get('Key1'),
+      images.get('Key1'),
+      images.get('Key1'),
+      images.get('Key1'),
+      images.get('Key1'),
+      images.get('Key1'),
+      images.get('Key1'),
+      images.get('Key1'),
+      images.get('Key1'),
+      images.get('Key1'),
+      images.get('Key1'),
+      images.get('Key1'),
+      images.get('Key1'),
+      images.get('Key1'),
+      images.get('Key1'),
+      images.get('Key1'),
+      images.get('Key1'),
+      images.get('Key1'),
+      images.get('Key1'),
+      images.get('Key1'),
+      images.get('Key1'),
+      images.get('Key1'),
+      images.get('Key1'),
+      images.get('Key2'),
+      images.get('Key3'),
+      images.get('Key4'),
+      images.get('Key5'),
+      images.get('Key6'),
+    ]))
+
+    sprites.add('GongDisabled', new Sprite(1, false, [
+      images.get('GongDisabled1'),
+      images.get('GongDisabled2'),
+      images.get('GongDisabled3'),
+      images.get('GongDisabled4'),
+      images.get('GongDisabled5'),
+      images.get('GongDisabled6'),
+    ]))
+
     sprites.add('PlayerWalkingRight', new Sprite(1, true, [
       images.get('PlayerWalkingRight1'),
       images.get('PlayerWalkingRight2'),
     ]))
 
+    sprites.add('FloorSquare', new Sprite(2, false, [
+      images.get('FloorPoof1'),
+      images.get('FloorPoof2'),
+      images.get('FloorPoof3Square'),
+      images.get('FloorSquareDone'),
+    ]))
+
+    sprites.add('FloorDiamond', new Sprite(2, false, [
+      images.get('FloorPoof1'),
+      images.get('FloorPoof2'),
+      images.get('FloorPoof3Diamond'),
+      images.get('FloorDiamondDone'),
+    ]))
+
     // Add all the images as single-image sprites too.
     for (const [name, image] of images.entries()) {
       sprites.add(name, Sprite.forSingleImage(image))
+    }
+
+    return {
+      grid: {width: 16, height: 16}
     }
   }
 
@@ -55,6 +117,7 @@ export class MyGame implements Game {
     const obZ = 0
     const hoverZ = -1
 
+    const Background = instances.simple(sprites, 'Background', bgZ)
     const Sand = instances.simple(sprites, 'Sand', bgZ)
     const Rock = instances.simple(sprites, 'Rock', obZ)
     const Bush = instances.simple(sprites, 'Bush', obZ)
@@ -86,8 +149,8 @@ export class MyGame implements Game {
     function g (item: GameObject<any, any>, pos: IPosition) {
       // convert from grid coordinates to pixels
       const o = item.new({
-        x: pos.x * 16,
-        y: pos.y * 16
+        x: pos.x,
+        y: pos.y
       })
 
       return o
@@ -220,6 +283,7 @@ export class MyGame implements Game {
     g(Bush, { x: x++, y })
     g(Bush, { x: x++, y })
     g(WallTopUpDown, { x: x++, y })
+    g(Background, { x, y })
     g(GongRed, { x: x++, y })
     g(Sand, { x: x++, y })
     g(Sand, { x: x++, y })
@@ -234,7 +298,8 @@ export class MyGame implements Game {
     g(LandCorner, { x: x++, y }).hFlip = true
     g(Sand, { x: x++, y })
     g(Rock, { x: x++, y })
-    g(Key, { x: x - 1 / 16, y: y - 5 / 16 })
+    // g(Key, { x: x - 1 / 16, y: y - 5 / 16 }) // TODO: Make all keys have an offset instead of using this non-integer coordinates
+    g(Key, { x, y }).offsetPos = { x: 0, y: -5}
     g(Pedestal, { x: x++, y })
     g(Rock, { x: x++, y })
     g(Sand, { x: x++, y })
@@ -490,14 +555,19 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
   ]
 
   const GongRed = sprites.get('GongRed')
+  const GongDisabled = sprites.get('GongDisabled')
   const PillarRed = sprites.get('PillarRed')
   const Key = sprites.get('Key')
   const Lock = sprites.get('Lock')
   const ArrowLeft = sprites.get('ArrowLeft')
   const ArrowLeftDisabled = sprites.get('ArrowLeftDisabled')
 
+  const FloorSquare = sprites.get('FloorSquare')
+  const FloorDiamond = sprites.get('FloorDiamond')
+
   const wallSprites = [...pushableSprites,
     GongRed,
+    GongDisabled,
     PillarRed,
     Lock,
     ArrowLeft,
@@ -559,8 +629,8 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
 
   const oldPos = o.pos
   const newPos = {
-    x: o.pos.x + dx * 16,
-    y: o.pos.y + dy * 16
+    x: o.pos.x + dx,
+    y: o.pos.y + dy
   }
 
   o.offsetPos = {
@@ -570,7 +640,7 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
   o.moveTo(newPos)
 
   // If there is a collision then move the player back
-  const neighborSprites = collisionChecker.searchBBox(o.toBBox())
+  const neighborSprites = collisionChecker.searchPoint(o.pos)
   const wallNeighbor = neighborSprites
     .find((obj) => wallSprites.includes(obj.sprite))
 
@@ -582,8 +652,9 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
       o.offsetPos = { x: 0, y: 0 }
       // remove all the pillars
       const pillars = collisionChecker.searchBBox(EVERYTHING_BBOX).filter(t => t.sprite === PillarRed)
-      pillars.forEach(p => p.destroy())
-      wallNeighbor.setMask(null, true)
+      pillars.forEach(p => p.setSprite(FloorSquare))
+      // wallNeighbor.setMask(null, true)
+      wallNeighbor.setSprite(GongDisabled)
 
     } else if (pushableSprites.includes(wallNeighbor.sprite)) {
       // start pushing the box. Just immediately push it for now (if it is empty behind it)
@@ -592,14 +663,14 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
       let newNeighborPos: IPosition
 
       switch (p.dir) {
-        case PLAYER_DIR.UP:    newNeighborPos = {x: wallNeighbor.pos.x, y: wallNeighbor.pos.y - 16}; break
-        case PLAYER_DIR.DOWN:  newNeighborPos = {x: wallNeighbor.pos.x, y: wallNeighbor.pos.y + 16}; break
-        case PLAYER_DIR.LEFT:  newNeighborPos = {x: wallNeighbor.pos.x - 16, y: wallNeighbor.pos.y}; break
-        case PLAYER_DIR.RIGHT: newNeighborPos = {x: wallNeighbor.pos.x + 16, y: wallNeighbor.pos.y}; break
+        case PLAYER_DIR.UP:    newNeighborPos = {x: wallNeighbor.pos.x, y: wallNeighbor.pos.y - 1}; break
+        case PLAYER_DIR.DOWN:  newNeighborPos = {x: wallNeighbor.pos.x, y: wallNeighbor.pos.y + 1}; break
+        case PLAYER_DIR.LEFT:  newNeighborPos = {x: wallNeighbor.pos.x - 1, y: wallNeighbor.pos.y}; break
+        case PLAYER_DIR.RIGHT: newNeighborPos = {x: wallNeighbor.pos.x + 1, y: wallNeighbor.pos.y}; break
         default: throw new Error(`BUG: Invalid direction ${p.dir}`)
       }
 
-      const isBehindNeighborFilled = collisionChecker.searchBBox(spriteToBBox(newNeighborPos, wallNeighbor.sprite))
+      const isBehindNeighborFilled = collisionChecker.searchPoint(newNeighborPos)
         .find((obj) => wallSprites.includes(obj.sprite))
 
       if (isBehindNeighborFilled === wallNeighbor) {
@@ -613,6 +684,8 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
       } else {
         
       }
+    } else {
+      o.offsetPos = { x: 0, y: 0 }
     }
   } else {
     p.state = PLAYER_STATE.STOPPED // Should be walking if moving
@@ -629,7 +702,7 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
   const maybeLock = neighborSprites.find(obj => obj.sprite === Lock)
   if (maybeLock && p.keyCount > 0) {
     p.keyCount--
-    maybeLock.destroy()
+    maybeLock.setSprite(FloorDiamond)
   }
 
   // Unlock the arrow locks when pushing the correct direction
@@ -639,8 +712,8 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
     let cur = maybeArrowLeft
     while (cur) {
       const pos = cur.pos
-      cur.destroy()
-      cur = collisionChecker.searchPoint({x: pos.x - 16, y: pos.y}).find(obj => obj.sprite === ArrowLeftDisabled)
+      cur.setSprite(FloorDiamond)
+      cur = collisionChecker.searchPoint({x: pos.x - 1, y: pos.y}).find(obj => obj.sprite === ArrowLeftDisabled)
     }
   }
 
@@ -676,5 +749,5 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
 
 function spriteToBBox(pos: IPosition, sprite: Sprite): BBox {
   const dim = sprite.tick(0, 0).getDimension()
-  return { minX: pos.x, minY: pos.y, maxX: pos.x + dim.width - 1, maxY: pos.y + dim.height - 1 }
+  return { minX: pos.x, minY: pos.y, maxX: pos.x, maxY: pos.y }
 }

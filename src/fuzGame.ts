@@ -560,6 +560,10 @@ export class MyGame implements Game {
     for (const [name, image] of images.entries()) {
       sprites.add(name, Sprite.forSingleImage(image))
     }
+
+    return {
+      grid: {width: 8, height: 8}
+    }
   }
 
   init (sprites: SpriteController, instances: InstanceController) {

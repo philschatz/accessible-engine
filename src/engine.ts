@@ -64,7 +64,7 @@ export class ObjectInstance<P, S> {
   }
 
   toBBox (): BBox {
-    return { minX: this.pos.x, minY: this.pos.y, maxX: this.pos.x + 15, maxY: this.pos.y + 15 }
+    return { minX: this.pos.x, minY: this.pos.y, maxX: this.pos.x, maxY: this.pos.y }
   }
 
   setSprite (sprite: Sprite) {
@@ -84,8 +84,8 @@ export class ObjectInstance<P, S> {
     return this._zIndex === null ? this.static.zIndex : this._zIndex
   }
 
-  getPixelPos() {
-    return posAdd(this.pos, this.offsetPos)
+  getPixelPos(grid: Size) {
+    return posAdd(posTimes(this.pos, grid), this.offsetPos)
   }
 }
 
@@ -220,8 +220,10 @@ export class Image {
 }
 
 export class CollisionChecker {
+  private grid: Size
   private readonly bush: RBush<ObjectInstance<any, any>>
-  constructor (bush: RBush<ObjectInstance<any, any>>) {
+  constructor (grid: Size, bush: RBush<ObjectInstance<any, any>>) {
+    this.grid = grid
     this.bush = bush
   }
 
@@ -253,10 +255,10 @@ export class Engine {
   private readonly gamepad: IGamepad
   private readonly overlayState: SimpleObject
   private pendingDialog: Opt<{message: string, startTick: number, target: Opt<IPosition>, additional: Opt<SimpleObject>}>
+  private grid: Size
 
   constructor (game: Game, renderer: IRenderer, gamepad: IGamepad) {
     this.bush = new MyRBush()
-    this.collisionChecker = new CollisionChecker(this.bush)
     this.sprites = new DefiniteMap<Sprite>()
     this.instances = new InstanceController(this.bush)
     this.camera = new Camera({ width: 128, height: 96 })
@@ -269,18 +271,20 @@ export class Engine {
     this.drawText = this.drawText.bind(this)
     this.drawPixels = this.drawPixels.bind(this)
     this.showDialog = this.showDialog.bind(this)
+
+    const {grid} = this.game.load(this.gamepad, this.sprites)
+    this.grid = grid
+    this.collisionChecker = new CollisionChecker(grid, this.bush)
+
+    // For debugging attach a name to each sprite
+    for (const [name, sprite] of this.sprites.entries()) {
+      sprite._name = name
+    }
+
+    this.game.init(this.sprites, this.instances)
   }
 
   tick () {
-    if (this.curTick === 0) {
-      this.game.load(this.gamepad, this.sprites)
-      // For debugging attach a name to each sprite
-      for (const [name, sprite] of this.sprites.entries()) {
-        sprite._name = name
-      }
-
-      this.game.init(this.sprites, this.instances)
-    }
     this.curTick++
 
     // Update each object
@@ -308,7 +312,7 @@ export class Engine {
       if (t.startTick === 0) { t.startTick = this.curTick }
       const image = t.sprite.tick(t.startTick, this.curTick)
       if (!image) { throw new Error('BUG: Could not find image for the sprite.') }
-      const pixelPos = t.getPixelPos()
+      const pixelPos = t.getPixelPos(this.grid)
       const screenPos = relativeTo({ x: pixelPos.x, y: pixelPos.y - image.pixels.length + 1 /* Shift the image up because it might not be a 8x8 sprite, like if it is a tall person */ }, this.camera.topLeft())
 
       let pixels = image.pixels
@@ -401,7 +405,7 @@ export interface SimpleObject {
 }
 
 export interface Game {
-  load(gamepad: IGamepad, sprites: SpriteController)
+  load(gamepad: IGamepad, sprites: SpriteController): {grid: Size}
   init(sprites: SpriteController, instances: InstanceController)
   drawBackground(tiles: Array<ObjectInstance<any, any>>, camera: Camera, drawPixelsFn: DrawPixelsFn)
   drawOverlay(drawPixelsFn: DrawPixelsFn, drawTextFn: DrawTextFn, additional: SimpleObject)
@@ -577,5 +581,23 @@ export function posAdd(pos1: IPosition, pos2: IPosition): IPosition {
   return {
     x: pos1.x + pos2.x,
     y: pos1.y + pos2.y,
+  }
+}
+
+export function posTimes(pos: IPosition, size: Size): IPosition {
+  if (!pos || !size) { throw new Error(`pos=${JSON.stringify(pos)} size=${JSON.stringify(size)}`)}
+  return {
+    x: pos.x * size.width,
+    y: pos.y * size.height,
+  }
+}
+
+export function bboxTimes(bbox: BBox, size: Size): BBox {
+  if (!(size.width > 0) || !(size.height > 0)) { throw new Error(`BUG: Invalid Size: ${JSON.stringify(size)}`) }
+  return {
+    minX: bbox.minX * size.width,
+    maxX: bbox.maxX * size.width,
+    minY: bbox.minY * size.height,
+    maxY: bbox.maxY * size.height,
   }
 }
