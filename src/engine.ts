@@ -242,11 +242,12 @@ export class CollisionChecker {
 }
 
 export type PaintFn = (message: string[], camera: Camera, startTick: number, currentTick: number, drawPixelsFn: DrawPixelsFn) => void
+export type Dialog = {message: string, startTick: number, target: Opt<IPosition>, additional: Opt<SimpleObject>}
 
 export class Engine {
   private curTick: number = 0
   private readonly game: Game
-  private readonly renderer: IRenderer
+  private readonly outputter: IOutputter
   private readonly bush: RBush<ObjectInstance<any, any>>
   private readonly collisionChecker: CollisionChecker
   private readonly sprites: SpriteController
@@ -254,22 +255,20 @@ export class Engine {
   private readonly camera: Camera
   private readonly gamepad: IGamepad
   private readonly overlayState: SimpleObject
-  private pendingDialog: Opt<{message: string, startTick: number, target: Opt<IPosition>, additional: Opt<SimpleObject>}>
+  private pendingDialog: Opt<Dialog>
   private grid: Size
 
-  constructor (game: Game, renderer: IRenderer, gamepad: IGamepad) {
+  constructor (game: Game, outputter: IOutputter, gamepad: IGamepad) {
     this.bush = new MyRBush()
     this.sprites = new DefiniteMap<Sprite>()
     this.instances = new InstanceController(this.bush)
-    this.camera = new Camera({ width: 128, height: 96 })
+    this.camera = new Camera({ width: 24 * 2, height: 12 * 2 })
     this.gamepad = gamepad
-    this.renderer = renderer
+    this.outputter = outputter
     this.game = game
     this.pendingDialog = null
     this.overlayState = {}
 
-    this.drawText = this.drawText.bind(this)
-    this.drawPixels = this.drawPixels.bind(this)
     this.showDialog = this.showDialog.bind(this)
 
     const {grid} = this.game.load(this.gamepad, this.sprites)
@@ -304,77 +303,10 @@ export class Engine {
     tiles.sort(zIndexComparator)
     tiles.reverse()
 
-    this.renderer.drawStart()
-
-    this.game.drawBackground(tiles, this.camera, this.drawPixels)
-
-    for (const t of tiles) {
-      if (t.startTick === 0) { t.startTick = this.curTick }
-      const image = t.sprite.tick(t.startTick, this.curTick)
-      if (!image) { throw new Error('BUG: Could not find image for the sprite.') }
-      const pixelPos = t.getPixelPos(this.grid)
-      const screenPos = relativeTo({ x: pixelPos.x, y: pixelPos.y - image.pixels.length + 1 /* Shift the image up because it might not be a 8x8 sprite, like if it is a tall person */ }, this.camera.topLeft())
-
-      let pixels = image.pixels
-      if (t.maskColor) {
-        pixels = pixels.map(row => row.map(c => c === null ? null : t.maskColor))
-      }
-      if (t.isGrayscale) {
-        pixels = pixels.map(row => row.map(c => c === null ? null : toGrayscale(c)))
-      }
-      this.drawPixels(screenPos, pixels, t.hFlip, false)
-    }
-
-    this.game.drawOverlay(this.drawPixels, this.drawText, this.overlayState)
-
-    if (this.pendingDialog) {
-      const target = this.pendingDialog.target ? relativeTo(this.pendingDialog.target, this.camera.topLeft()) : null
-      this.game.drawDialog(this.pendingDialog.message, this.drawPixels, this.drawText, this.curTick - this.pendingDialog.startTick, target, this.pendingDialog.additional)
-      this.pendingDialog = null
-    }
-
-    this.renderer.drawEnd()
+    this.outputter.draw(this.game, tiles, this.camera, this.curTick, this.grid, this.overlayState, this.pendingDialog)
+    this.pendingDialog = null
   }
 
-  private drawPixels (screenPos: IPosition, pixels: IPixel[][], hFlip: boolean, vFlip: boolean) {
-    const height = pixels.length
-    let relY = 0
-    for (const row of pixels) {
-      if (!row) {
-        relY++
-        continue
-      }
-      const width = row.length
-      let relX = 0
-      for (const pixel of row) {
-        const x = screenPos.x + (hFlip ? width - 1 - relX : relX)
-        const y = screenPos.y + (vFlip ? height - 1 - relY : relY)
-        if (pixel !== null && pixel !== undefined && x >= 0 && y >= 0) {
-          const pos = { x, y }
-          this.renderer.drawPixel(pos, pixel)
-        }
-        relX++
-      }
-      relY++
-    }
-  }
-
-  private drawText (screenPos: IPosition, message: string, hexColor: string) {
-    // convert the lines of text to characters
-    const line = message
-    for (let colNum = 0; colNum < line.length; colNum++) {
-      const c = line[colNum]
-
-      const l = LETTERS.get(c)
-      if (!l) {
-        throw new Error(`BUG: Do not have sprite for character "${c}"`)
-      }
-      const pixels = l.map(row => row.map(bit => bit ? hexColor : null))
-      const x = screenPos.x + colNum * 4
-      const y = screenPos.y
-      this.drawPixels({ x, y }, pixels, false, false)
-    }
-  }
 
   showDialog (message: string, target: Opt<IPosition>, additional: Opt<SimpleObject>) {
     if (!this.pendingDialog || this.pendingDialog.message !== message) {
@@ -502,10 +434,97 @@ export class InstanceController {
   }
 }
 
+export interface IOutputter {
+  draw(game: Game, tiles: ObjectInstance<any, any>[], camera: Camera, curTick: number, grid: Size, overlayState: SimpleObject, pendingDialog: Opt<Dialog>): void
+}
+
 export interface IRenderer {
   drawStart(): void
   drawEnd(): void
   drawPixel(pos: IPosition, hex: string): void
+}
+
+export class VisualOutputter implements IOutputter {
+  private renderer: IRenderer
+  constructor(renderer: IRenderer) {
+    this.renderer = renderer
+    this.drawPixels = this.drawPixels.bind(this)
+    this.drawText = this.drawText.bind(this)
+  }
+
+  draw(game: Game, tiles: ObjectInstance<any, any>[], camera: Camera, curTick: number, grid: Size, overlayState: SimpleObject, pendingDialog: Opt<Dialog>) {
+    this.renderer.drawStart()
+
+    game.drawBackground(tiles, camera, this.drawPixels)
+
+    for (const t of tiles) {
+      if (t.startTick === 0) { t.startTick = curTick }
+      const image = t.sprite.tick(t.startTick, curTick)
+      if (!image) { throw new Error('BUG: Could not find image for the sprite.') }
+      const pixelPos = t.getPixelPos(grid)
+      const screenPos = relativeTo({ x: pixelPos.x, y: pixelPos.y - image.pixels.length + 1 /* Shift the image up because it might not be a 8x8 sprite, like if it is a tall person */ }, camera.topLeft())
+
+      let pixels = image.pixels
+      if (t.maskColor) {
+        pixels = pixels.map(row => row.map(c => c === null ? null : t.maskColor))
+      }
+      if (t.isGrayscale) {
+        pixels = pixels.map(row => row.map(c => c === null ? null : toGrayscale(c)))
+      }
+      this.drawPixels(screenPos, pixels, t.hFlip, false)
+    }
+
+    game.drawOverlay(this.drawPixels, this.drawText, overlayState)
+
+    if (pendingDialog) {
+      const target = pendingDialog.target ? relativeTo(pendingDialog.target, camera.topLeft()) : null
+      game.drawDialog(pendingDialog.message, this.drawPixels, this.drawText, curTick - pendingDialog.startTick, target, pendingDialog.additional)
+    }
+
+    this.renderer.drawEnd()
+
+  }
+
+  private drawPixels (screenPos: IPosition, pixels: IPixel[][], hFlip: boolean, vFlip: boolean) {
+    const height = pixels.length
+    let relY = 0
+    for (const row of pixels) {
+      if (!row) {
+        relY++
+        continue
+      }
+      const width = row.length
+      let relX = 0
+      for (const pixel of row) {
+        const x = screenPos.x + (hFlip ? width - 1 - relX : relX)
+        const y = screenPos.y + (vFlip ? height - 1 - relY : relY)
+        if (pixel !== null && pixel !== undefined && x >= 0 && y >= 0) {
+          const pos = { x, y }
+          this.renderer.drawPixel(pos, pixel)
+        }
+        relX++
+      }
+      relY++
+    }
+  }
+
+  private drawText (screenPos: IPosition, message: string, hexColor: string) {
+    // convert the lines of text to characters
+    const line = message
+    for (let colNum = 0; colNum < line.length; colNum++) {
+      const c = line[colNum]
+
+      const l = LETTERS.get(c)
+      if (!l) {
+        throw new Error(`BUG: Do not have sprite for character "${c}"`)
+      }
+      const pixels = l.map(row => row.map(bit => bit ? hexColor : null))
+      const x = screenPos.x + colNum * 4
+      const y = screenPos.y
+      this.drawPixels({ x, y }, pixels, false, false)
+    }
+  }
+
 }
 
 export class DefiniteMap<V> {

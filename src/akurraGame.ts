@@ -539,7 +539,7 @@ interface PlayerProps {
 
 function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, showDialog: ShowDialogFn, overlayState: SimpleObject, curTick: number) {
   // Follow the player for now
-  camera.nudge(o.pos, 32, 0)
+  // camera.nudge(o.pos, 32, 0)
   // camera.track(o.pos)
 
   const PlayerWalkingUp = sprites.get('PlayerWalkingUp')
