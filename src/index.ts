@@ -20,6 +20,7 @@ import { KeyboardGamepad, AnyGamepad, OrGamepad } from './gamepad/implementation
 // import { MyGame } from './fuzGame'
 import { MyGame } from './akurraGame'
 import { BUTTON_TYPE } from './gamepad/api'
+import { TableOutputter, AudioOutputter } from './table'
 
 const keyConfig = {}
 keyConfig[BUTTON_TYPE.DPAD_UP] = ['W', 'w', '\u001B\u005B\u0041']
@@ -30,7 +31,9 @@ keyConfig[BUTTON_TYPE.CLUSTER_DOWN] = ['X', 'x', ' ', '\u000D']
 keyConfig[BUTTON_TYPE.BUMPER_TOP_LEFT] = ['Q', 'q']
 keyConfig[BUTTON_TYPE.BUMPER_TOP_RIGHT] = ['E', 'e']
 
-const outputter = new VisualOutputter(new TerminalRenderer())
+// const outputter = new VisualOutputter(new TerminalRenderer())
+// const outputter = new TableOutputter()
+const outputter = new AudioOutputter()
 const engine = new Engine(new MyGame(), outputter, new OrGamepad([new KeyboardGamepad(keyConfig), new AnyGamepad(1000)]))
 
 const sleep = async (ms: number) => new Promise((resolve, reject) => {

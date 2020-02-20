@@ -39,6 +39,10 @@ export class DoubleArray<T> {
   asArray () {
     return this.ary
   }
+
+  forEach(fn: (value: T[], index: number, array: T[][]) => void) {
+    this.ary.forEach(fn)
+  }
 }
 
 const BLACK = '#000000'

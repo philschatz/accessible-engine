@@ -285,6 +285,7 @@ export class Engine {
 
   tick () {
     this.curTick++
+    this.gamepad.tick()
 
     // Update each object
     // TODO: Only update objects in view or ones that have an alwaysUpdate=true flag set (TBD)

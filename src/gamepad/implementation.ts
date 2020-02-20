@@ -1,3 +1,4 @@
+import { readFileSync } from 'fs'
 import * as HID from 'node-hid'
 import { IGamepadRoot, IGamepad, BUTTON_TYPE, STICK_TYPE } from './api'
 import ps3 from './ps3.json'
@@ -91,6 +92,8 @@ class Gamepad implements IGamepad {
     this.usb.on('data', this.onUsbFrame.bind(this))
     process.on('exit', this.disconnect.bind(this))
   }
+
+  tick() { }
 
   disconnect () {
     if (this.usb) {
@@ -212,6 +215,7 @@ export class KeyboardGamepad implements IGamepad {
   timestamp = Date.now()
   private curPressed: string
   private readonly keyConfig
+  private pipedKeys: string[] = []
 
   // Gamepad API. TODO: Actually map it (not too hard)
   buttons: []
@@ -226,7 +230,9 @@ export class KeyboardGamepad implements IGamepad {
     if (process.stdin.setRawMode) {
       process.stdin.setRawMode(true)
     } else {
-      throw new Error('ERROR: stdin does not allow setting setRawMode (we need that for keyboard input')
+      console.warn('WARNING: stdin does not allow setting setRawMode (we need that for keyboard input). Maybe you are piping keys in via stdin?')
+      this.pipedKeys = readFileSync(0).toString().split('')
+      this.pipedKeys.push(null) // add this character so we exit the process
     }
     process.stdin.resume()
     process.stdin.setEncoding('utf8')
@@ -244,6 +250,17 @@ export class KeyboardGamepad implements IGamepad {
           this.curPressed = key
       }
     })
+  }
+
+  tick() {
+    // feed the piped keys in one tick at a time
+    if (this.pipedKeys.length > 0) {
+      this.timestamp = Date.now() + 100 * 1000 // ensure that we do not hit they key interval
+      this.curPressed = this.pipedKeys.shift()
+      if (this.curPressed === null) {
+        return process.exit(0)
+      }
+    }
   }
 
   isButtonPressed (btn: BUTTON_TYPE) {
@@ -275,6 +292,8 @@ export class OrGamepad implements IGamepad {
   constructor (pads: IGamepad[]) {
     this.pads = pads
   }
+
+  tick() { for (const pad of this.pads) { pad.tick() }}
 
   isButtonPressed (btn: BUTTON_TYPE) {
     for (const pad of this.pads) {
@@ -312,6 +331,8 @@ export class AnyGamepad implements IGamepad {
   constructor (pollingInterval: number) {
     this.polling = pollingInterval
   }
+
+  tick() { for (const pad of this.pads) { pad.tick() }}
 
   isButtonPressed (btn: BUTTON_TYPE) {
     if (this.timestamp + this.polling < Date.now()) {

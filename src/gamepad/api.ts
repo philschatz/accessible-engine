@@ -34,6 +34,7 @@ export interface IGamepadRoot {
 }
 
 export interface IGamepad {
+  tick(): void
   isButtonPressed(btn: BUTTON_TYPE): boolean
   getStickCoordinates(stick: STICK_TYPE): IPosition | null
 
