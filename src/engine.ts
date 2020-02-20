@@ -304,7 +304,7 @@ export class Engine {
     tiles.sort(zIndexComparator)
     tiles.reverse()
 
-    this.outputter.draw(this.game, tiles, this.camera, this.curTick, this.grid, this.overlayState, this.pendingDialog)
+    this.outputter.draw(this.game, tiles, this.camera, this.curTick, this.grid, this.overlayState, this.pendingDialog, this.sprites)
     this.pendingDialog = null
   }
 
@@ -334,7 +334,7 @@ export interface Game {
   load(gamepad: IGamepad, sprites: SpriteController): {grid: Size}
   init(sprites: SpriteController, instances: InstanceController)
   drawBackground(tiles: Array<ObjectInstance<any, any>>, camera: Camera, drawPixelsFn: DrawPixelsFn)
-  drawOverlay(drawPixelsFn: DrawPixelsFn, drawTextFn: DrawTextFn, additional: SimpleObject)
+  drawOverlay(drawPixelsFn: DrawPixelsFn, drawTextFn: DrawTextFn, additional: SimpleObject, sprites: SpriteController)
   drawDialog(message: string, drawPixelsFn: DrawPixelsFn, drawTextFn: DrawTextFn, elapsedMs: number, target: Opt<IPosition>, additional: Opt<SimpleObject>)
 }
 
@@ -429,7 +429,7 @@ export class InstanceController {
 }
 
 export interface IOutputter {
-  draw(game: Game, tiles: ObjectInstance<any, any>[], camera: Camera, curTick: number, grid: Size, overlayState: SimpleObject, pendingDialog: Opt<Dialog>): void
+  draw(game: Game, tiles: ObjectInstance<any, any>[], camera: Camera, curTick: number, grid: Size, overlayState: SimpleObject, pendingDialog: Opt<Dialog>, sprites: SpriteController): void
 }
 
 

@@ -31,9 +31,9 @@ keyConfig[BUTTON_TYPE.CLUSTER_DOWN] = ['X', 'x', ' ', '\u000D']
 keyConfig[BUTTON_TYPE.BUMPER_TOP_LEFT] = ['Q', 'q']
 keyConfig[BUTTON_TYPE.BUMPER_TOP_RIGHT] = ['E', 'e']
 
-// const outputter = new VisualOutputter(new TerminalRenderer())
+const outputter = new VisualOutputter(new TerminalRenderer())
 // const outputter = new TableOutputter()
-const outputter = new AudioOutputter()
+// const outputter = new AudioOutputter()
 const engine = new Engine(new MyGame(), outputter, new OrGamepad([new KeyboardGamepad(keyConfig), new AnyGamepad(1000)]))
 
 const sleep = async (ms: number) => new Promise((resolve, reject) => {

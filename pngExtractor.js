@@ -104,6 +104,8 @@ fs.createReadStream('akurra-tiles.png')
     ['GongDisabled1', 'GongDisabled2', 'GongDisabled3', 'GongDisabled4', 'GongDisabled5', 'GongDisabled6'],
     ['Key1', 'Key2', 'Key3', 'Key4', 'Key5', 'Key6'],
     ['FloorSquareDone', 'FloorDiamondDone', 'FloorPoof1', 'FloorPoof2', 'FloorPoof3Diamond', 'FloorPoof3Square'],
+    ['OverlayTopLeft1', 'OverlayTopLeft2', 'OverlayTop', 'OverlayTopCrack', 'OverlayTopRight1', 'OverlayTopRight2'],
+    ['OverlayBottomLeft1', 'OverlayBottomLeft2', 'OverlayBottom', 'OverlayBottomCrack', 'OverlayBottomRight1', 'OverlayBottomRight2'],
   ]
   const letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXY' // Z is null
 

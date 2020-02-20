@@ -148,10 +148,7 @@ export class MyGame implements Game {
     const validator = {}
     function g (item: GameObject<any, any>, pos: IPosition) {
       // convert from grid coordinates to pixels
-      const o = item.new({
-        x: pos.x,
-        y: pos.y
-      })
+      const o = item.new(pos)
 
       return o
     }
@@ -511,7 +508,76 @@ export class MyGame implements Game {
     drawPixelsFn({ x: 0, y: 0 }, pixels, false, false)
   }
 
-  drawOverlay (drawPixelsFn: DrawPixelsFn, drawTextFn: DrawTextFn, fields: SimpleObject) {
+  drawOverlay (drawPixelsFn: DrawPixelsFn, drawTextFn: DrawTextFn, fields: SimpleObject, sprites: SpriteController) {
+    const Key = sprites.get('Key')
+
+    const OverlayTopLeft1 = sprites.get('OverlayTopLeft1')
+    const OverlayTopLeft2 = sprites.get('OverlayTopLeft2')
+    const OverlayTopRight1 = sprites.get('OverlayTopRight1')
+    const OverlayTopRight2 = sprites.get('OverlayTopRight2')
+    const OverlayTop = sprites.get('OverlayTop')
+
+    const OverlayBottomLeft1 = sprites.get('OverlayBottomLeft1')
+    const OverlayBottomLeft2 = sprites.get('OverlayBottomLeft2')
+    const OverlayBottomRight1 = sprites.get('OverlayBottomRight1')
+    const OverlayBottomRight2 = sprites.get('OverlayBottomRight2')
+    const OverlayBottom = sprites.get('OverlayBottom')
+
+    let x = 0
+    let y = 0
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayTopLeft1.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayTopLeft2.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayTop.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayTop.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayTop.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayTop.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayTop.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayTop.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayTop.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayTop.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayTop.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayTop.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayTop.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayTop.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayTop.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayTop.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayTop.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayTop.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayTop.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayTop.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayTop.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayTop.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayTopRight1.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayTopRight2.images[0].pixels, false, false)
+
+    x = 0; y += 1
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayBottomLeft1.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayBottomLeft2.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayBottom.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayBottom.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayBottom.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayBottom.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayBottom.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayBottom.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayBottom.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayBottom.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayBottom.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayBottom.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayBottom.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayBottom.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayBottom.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayBottom.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayBottom.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayBottom.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayBottom.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayBottom.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayBottom.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayBottom.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayBottomRight1.images[0].pixels, false, false)
+    drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayBottomRight2.images[0].pixels, false, false)
+
+    drawPixelsFn({ x: 22, y: 3}, Key.images[0].pixels, false, false)
+    drawTextFn({x: 28, y: 20}, `${fields.keyCount || 0}`, '#ffffff')
   }
 
   drawDialog (message: string, drawPixelsFn: DrawPixelsFn, drawTextFn: DrawTextFn, elapsedMs: number, target: Opt<IPosition>, additional: Opt<SimpleObject>) {
@@ -534,7 +600,7 @@ interface PlayerProps {
   dir: PLAYER_DIR
   state: PLAYER_STATE
   stateStart: number
-  keyCount: number
+  // keyCount: number  stored in the overlayState
 }
 
 function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, showDialog: ShowDialogFn, overlayState: SimpleObject, curTick: number) {
@@ -588,7 +654,7 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
   if (p.state === undefined) {
     p.dir = PLAYER_DIR.DOWN
     p.state = PLAYER_STATE.STOPPED
-    p.keyCount = 0
+    overlayState.keyCount = 0
   }
 
   function reduce(i: number) {
@@ -694,14 +760,14 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
   // Pick up a key
   const maybeKey = neighborSprites.find(obj => obj.sprite === Key)
   if (maybeKey) {
-    p.keyCount++
+    overlayState.keyCount = typeof overlayState.keyCount === 'number' ? overlayState.keyCount + 1 : 1
     maybeKey.destroy() // TODO: animate it moving to the overlay
   }
 
   // Unlock a lock
   const maybeLock = neighborSprites.find(obj => obj.sprite === Lock)
-  if (maybeLock && p.keyCount > 0) {
-    p.keyCount--
+  if (maybeLock && overlayState.keyCount > 0) {
+    overlayState.keyCount = typeof overlayState.keyCount === 'number' ? overlayState.keyCount - 1 : 0
     maybeLock.setSprite(FloorDiamond)
   }
 

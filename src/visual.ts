@@ -1,4 +1,4 @@
-import { IOutputter, IPosition, Game, ObjectInstance, Camera, Size, SimpleObject, Opt, Dialog, IPixel } from "./engine"
+import { IOutputter, IPosition, Game, ObjectInstance, Camera, Size, SimpleObject, Opt, Dialog, IPixel, SpriteController } from "./engine"
 import { LETTERS } from "./letters"
 
 export interface IRenderer {
@@ -15,7 +15,7 @@ export class VisualOutputter implements IOutputter {
     this.drawText = this.drawText.bind(this)
   }
 
-  draw(game: Game, tiles: ObjectInstance<any, any>[], camera: Camera, curTick: number, grid: Size, overlayState: SimpleObject, pendingDialog: Opt<Dialog>) {
+  draw(game: Game, tiles: ObjectInstance<any, any>[], camera: Camera, curTick: number, grid: Size, overlayState: SimpleObject, pendingDialog: Opt<Dialog>, sprites: SpriteController) {
     this.renderer.drawStart()
 
     game.drawBackground(tiles, camera, this.drawPixels)
@@ -37,7 +37,7 @@ export class VisualOutputter implements IOutputter {
       this.drawPixels(screenPos, pixels, t.hFlip, false)
     }
 
-    game.drawOverlay(this.drawPixels, this.drawText, overlayState)
+    game.drawOverlay(this.drawPixels, this.drawText, overlayState, sprites)
 
     if (pendingDialog) {
       const target = pendingDialog.target ? relativeTo(pendingDialog.target, camera.topLeft()) : null
