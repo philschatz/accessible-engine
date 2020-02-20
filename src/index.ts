@@ -20,7 +20,7 @@ import { KeyboardGamepad, AnyGamepad, OrGamepad } from './gamepad/implementation
 // import { MyGame } from './fuzGame'
 import { MyGame } from './akurraGame'
 import { BUTTON_TYPE } from './gamepad/api'
-import { TableOutputter, AudioOutputter } from './table'
+import { TableOutputter, AudioOutputter, AndOutputter } from './table'
 
 const keyConfig = {}
 keyConfig[BUTTON_TYPE.DPAD_UP] = ['W', 'w', '\u001B\u005B\u0041']
@@ -33,6 +33,7 @@ keyConfig[BUTTON_TYPE.BUMPER_TOP_RIGHT] = ['E', 'e']
 
 let outputter: IOutputter
 switch (process.env['OUTPUT_MODE']) {
+  case 'both': outputter = new AndOutputter([new VisualOutputter(new TerminalRenderer()), new AudioOutputter(console.error.bind(console))]); break
   case 'audio': outputter = new AudioOutputter(); break
   case 'table': outputter = new TableOutputter(); break
   default: outputter = new VisualOutputter(new TerminalRenderer())

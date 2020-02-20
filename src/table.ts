@@ -1,4 +1,4 @@
-import { IOutputter, IPosition, Game, ObjectInstance, Camera, Size, SimpleObject, SimpleValue, Opt, Dialog, IPixel } from "./engine"
+import { IOutputter, IPosition, Game, ObjectInstance, Camera, Size, SimpleObject, SimpleValue, Opt, Dialog, IPixel, SpriteController } from "./engine"
 import { DoubleArray } from "./terminal"
 
 export interface IRenderer {
@@ -32,7 +32,6 @@ categories.set('PlayerWalkingDown', 'PLAYER')
 categories.set('PlayerPushingUp', 'PlayerPushing')
 categories.set('PlayerPushingDown', 'PlayerPushing')
 categories.set('PlayerPushingRight', 'PlayerPushing')
-
 
 function categorize(spriteName: string) {
   if (categories.has(spriteName)) {
@@ -78,9 +77,16 @@ function positionToString(pos: IPosition) {
   return `x ${pos.x}, y ${pos.y}`
 }
 
+export type LoggerFn = (message?: any, ...optionalParams: any[]) => void
+
 export class AudioOutputter implements IOutputter {
+  private readonly logger: LoggerFn
   prev = new Map<ObjectInstance<any, any>, {pos: IPosition, category: string}>()
   prevOverlay = new Map<string, SimpleValue>()
+
+  constructor(logger: LoggerFn = console.log.bind(console)) {
+    this.logger = logger
+  }
 
   draw(game: Game, tiles: ObjectInstance<any, any>[], camera: Camera, curTick: number, grid: Size, overlayState: SimpleObject, pendingDialog: Opt<Dialog>) {
     const current = new Map<ObjectInstance<any, any>, {pos: IPosition, category: string}>()
@@ -108,14 +114,14 @@ export class AudioOutputter implements IOutputter {
       // Output the initial stats
       this.prevOverlay = currentOverlay
       if (currentOverlay.size > 0) {
-        console.log('START: Items in the Overlay');
+        this.logger('START: Items in the Overlay');
         [...currentOverlay.entries()].forEach(([key, value]) =>{
-          console.log(`  item ${key} has value ${value}`)
+          this.logger(`  item ${key} has value ${value}`)
         })
-        console.log('END: Items in the Overlay');
+        this.logger('END: Items in the Overlay');
       }
 
-      console.log('START: Initial Room Information')
+      this.logger('START: Initial Room Information')
       const catPositions = new Map<string, IPosition[]>()
       for (const v of current.values()) {
         let p = catPositions.get(v.category)
@@ -133,15 +139,15 @@ export class AudioOutputter implements IOutputter {
         const positions = v[1]
         const category = v[0]
         if (positions.length === 1) {
-          console.log(`  1 ${category} sprite @ ${positionToString(positions[0])}`)
+          this.logger(`  1 ${category} sprite @ ${positionToString(positions[0])}`)
         } else if (positions.length === 2) {
-          console.log(`  2 ${category} sprites @ ${positionToString(positions[0])} and @ ${positionToString(positions[1])}`)
+          this.logger(`  2 ${category} sprites @ ${positionToString(positions[0])} and @ ${positionToString(positions[1])}`)
         } else {
-          console.log(`  ${positions.length} ${category} sprites`)
+          this.logger(`  ${positions.length} ${category} sprites`)
         }
       }
 
-      console.log('END: Initial Room Information')
+      this.logger('END: Initial Room Information')
     } else {
       // Do the changed for the overlay info
       {
@@ -162,29 +168,29 @@ export class AudioOutputter implements IOutputter {
         }
 
         if (appeared.size + disappeared.size + changed.size > 0) {
-          console.log('START: Overlay updates')
+          this.logger('START: Overlay updates')
 
           if (appeared.size > 0) {
             [...appeared.keys()].forEach((key) => {
               const value = currentOverlay.get(key)
-              console.log(`  Item ${key} added with value ${value}`)
+              this.logger(`  Item ${key} added with value ${value}`)
             })
           }
 
           if (disappeared.size > 0) {
             [...disappeared.keys()].forEach((key) => {
               const value = this.prevOverlay.get(key)
-              console.log(`  Item ${key} removed with value ${value}`)
+              this.logger(`  Item ${key} removed with value ${value}`)
             })
           }
 
           if (changed.size > 0) {
             [...changed.entries()].forEach(([key, {from, to}]) => {
-              console.log(`  Item ${key} changed from ${from} to ${to}`)
+              this.logger(`  Item ${key} changed from ${from} to ${to}`)
             })
           }
         
-          console.log(`END: Overlay Updates`)
+          this.logger(`END: Overlay Updates`)
         }
   
         this.prevOverlay = currentOverlay
@@ -212,17 +218,17 @@ export class AudioOutputter implements IOutputter {
       }
 
       // Print out all the changes
-      const appearedSprites = [...appeared].map(i => categorize(i.sprite._name)).filter(s => !!s) // remove nulls
-      const disappearedSprites = [...disappeared].map(i => categorize(i.sprite._name)).filter(s => !!s) // remove nulls
+      const appearedSprites = [...appeared].map(i => current.get(i).category).filter(s => !!s) // remove nulls
+      const disappearedSprites = [...disappeared].map(i => this.prev.get(i).category).filter(s => !!s) // remove nulls
       if (appearedSprites.length === 1) {
-        console.log(`1 thing appeared: ${appearedSprites[0]}`)
+        this.logger(`1 thing appeared: ${appearedSprites[0]}`)
       } else if (appearedSprites.length > 0) {
-        console.log(`${appearedSprites.length} things appeared: ${JSON.stringify(appearedSprites)}`)
+        this.logger(`${appearedSprites.length} things appeared: ${JSON.stringify(appearedSprites)}`)
       }
       if (disappearedSprites.length === 1) {
-        console.log(`1 thing disappeared: ${disappearedSprites[0]}`)
+        this.logger(`1 thing disappeared: ${disappearedSprites[0]}`)
       } else if (disappearedSprites.length > 0) {
-        console.log(`${disappearedSprites.length} things disappeared: ${disappearedSprites.join(', ')}`)
+        this.logger(`${disappearedSprites.length} things disappeared: ${disappearedSprites.join(', ')}`)
       }
       if (moved.size > 0) {
         const movedMessages = [...moved.entries()].map(([i, {from, to}]) => {
@@ -245,9 +251,9 @@ export class AudioOutputter implements IOutputter {
           return msg.join(' ')
         })
         if (moved.size === 1) {
-          console.log(`Moved ${movedMessages[0]}`)
+          this.logger(`Moved ${movedMessages[0]}`)
         } else {
-          console.log(`${moved.size} things moved: ${movedMessages.join(', ')}`)
+          this.logger(`${moved.size} things moved: ${movedMessages.join(', ')}`)
         }
       }
 
@@ -256,9 +262,9 @@ export class AudioOutputter implements IOutputter {
           return `FROM ${from} TO ${to}`
         })
         if (changed.size === 1) {
-          console.log(`changed ${changedMessages[0]}`)
+          this.logger(`changed ${changedMessages[0]}`)
         } else {
-          console.log(`${changed.size} things changed: ${changedMessages.join(', ')}`)
+          this.logger(`${changed.size} things changed: ${changedMessages.join(', ')}`)
         }
         
       }
@@ -305,4 +311,16 @@ function setIntersection<T>(s1: Set<T>, s2: Set<T>) {
     }
   })
   return ret
+}
+
+export class AndOutputter implements IOutputter {
+  private readonly outs: IOutputter[]
+  constructor(outs: IOutputter[]) {
+    this.outs = outs
+  }
+  draw(game: Game, tiles: ObjectInstance<any, any>[], camera: Camera, curTick: number, grid: Size, overlayState: SimpleObject, pendingDialog: Opt<Dialog>, sprites: SpriteController) {
+    for (const o of this.outs) {
+      o.draw(game, tiles, camera, curTick, grid, overlayState, pendingDialog, sprites)
+    }
+  }
 }
