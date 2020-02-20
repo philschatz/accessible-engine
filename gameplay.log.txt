@@ -3,31 +3,72 @@
 > node -r source-map-support/register ./src/index.js
 
 NOTE: Keyboards in a terminal do not work well for platformers (holding down a key). So when you run & jump you should tap up and then keep tapping left/right to keep moving in that direction
-Initial Room Information
-1 PLAYER @ x 11, y 7
-1 PillarRed @ x 17, y 5
-1 GongRed @ x 3, y 4
-1 Key @ x 17, y 4
-1 Lock @ x 13, y 3
-1 ArrowLeft @ x 12, y 3
-1 Pedestal @ x 17, y 4
-2 ArrowLeftDisableds @ x 11, y 3 and @ x 10, y 3
-2 Crates @ x 5, y 6 and @ x 6, y 6
-65 Waters
-112 Walls
-moved PLAYER LEFT 1
-moved PLAYER LEFT 1
-moved PLAYER LEFT 1
-moved PLAYER LEFT 1
-moved PLAYER LEFT 1
+START: Items in the Overlay
+  item keyCount has value 0
+END: Items in the Overlay
+START: Initial Room Information
+  1 PLAYER sprite @ x 11, y 7
+  1 PillarRed sprite @ x 17, y 5
+  1 GongRed sprite @ x 3, y 4
+  1 Key sprite @ x 17, y 4
+  1 Lock sprite @ x 13, y 3
+  1 ArrowLeft sprite @ x 12, y 3
+  1 Pedestal sprite @ x 17, y 4
+  2 ArrowLeftDisabled sprites @ x 11, y 3 and @ x 10, y 3
+  2 Crate sprites @ x 5, y 6 and @ x 6, y 6
+  65 Water sprites
+  112 Wall sprites
+END: Initial Room Information
+Moved PLAYER LEFT 1
+Moved PLAYER LEFT 1
+Moved PLAYER LEFT 1
+Moved PLAYER LEFT 1
+Moved PLAYER LEFT 1
 2 things moved: Crate UP 1, PlayerPushing UP 1
 changed FROM PLAYER TO PlayerPushing
 changed FROM PlayerPushing TO PLAYER
 2 things moved: Crate LEFT 1, PlayerPushing LEFT 1
 changed FROM PLAYER TO PlayerPushing
 changed FROM PlayerPushing TO PLAYER
-moved PLAYER UP 1
-moved PLAYER UP 1
-moved PLAYER LEFT 1
+Moved PLAYER UP 1
+Moved PLAYER UP 1
+Moved PLAYER LEFT 1
 2 things changed: FROM GongRed TO GongDisabled, FROM PLAYER TO PlayerPushing
 changed FROM PlayerPushing TO PLAYER
+Moved PLAYER RIGHT 1
+Moved PLAYER DOWN 1
+Moved PLAYER DOWN 1
+Moved PLAYER DOWN 1
+Moved PLAYER RIGHT 1
+Moved PLAYER RIGHT 1
+Moved PLAYER RIGHT 1
+Moved PLAYER RIGHT 1
+Moved PLAYER RIGHT 1
+Moved PLAYER RIGHT 1
+Moved PLAYER RIGHT 1
+Moved PLAYER RIGHT 1
+Moved PLAYER RIGHT 1
+Moved PLAYER RIGHT 1
+Moved PLAYER RIGHT 1
+Moved PLAYER RIGHT 1
+Moved PLAYER UP 1
+Moved PLAYER UP 1
+START: Overlay updates
+  Item keyCount changed from 0 to 1
+END: Overlay Updates
+1 thing disappeared: Key
+Moved PLAYER UP 1
+Moved PLAYER DOWN 1
+Moved PLAYER DOWN 1
+Moved PLAYER LEFT 1
+Moved PLAYER LEFT 1
+Moved PLAYER UP 1
+Moved PLAYER LEFT 1
+Moved PLAYER LEFT 1
+Moved PLAYER UP 1
+START: Overlay updates
+  Item keyCount changed from 1 to 0
+END: Overlay Updates
+changed FROM PLAYER TO PlayerPushing
+changed FROM PlayerPushing TO PLAYER
+Moved PLAYER LEFT 1

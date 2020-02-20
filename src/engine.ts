@@ -324,7 +324,7 @@ export class Engine {
 export type DrawPixelsFn = (screenPos: IPosition, pixels: IPixel[][], hFlip: boolean, vFlip: boolean) => void
 export type DrawTextFn = (screenPos: IPosition, letters: string, hexColor: string) => void
 
-type SimpleValue = null | boolean | number | string | SimpleValue[]
+export type SimpleValue = null | boolean | number | string | SimpleValue[]
 
 export interface SimpleObject {
   [key: string]: SimpleValue

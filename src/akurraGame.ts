@@ -149,7 +149,6 @@ export class MyGame implements Game {
     function g (item: GameObject<any, any>, pos: IPosition) {
       // convert from grid coordinates to pixels
       const o = item.new(pos)
-
       return o
     }
 
@@ -577,7 +576,7 @@ export class MyGame implements Game {
     drawPixelsFn({x: x++ * 16, y: y * 16}, OverlayBottomRight2.images[0].pixels, false, false)
 
     drawPixelsFn({ x: 22, y: 3}, Key.images[0].pixels, false, false)
-    drawTextFn({x: 28, y: 20}, `${fields.keyCount || 0}`, '#ffffff')
+    drawTextFn({x: 28, y: 20}, `${fields.keyCount}`, '#ffffff')
   }
 
   drawDialog (message: string, drawPixelsFn: DrawPixelsFn, drawTextFn: DrawTextFn, elapsedMs: number, target: Opt<IPosition>, additional: Opt<SimpleObject>) {
