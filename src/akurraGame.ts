@@ -1,6 +1,5 @@
-import { Game, Camera, SpriteController, Image, DefiniteMap, Sprite, InstanceController, ObjectInstance, CollisionChecker, IPosition, GameObject, zIndexComparator, DrawPixelsFn, ShowDialogFn, SimpleObject, Opt, DrawTextFn } from './engine'
-import { setMoveTo, DoubleArray } from './terminal'
-import { IGamepad, BUTTON_TYPE } from './gamepad/api'
+import { Game, Camera, SpriteController, Image, DefiniteMap, Sprite, InstanceController, ObjectInstance, CollisionChecker, IPosition, GameObject, zIndexComparator, DrawPixelsFn, ShowDialogFn, SimpleObject, Opt, DrawTextFn } from './common/engine'
+import { IGamepad, BUTTON_TYPE } from './common/gamepad'
 import { loadImages } from './akurraImages'
 import { BBox } from 'rbush'
 

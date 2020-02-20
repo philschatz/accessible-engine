@@ -3,3 +3,5 @@ src/**/*.js.map
 node_modules
 venv
 picotool
+
+browser.bundle.js*

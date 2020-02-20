@@ -1,5 +1,5 @@
-import { IOutputter, IPosition, Game, ObjectInstance, Camera, Size, SimpleObject, Opt, Dialog, IPixel, SpriteController } from "./engine"
-import { LETTERS } from "./letters"
+import { IOutputter, IPosition, Game, ObjectInstance, Camera, Size, SimpleObject, Opt, Dialog, IPixel, SpriteController } from "../engine"
+import { LETTERS } from "../letters"
 
 export interface IRenderer {
   drawStart(): void

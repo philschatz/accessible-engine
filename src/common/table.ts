@@ -1,5 +1,5 @@
-import { IOutputter, IPosition, Game, ObjectInstance, Camera, Size, SimpleObject, SimpleValue, Opt, Dialog, IPixel, SpriteController } from "./engine"
-import { DoubleArray } from "./terminal"
+import { IOutputter, IPosition, Game, ObjectInstance, Camera, Size, SimpleObject, SimpleValue, Opt, Dialog, IPixel, SpriteController } from "../engine"
+import { DoubleArray } from "./doubleArray"
 
 export interface IRenderer {
   drawStart(): void

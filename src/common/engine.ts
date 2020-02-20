@@ -1,6 +1,5 @@
 import Rbush from 'rbush'
-import { IGamepad } from './gamepad/api'
-import { LETTERS } from './letters'
+import { IGamepad } from './gamepad'
 
 class MyRBush extends Rbush<ObjectInstance<any, any>> {
   toBBox (item: ObjectInstance<any, any>) { return item.toBBox() }

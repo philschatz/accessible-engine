@@ -1,4 +1,4 @@
-import { IPosition } from '../engine'
+import { IPosition } from './engine'
 
 export enum BUTTON_TYPE {
   DPAD_UP = 'DPAD_UP',
@@ -43,4 +43,42 @@ export interface IGamepad {
   axes: number[]
   mapping: string
   timestamp: number
+}
+
+export class OrGamepad implements IGamepad {
+  private readonly pads: IGamepad[]
+
+  // Gamepad API. TODO: Implement (not hard)
+  buttons: []
+  axes: []
+  mapping: 'none'
+  timestamp: 0
+
+  constructor (pads: IGamepad[]) {
+    this.pads = pads
+  }
+
+  tick() { for (const pad of this.pads) { pad.tick() }}
+
+  isButtonPressed (btn: BUTTON_TYPE) {
+    for (const pad of this.pads) {
+      if (pad.isButtonPressed(btn)) { return true }
+    }
+    return false
+  }
+
+  getStickCoordinates (stick: STICK_TYPE) {
+    const farthest = new Map<number, IPosition>()
+    let max = -1
+    for (const pad of this.pads) {
+      const c = pad.getStickCoordinates(stick) || { x: 0, y: 0 }
+      const distance = Math.abs(c.x) + Math.abs(c.y)
+      max = Math.max(max, distance)
+      farthest.set(distance, c)
+    }
+    if (max > 0) {
+      return farthest.get(max)
+    }
+    return { x: 0, y: 0 }
+  }
 }

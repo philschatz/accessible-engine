@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs'
 import * as HID from 'node-hid'
-import { IGamepadRoot, IGamepad, BUTTON_TYPE, STICK_TYPE } from './api'
+import { IGamepadRoot, IGamepad, BUTTON_TYPE, STICK_TYPE } from '../common/gamepad'
 import ps3 from './ps3.json'
 import ps4 from './ps4v2.json'
 
@@ -277,44 +277,6 @@ export class KeyboardGamepad implements IGamepad {
       this.curPressed = ''
     }
     return this.curPressed
-  }
-}
-
-export class OrGamepad implements IGamepad {
-  private readonly pads: IGamepad[]
-
-  // Gamepad API. TODO: Implement (not hard)
-  buttons: []
-  axes: []
-  mapping: 'none'
-  timestamp: 0
-
-  constructor (pads: IGamepad[]) {
-    this.pads = pads
-  }
-
-  tick() { for (const pad of this.pads) { pad.tick() }}
-
-  isButtonPressed (btn: BUTTON_TYPE) {
-    for (const pad of this.pads) {
-      if (pad.isButtonPressed(btn)) { return true }
-    }
-    return false
-  }
-
-  getStickCoordinates (stick: STICK_TYPE) {
-    const farthest = new Map<number, IPosition>()
-    let max = -1
-    for (const pad of this.pads) {
-      const c = pad.getStickCoordinates(stick) || { x: 0, y: 0 }
-      const distance = Math.abs(c.x) + Math.abs(c.y)
-      max = Math.max(max, distance)
-      farthest.set(distance, c)
-    }
-    if (max > 0) {
-      return farthest.get(max)
-    }
-    return { x: 0, y: 0 }
   }
 }
 
