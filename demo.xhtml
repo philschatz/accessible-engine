@@ -1,8 +1,15 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 
+<head>
+  <style>
+    #my_audio { height: 10rem; overflow: scroll; }
+  </style>
+</head>
+
 <body>
   <canvas id="my_canvas" width="500" height="250"></canvas>
   <table id="my_table"></table>
+  <label for="#my_audio">These are read out as they appear if the user has a screen reader</label>
   <div id="my_audio"></div>
   <script src="browser.bundle.js"></script>
 
@@ -13,9 +20,16 @@
 
       const myCanvas = document.querySelector('#my_canvas')
       const myTable = document.querySelector('#my_table')
+      const myAudio = document.querySelector('#my_audio')
 
+      const logger = (msg) => {
+        const line = document.createElement('p')
+        line.innerHTML = msg
+        myAudio.appendChild(line)
+        myAudio.scrollTop = myAudio.scrollHeight
+      }
       const outputter = new AndOutputter([
-        new AudioOutputter(console.log.bind(console)), 
+        new AudioOutputter(logger), 
         new VisualOutputter(new CanvasRenderer(myCanvas, 1)), 
         new GridTableOutputter(myTable)
       ])

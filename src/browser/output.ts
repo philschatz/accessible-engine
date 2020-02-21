@@ -17,7 +17,17 @@ export class GridTableOutputter implements IOutputter {
       spritenames.add(categorize(t.sprite._name))
     })
 
+    const overlayInfo = ['Overlay Info:']
+    for (const key in overlayState) {
+      const v = overlayState[key]
+      overlayInfo.push(`Item ${key} is ${v}`)
+    }
+
     this.table.innerHTML = ''
+    const caption = document.createElement('caption')
+    caption.innerHTML = overlayInfo.join(' ')
+
+    this.table.appendChild(caption)
     model.forEach(row => {
       const tr = document.createElement('tr')
       row.forEach(col => {

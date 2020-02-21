@@ -25,7 +25,8 @@ export class VisualOutputter implements IOutputter {
       const image = t.sprite.tick(t.startTick, curTick)
       if (!image) { throw new Error('BUG: Could not find image for the sprite.') }
       const pixelPos = t.getPixelPos(grid)
-      const screenPos = relativeTo({ x: pixelPos.x, y: pixelPos.y - image.pixels.length + 1 /* Shift the image up because it might not be a 8x8 sprite, like if it is a tall person */ }, camera.topLeft())
+      const screenPos = relativeTo({ x: pixelPos.x, y: pixelPos.y - image.pixels.length + 1 /* Shift the image up because it might not be a 8x8 sprite, like if it is a tall person */ }, camera.topLeftPixelPos(grid))
+      // const screenPos = pixelPos
 
       let pixels = image.pixels
       if (t.maskColor) {

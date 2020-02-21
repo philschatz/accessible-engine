@@ -601,9 +601,10 @@ interface PlayerProps {
 }
 
 function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, showDialog: ShowDialogFn, overlayState: SimpleObject, curTick: number) {
-  // Follow the player for now
-  // camera.nudge(o.pos, 32, 0)
-  // camera.track(o.pos)
+
+  const room = {width: 24, height: 14}
+  camera.pos = {x: room.width / 2, y: room.height / 2 - 3}
+  camera.resize(room)
 
   const PlayerWalkingUp = sprites.get('PlayerWalkingUp')
   const PlayerWalkingDown = sprites.get('PlayerWalkingDown')
@@ -655,14 +656,14 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
   }
 
   function reduce (i: number, by: number) {
-    if (i < 0) { return Math.max(i + by, 0) } else if (i > 0) { return Math.min(i - by, 0) } else { return 0 }
+    if (i < 0) { return Math.min(i + by, 0) } else if (i > 0) { return Math.max(i - by, 0) } else { return 0 }
   }
 
   if (o.offsetPos.x !== 0 || o.offsetPos.y !== 0) {
     // slowly move the sprite
     o.offsetPos = {
-      x: reduce(o.offsetPos.x, 2),
-      y: reduce(o.offsetPos.y, 2)
+      x: reduce(o.offsetPos.x, 4),
+      y: reduce(o.offsetPos.y, 4)
     }
     return
   }
