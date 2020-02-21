@@ -2,14 +2,13 @@
   "scripts": {
     "build": "tsc",
     "bundle": "rollup --config ./rollup.config.js",
-    "clean": "rm ./src/akurraImages.ts ./browser.bundle.js* src/*.js* src/*/*.js*",
+    "clean": "rm ./src/akurraImages.ts ./gameplay.log.txt ./browser.bundle.js* src/*.js src/*/*.js src/*.js.map src/*/*.js.map",
     "lint": "eslint . --fix --ext .ts,.tsx",
     "png": "node ./pngExtractor.js > ./src/akurraImages.ts",
-    "test": "npm run-script png && npm run-script build && npm run-script start",
-    "test:debug": "npm run-script build && npm run-script start:debug",
-    "test:audio": "cat gameplay.input.txt | OUTPUT_MODE=${OUTPUT_MODE:-audio} npm run-script start | tee gameplay.log.txt",
-    "start": "node -r source-map-support/register ./src/index.js",
-    "start:debug": "node --inspect-brk -r source-map-support/register ./src/index.js"
+    "test": "npm run-script png && npm run-script bundle && npm run-script build && npm run-script test:audio && npm run-script lint",
+    "test:audio": "cat gameplay.input.txt | OUTPUT_MODE=${OUTPUT_MODE:-audio} node ./src/terminal.js | tee gameplay.log.txt",
+    "start": "node -r source-map-support/register ./src/terminal.js",
+    "start:debug": "node --inspect-brk -r source-map-support/register ./src/terminal.js"
   },
   "devDependencies": {
     "@rollup/plugin-json": "^4.0.2",

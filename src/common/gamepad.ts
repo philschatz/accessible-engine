@@ -58,7 +58,7 @@ export class OrGamepad implements IGamepad {
     this.pads = pads
   }
 
-  tick() { for (const pad of this.pads) { pad.tick() }}
+  tick () { for (const pad of this.pads) { pad.tick() } }
 
   isButtonPressed (btn: BUTTON_TYPE) {
     for (const pad of this.pads) {

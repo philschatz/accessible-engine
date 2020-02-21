@@ -1,4 +1,4 @@
-WARNING: stdin does not allow setting setRawMode (we need that for keyboard input). Maybe you are piping keys in via stdin?
+NOTE: Keyboards in a terminal do not work well for platformers (holding down a key). So when you run & jump you should tap up and then keep tapping left/right to keep moving in that direction
 START: Items in the Overlay
   item keyCount has value 0
 END: Items in the Overlay
@@ -75,5 +75,3 @@ changed FROM PLAYER TO PlayerPushing
 changed FROM PlayerPushing TO PLAYER
 Moved PLAYER LEFT 1
 Moved PLAYER UP 1
-exit
-null

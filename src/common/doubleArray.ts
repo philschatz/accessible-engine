@@ -1,4 +1,4 @@
-import { IPosition } from "../engine"
+import { IPosition } from './engine'
 
 export class DoubleArray<T> {
   private ary: T[][] = []
@@ -37,7 +37,7 @@ export class DoubleArray<T> {
     return this.ary
   }
 
-  forEach(fn: (value: T[], index: number, array: T[][]) => void) {
+  forEach (fn: (value: T[], index: number, array: T[][]) => void) {
     this.ary.forEach(fn)
   }
 }

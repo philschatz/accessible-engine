@@ -563,7 +563,7 @@ export class MyGame implements Game {
     }
 
     return {
-      grid: {width: 8, height: 8}
+      grid: { width: 8, height: 8 }
     }
   }
 

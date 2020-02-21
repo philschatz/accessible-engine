@@ -1,5 +1,5 @@
-import { IOutputter, IPosition, Game, ObjectInstance, Camera, Size, SimpleObject, SimpleValue, Opt, Dialog, IPixel, SpriteController } from "../engine"
-import { DoubleArray } from "./doubleArray"
+import { IOutputter, IPosition, Game, ObjectInstance, Camera, Size, SimpleObject, SimpleValue, Opt, Dialog, SpriteController } from './engine'
+import { DoubleArray } from './doubleArray'
 
 export interface IRenderer {
   drawStart(): void
@@ -33,7 +33,7 @@ categories.set('PlayerPushingUp', 'PlayerPushing')
 categories.set('PlayerPushingDown', 'PlayerPushing')
 categories.set('PlayerPushingRight', 'PlayerPushing')
 
-function categorize(spriteName: string) {
+function categorize (spriteName: string) {
   if (categories.has(spriteName)) {
     return categories.get(spriteName)
   }
@@ -41,7 +41,7 @@ function categorize(spriteName: string) {
 }
 
 export class TableOutputter implements IOutputter {
-  draw(game: Game, tiles: ObjectInstance<any, any>[], camera: Camera, curTick: number, grid: Size, overlayState: SimpleObject, pendingDialog: Opt<Dialog>) {
+  draw (game: Game, tiles: Array<ObjectInstance<any, any>>, camera: Camera, curTick: number, grid: Size, overlayState: SimpleObject, pendingDialog: Opt<Dialog>) {
     const table = new DoubleArray<string[]>()
 
     for (const t of tiles) {
@@ -73,7 +73,7 @@ export class TableOutputter implements IOutputter {
   }
 }
 
-function positionToString(pos: IPosition) {
+function positionToString (pos: IPosition) {
   return `x ${pos.x}, y ${pos.y}`
 }
 
@@ -84,16 +84,16 @@ export class AudioOutputter implements IOutputter {
   prev = new Map<ObjectInstance<any, any>, {pos: IPosition, category: string}>()
   prevOverlay = new Map<string, SimpleValue>()
 
-  constructor(logger: LoggerFn = console.log.bind(console)) {
+  constructor (logger: LoggerFn = console.log.bind(console)) {
     this.logger = logger
   }
 
-  draw(game: Game, tiles: ObjectInstance<any, any>[], camera: Camera, curTick: number, grid: Size, overlayState: SimpleObject, pendingDialog: Opt<Dialog>) {
+  draw (game: Game, tiles: Array<ObjectInstance<any, any>>, camera: Camera, curTick: number, grid: Size, overlayState: SimpleObject, pendingDialog: Opt<Dialog>) {
     const current = new Map<ObjectInstance<any, any>, {pos: IPosition, category: string}>()
     tiles.forEach(t => {
       const c = categorize(t.sprite._name)
       if (c) {
-        current.set(t, {pos: t.pos, category: c})
+        current.set(t, { pos: t.pos, category: c })
       }
     })
 
@@ -102,7 +102,6 @@ export class AudioOutputter implements IOutputter {
       const v = overlayState[key]
       currentOverlay.set(key, v)
     }
-
 
     // We notify for 4 things:
     // New thing appeared
@@ -115,10 +114,10 @@ export class AudioOutputter implements IOutputter {
       this.prevOverlay = currentOverlay
       if (currentOverlay.size > 0) {
         this.logger('START: Items in the Overlay');
-        [...currentOverlay.entries()].forEach(([key, value]) =>{
+        [...currentOverlay.entries()].forEach(([key, value]) => {
           this.logger(`  item ${key} has value ${value}`)
         })
-        this.logger('END: Items in the Overlay');
+        this.logger('END: Items in the Overlay')
       }
 
       this.logger('START: Initial Room Information')
@@ -153,17 +152,17 @@ export class AudioOutputter implements IOutputter {
       {
         const cur = new Set(currentOverlay.keys())
         const prev = new Set(this.prevOverlay.keys())
-  
+
         const appeared = setDifference(cur, prev)
         const disappeared = setDifference(prev, cur)
         const stillAround = setIntersection(prev, cur)
-        
+
         const changed = new Map()
         for (const i of stillAround) {
           const p = this.prevOverlay.get(i)
           const c = currentOverlay.get(i)
           if (p !== c) {
-            changed.set(i, {from: p, to: c})
+            changed.set(i, { from: p, to: c })
           }
         }
 
@@ -185,17 +184,16 @@ export class AudioOutputter implements IOutputter {
           }
 
           if (changed.size > 0) {
-            [...changed.entries()].forEach(([key, {from, to}]) => {
+            [...changed.entries()].forEach(([key, { from, to }]) => {
               this.logger(`  Item ${key} changed from ${from} to ${to}`)
             })
           }
-        
-          this.logger(`END: Overlay Updates`)
+
+          this.logger('END: Overlay Updates')
         }
-  
+
         this.prevOverlay = currentOverlay
       }
-
 
       const cur = new Set(current.keys())
       const prev = new Set(this.prev.keys())
@@ -210,10 +208,10 @@ export class AudioOutputter implements IOutputter {
         const p = this.prev.get(i)
         const c = current.get(i)
         if (p.pos.x !== c.pos.x || p.pos.y !== c.pos.y) {
-          moved.set(i, {from: p.pos, to: c.pos})
+          moved.set(i, { from: p.pos, to: c.pos })
         }
         if (p.category !== c.category) {
-          changed.set(i, {from: p.category, to: c.category})
+          changed.set(i, { from: p.category, to: c.category })
         }
       }
 
@@ -231,7 +229,7 @@ export class AudioOutputter implements IOutputter {
         this.logger(`${disappearedSprites.length} things disappeared: ${disappearedSprites.join(', ')}`)
       }
       if (moved.size > 0) {
-        const movedMessages = [...moved.entries()].map(([i, {from, to}]) => {
+        const movedMessages = [...moved.entries()].map(([i, { from, to }]) => {
           const c = categorize(i.sprite._name)
           if (!c) { return '' }
           const msg = [c]
@@ -258,7 +256,7 @@ export class AudioOutputter implements IOutputter {
       }
 
       if (changed.size > 0) {
-        const changedMessages = [...changed.entries()].map(([i, {from, to}]) => {
+        const changedMessages = [...changed.entries()].map(([i, { from, to }]) => {
           return `FROM ${from} TO ${to}`
         })
         if (changed.size === 1) {
@@ -266,18 +264,13 @@ export class AudioOutputter implements IOutputter {
         } else {
           this.logger(`${changed.size} things changed: ${changedMessages.join(', ')}`)
         }
-        
       }
     }
     this.prev = current
   }
 }
 
-function distance(p1: IPosition, p2: IPosition) {
-  return Math.abs(p2.x - p1.x) + Math.abs(p2.y - p1.y)
-}
-
-function setDifference<T>(s1: Set<T>, s2: Set<T>) {
+function setDifference<T> (s1: Set<T>, s2: Set<T>) {
   const ret = new Set<T>()
   for (const i of s1) {
     if (!s2.has(i)) {
@@ -287,14 +280,7 @@ function setDifference<T>(s1: Set<T>, s2: Set<T>) {
   return ret
 }
 
-function setUnion<T>(s1: Set<T>, s2: Set<T>) {
-  const ret = new Set<T>()
-  for (const i of s1) { ret.add(i) }
-  for (const i of s2) { ret.add(i) }
-  return ret
-}
-
-function setIntersection<T>(s1: Set<T>, s2: Set<T>) {
+function setIntersection<T> (s1: Set<T>, s2: Set<T>) {
   let sA: Set<T>
   let sB: Set<T>
   if (s1.size < s2.size) {
@@ -315,10 +301,11 @@ function setIntersection<T>(s1: Set<T>, s2: Set<T>) {
 
 export class AndOutputter implements IOutputter {
   private readonly outs: IOutputter[]
-  constructor(outs: IOutputter[]) {
+  constructor (outs: IOutputter[]) {
     this.outs = outs
   }
-  draw(game: Game, tiles: ObjectInstance<any, any>[], camera: Camera, curTick: number, grid: Size, overlayState: SimpleObject, pendingDialog: Opt<Dialog>, sprites: SpriteController) {
+
+  draw (game: Game, tiles: Array<ObjectInstance<any, any>>, camera: Camera, curTick: number, grid: Size, overlayState: SimpleObject, pendingDialog: Opt<Dialog>, sprites: SpriteController) {
     for (const o of this.outs) {
       o.draw(game, tiles, camera, curTick, grid, overlayState, pendingDialog, sprites)
     }

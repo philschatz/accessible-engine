@@ -93,7 +93,9 @@ class Gamepad implements IGamepad {
     process.on('exit', this.disconnect.bind(this))
   }
 
-  tick() { }
+  tick () {
+    // Nothing to do, this pulls data off the usb stream directly
+  }
 
   disconnect () {
     if (this.usb) {
@@ -215,7 +217,7 @@ export class KeyboardGamepad implements IGamepad {
   timestamp = Date.now()
   private curPressed: string
   private readonly keyConfig
-  private pipedKeys: string[] = []
+  private readonly pipedKeys: string[] = []
 
   // Gamepad API. TODO: Actually map it (not too hard)
   buttons: []
@@ -252,7 +254,7 @@ export class KeyboardGamepad implements IGamepad {
     })
   }
 
-  tick() {
+  tick () {
     // feed the piped keys in one tick at a time
     if (this.pipedKeys.length > 0) {
       this.timestamp = Date.now() + 100 * 1000 // ensure that we do not hit they key interval
@@ -294,7 +296,7 @@ export class AnyGamepad implements IGamepad {
     this.polling = pollingInterval
   }
 
-  tick() { for (const pad of this.pads) { pad.tick() }}
+  tick () { for (const pad of this.pads) { pad.tick() } }
 
   isButtonPressed (btn: BUTTON_TYPE) {
     if (this.timestamp + this.polling < Date.now()) {

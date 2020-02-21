@@ -6,7 +6,6 @@ import { TableOutputter, AudioOutputter, AndOutputter } from './common/table'
 
 export { Engine, MyGame, AudioOutputter, AndOutputter, OrGamepad, IGamepad, IOutputter }
 
-
 const outputter = new AndOutputter([new TableOutputter(), new AudioOutputter(console.error.bind(console))])
 const engine = new Engine(new MyGame(), outputter, new OrGamepad([]))
 

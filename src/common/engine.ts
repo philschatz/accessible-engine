@@ -50,7 +50,7 @@ export class ObjectInstance<P, S> {
     this.pos = pos
     this.props = props
     this.hFlip = false
-    this.offsetPos = {x: 0, y: 0}
+    this.offsetPos = { x: 0, y: 0 }
   }
 
   destroy () {
@@ -79,11 +79,11 @@ export class ObjectInstance<P, S> {
     this.isGrayscale = isGrayscale
   }
 
-  zIndex() {
+  zIndex () {
     return this._zIndex === null ? this.static.zIndex : this._zIndex
   }
 
-  getPixelPos(grid: Size) {
+  getPixelPos (grid: Size) {
     return posAdd(posTimes(this.pos, grid), this.offsetPos)
   }
 }
@@ -177,9 +177,9 @@ export class Sprite {
     const i = Math.round((curTick - startTick) / this.playbackRate)
     let ret: Image
 
-    if (this.loop) { 
-      ret = this.images[i % this.images.length] 
-    } else { 
+    if (this.loop) {
+      ret = this.images[i % this.images.length]
+    } else {
       ret = this.images[Math.min(i, this.images.length - 1)]
     }
 
@@ -219,7 +219,7 @@ export class Image {
 }
 
 export class CollisionChecker {
-  private grid: Size
+  private readonly grid: Size
   private readonly bush: RBush<ObjectInstance<any, any>>
   constructor (grid: Size, bush: RBush<ObjectInstance<any, any>>) {
     this.grid = grid
@@ -241,7 +241,7 @@ export class CollisionChecker {
 }
 
 export type PaintFn = (message: string[], camera: Camera, startTick: number, currentTick: number, drawPixelsFn: DrawPixelsFn) => void
-export type Dialog = {message: string, startTick: number, target: Opt<IPosition>, additional: Opt<SimpleObject>}
+export interface Dialog {message: string, startTick: number, target: Opt<IPosition>, additional: Opt<SimpleObject>}
 
 export class Engine {
   private curTick: number = 0
@@ -255,7 +255,7 @@ export class Engine {
   private readonly gamepad: IGamepad
   private readonly overlayState: SimpleObject
   private pendingDialog: Opt<Dialog>
-  private grid: Size
+  private readonly grid: Size
 
   constructor (game: Game, outputter: IOutputter, gamepad: IGamepad) {
     this.bush = new MyRBush()
@@ -270,7 +270,7 @@ export class Engine {
 
     this.showDialog = this.showDialog.bind(this)
 
-    const {grid} = this.game.load(this.gamepad, this.sprites)
+    const { grid } = this.game.load(this.gamepad, this.sprites)
     this.grid = grid
     this.collisionChecker = new CollisionChecker(grid, this.bush)
 
@@ -306,7 +306,6 @@ export class Engine {
     this.outputter.draw(this.game, tiles, this.camera, this.curTick, this.grid, this.overlayState, this.pendingDialog, this.sprites)
     this.pendingDialog = null
   }
-
 
   showDialog (message: string, target: Opt<IPosition>, additional: Opt<SimpleObject>) {
     if (!this.pendingDialog || this.pendingDialog.message !== message) {
@@ -428,9 +427,8 @@ export class InstanceController {
 }
 
 export interface IOutputter {
-  draw(game: Game, tiles: ObjectInstance<any, any>[], camera: Camera, curTick: number, grid: Size, overlayState: SimpleObject, pendingDialog: Opt<Dialog>, sprites: SpriteController): void
+  draw(game: Game, tiles: Array<ObjectInstance<any, any>>, camera: Camera, curTick: number, grid: Size, overlayState: SimpleObject, pendingDialog: Opt<Dialog>, sprites: SpriteController): void
 }
-
 
 export class DefiniteMap<V> {
   private readonly map: Map<string, V> = new Map()
@@ -463,8 +461,8 @@ export enum DPAD {
 export function zIndexComparator (a: ObjectInstance<any, any>, b: ObjectInstance<any, any>) {
   const az = a.zIndex()
   const bz = b.zIndex()
-  const aNull = az == undefined || az === null
-  const bNull = bz == undefined || bz === null
+  const aNull = az === undefined || az === null
+  const bNull = bz === undefined || bz === null
   if (aNull && bNull) {
     return 0
   } else if (bNull) {
@@ -476,27 +474,27 @@ export function zIndexComparator (a: ObjectInstance<any, any>, b: ObjectInstance
   }
 }
 
-export function posAdd(pos1: IPosition, pos2: IPosition): IPosition {
+export function posAdd (pos1: IPosition, pos2: IPosition): IPosition {
   return {
     x: pos1.x + pos2.x,
-    y: pos1.y + pos2.y,
+    y: pos1.y + pos2.y
   }
 }
 
-export function posTimes(pos: IPosition, size: Size): IPosition {
-  if (!pos || !size) { throw new Error(`pos=${JSON.stringify(pos)} size=${JSON.stringify(size)}`)}
+export function posTimes (pos: IPosition, size: Size): IPosition {
+  if (!pos || !size) { throw new Error(`pos=${JSON.stringify(pos)} size=${JSON.stringify(size)}`) }
   return {
     x: pos.x * size.width,
-    y: pos.y * size.height,
+    y: pos.y * size.height
   }
 }
 
-export function bboxTimes(bbox: BBox, size: Size): BBox {
+export function bboxTimes (bbox: BBox, size: Size): BBox {
   if (!(size.width > 0) || !(size.height > 0)) { throw new Error(`BUG: Invalid Size: ${JSON.stringify(size)}`) }
   return {
     minX: bbox.minX * size.width,
     maxX: bbox.maxX * size.width,
     minY: bbox.minY * size.height,
-    maxY: bbox.maxY * size.height,
+    maxY: bbox.maxY * size.height
   }
 }

@@ -17,10 +17,10 @@ import { Engine, IOutputter } from './common/engine'
 import { VisualOutputter } from './common/visual'
 import { TerminalRenderer } from './terminal/renderer'
 import { KeyboardGamepad, AnyGamepad } from './terminal/gamepad'
-import { OrGamepad } from './common/gamepad'
+import { OrGamepad, BUTTON_TYPE } from './common/gamepad'
 // import { MyGame } from './fuzGame'
 import { MyGame } from './akurraGame'
-import { BUTTON_TYPE } from './common/gamepad'
+
 import { TableOutputter, AudioOutputter, AndOutputter } from './common/table'
 
 const keyConfig = {}
@@ -32,9 +32,10 @@ keyConfig[BUTTON_TYPE.CLUSTER_DOWN] = ['X', 'x', ' ', '\u000D']
 keyConfig[BUTTON_TYPE.BUMPER_TOP_LEFT] = ['Q', 'q']
 keyConfig[BUTTON_TYPE.BUMPER_TOP_RIGHT] = ['E', 'e']
 
+const err = console.error.bind(console)
 let outputter: IOutputter
-switch (process.env['OUTPUT_MODE']) {
-  case 'both': outputter = new AndOutputter([new VisualOutputter(new TerminalRenderer()), new AudioOutputter(console.error.bind(console))]); break
+switch (process.env.OUTPUT_MODE) {
+  case 'both': outputter = new AndOutputter([new VisualOutputter(new TerminalRenderer()), new AudioOutputter(err)]); break
   case 'audio': outputter = new AudioOutputter(); break
   case 'table': outputter = new TableOutputter(); break
   default: outputter = new VisualOutputter(new TerminalRenderer())
