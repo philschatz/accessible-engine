@@ -1,0 +1,32 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<body>
+  <canvas id="my_canvas" width="500" height="250"></canvas>
+  <table id="my_table"></table>
+  <div id="my_audio"></div>
+  <script src="browser.bundle.js"></script>
+
+  <script>
+    (function() {
+      console.log(window.GameEngine)
+      const {MyGame, AndOutputter, AudioOutputter, CanvasRenderer, Engine, GridTableOutputter, OrGamepad, VisualOutputter, KeyGamepad } = window.GameEngine
+
+      const myCanvas = document.querySelector('#my_canvas')
+      const myTable = document.querySelector('#my_table')
+
+      const outputter = new AndOutputter([
+        new AudioOutputter(console.log.bind(console)), 
+        new VisualOutputter(new CanvasRenderer(myCanvas, 1)), 
+        new GridTableOutputter(myTable)
+      ])
+      const inputter = new KeyGamepad() // new OrGamepad([new KeyGamepad()])
+      const engine = new Engine(new MyGame(), outputter, inputter)
+
+      setInterval(() => {
+        engine.tick()
+      }, 1)
+
+    })()
+  </script>
+</body>
+</html>

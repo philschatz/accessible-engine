@@ -1,12 +1,6 @@
 import Rbush from 'rbush'
 import { IGamepad } from './gamepad'
 
-class MyRBush extends Rbush<ObjectInstance<any, any>> {
-  toBBox (item: ObjectInstance<any, any>) { return item.toBBox() }
-  compareMinX (a: ObjectInstance<any, any>, b: ObjectInstance<any, any>) { return a.pos.x - b.pos.x }
-  compareMinY (a: ObjectInstance<any, any>, b: ObjectInstance<any, any>) { return a.pos.y - b.pos.y }
-}
-
 // From https://github.com/mourner/rbush
 interface RBush<I> {
   insert(item: I): void
@@ -258,7 +252,14 @@ export class Engine {
   private readonly grid: Size
 
   constructor (game: Game, outputter: IOutputter, gamepad: IGamepad) {
-    this.bush = new MyRBush()
+    this.bush = new Rbush();
+
+    // The browser does not like "class MyRBush extends RBush { ... }"
+    // because typescript or rollup downgrade the `class` to use ES4 prototypes
+    (this.bush as any).toBBox = function (item: ObjectInstance<any, any>) { return item.toBBox() };
+    (this.bush as any).compareMinX = function (a: ObjectInstance<any, any>, b: ObjectInstance<any, any>) { return a.pos.x - b.pos.x };
+    (this.bush as any).compareMinY = function (a: ObjectInstance<any, any>, b: ObjectInstance<any, any>) { return a.pos.y - b.pos.y }
+
     this.sprites = new DefiniteMap<Sprite>()
     this.instances = new InstanceController(this.bush)
     this.camera = new Camera({ width: 24 * 2, height: 12 * 2 })

@@ -26,6 +26,7 @@ categories.set('LandCorner', null)
 categories.set('LandBottom', null)
 categories.set('FloorSquare', null)
 categories.set('FloorDiamond', null)
+categories.set('Pedestal', null)
 categories.set('PlayerWalkingRight', 'PLAYER')
 categories.set('PlayerWalkingUp', 'PLAYER')
 categories.set('PlayerWalkingDown', 'PLAYER')
@@ -33,7 +34,7 @@ categories.set('PlayerPushingUp', 'PlayerPushing')
 categories.set('PlayerPushingDown', 'PlayerPushing')
 categories.set('PlayerPushingRight', 'PlayerPushing')
 
-function categorize (spriteName: string) {
+export function categorize (spriteName: string) {
   if (categories.has(spriteName)) {
     return categories.get(spriteName)
   }

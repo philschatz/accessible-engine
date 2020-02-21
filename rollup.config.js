@@ -12,7 +12,7 @@ export default {
     },
     plugins: [
         json(),
-        typescript(/*{ plugin options }*/),
+        typescript({module: 'ESNext'}),
         resolve(),
     ]
 }

@@ -496,12 +496,12 @@ export class MyGame implements Game {
   }
 
   drawBackground (tiles: Array<ObjectInstance<any, any>>, camera: Camera, drawPixelsFn: DrawPixelsFn) {
-    const bbox = camera.toBBox()
-    const color = '#FFFFFF' // white
+    // const bbox = camera.toBBox()
+    // const color = '#FFFFFF' // white
 
-    const pixels = Array(bbox.maxY - bbox.minY).fill(Array(bbox.maxX - bbox.minX).fill(color))
+    // const pixels = Array(bbox.maxY - bbox.minY).fill(Array(bbox.maxX - bbox.minX).fill(color))
 
-    drawPixelsFn({ x: 0, y: 0 }, pixels, false, false)
+    // drawPixelsFn({ x: 0, y: 0 }, pixels, false, false)
   }
 
   drawOverlay (drawPixelsFn: DrawPixelsFn, drawTextFn: DrawTextFn, fields: SimpleObject, sprites: SpriteController) {
@@ -654,15 +654,15 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
     overlayState.keyCount = 0
   }
 
-  function reduce (i: number) {
-    if (i < 0) { return i + 1 } else if (i > 0) { return i - 1 } else { return 0 }
+  function reduce (i: number, by: number) {
+    if (i < 0) { return Math.max(i + by, 0) } else if (i > 0) { return Math.min(i - by, 0) } else { return 0 }
   }
 
   if (o.offsetPos.x !== 0 || o.offsetPos.y !== 0) {
     // slowly move the sprite
     o.offsetPos = {
-      x: reduce(o.offsetPos.x),
-      y: reduce(o.offsetPos.y)
+      x: reduce(o.offsetPos.x, 2),
+      y: reduce(o.offsetPos.y, 2)
     }
     return
   }

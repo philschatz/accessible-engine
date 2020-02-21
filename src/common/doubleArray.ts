@@ -22,8 +22,20 @@ export class DoubleArray<T> {
   }
 
   get (pos: IPosition, def: T): T {
-    if (!this.ary[pos.y]) { return def }
-    return this.ary[pos.y][pos.x] || def
+    this.maxY = Math.max(this.maxY, pos.y)
+    this.maxX = Math.max(this.maxX, pos.x)
+
+    if (!this.ary[pos.y]) {
+      const v = []
+      this.ary[pos.y] = v
+      v[pos.x] = def
+      return def
+    }
+    if (!this.ary[pos.y][pos.x]) {
+      this.ary[pos.y][pos.x] = def
+      return def
+    }
+    return this.ary[pos.y][pos.x]
   }
 
   dim () {
