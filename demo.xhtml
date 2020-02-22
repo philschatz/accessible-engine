@@ -3,14 +3,28 @@
 <head>
   <style>
     #my_audio { height: 10rem; overflow: scroll; }
+    #my_table { border-spacing: 0; }
+    #my_table caption { font-weight: bold }
+    #my_table td { border: 1px solid black; }
+    #my_table td .player { font-weight: bold; }
+    #my_audio > *:last-child { font-weight: bold; }
   </style>
 </head>
 
 <body>
+  <fieldset>
+    <legend>Which ways would you like to play the game? Check one or more:</legend>
+    <input id="play_sprites" type="checkbox" name="play_style" value="visually" checked="checked"/>
+    <label for="play_sprites">Visually with Sprites</label><br/>
+    <input id="play_table" type="checkbox" name="play_style" value="table"/>
+    <label for="play_table">In an Accessible Table (for low vision users or blind people that enjoy navigating in tables)</label><br/>
+    <input id="play_screenreader" type="checkbox" name="play_style" value="screenreader"/>
+    <label for="play_screenreader">Using Audio read by a screenreader</label><br/>
+    <p><strong>How to use this</strong> . Try completing the level without using the graphical option. Note what happens when you push against a wall, or when you get/use a key. Creating a sokoban-style games to be accessible only requires a minimal amount of accessible hoops to jump through; game devs can just write game code for the most part. For more on how to build accessible videogames check out the repository.</p>
+  </fieldset>
   <canvas id="my_canvas" width="500" height="250"></canvas>
   <table id="my_table"></table>
-  <label for="#my_audio">These are read out as they appear if the user has a screen reader</label>
-  <div id="my_audio"></div>
+  <div id="my_audio" role="log" aria-live="polite"></div>
   <script src="browser.bundle.js"></script>
 
   <script>
@@ -39,6 +53,24 @@
       setInterval(() => {
         engine.tick()
       }, 1)
+
+      // Show/Hide the games based on the checkboxes
+      const playSprites = document.querySelector('#play_sprites')
+      const playTable = document.querySelector('#play_table')
+      const playScreenreader = document.querySelector('#play_screenreader')
+      
+      function toggle(checkbox, renderer) {
+        const fn = () => {
+          renderer.style.display = checkbox.checked ? '' : 'none'
+          // in case we enabled the logger, scroll to the bottom
+          renderer.scrollTop = renderer.scrollHeight
+        }
+        checkbox.addEventListener('change', fn)
+        fn()
+      }
+      toggle(playSprites, myCanvas)
+      toggle(playTable, myTable)
+      toggle(playScreenreader, myAudio)
 
     })()
   </script>

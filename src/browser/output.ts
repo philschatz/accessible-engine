@@ -31,8 +31,15 @@ export class GridTableOutputter implements IOutputter {
     model.forEach(row => {
       const tr = document.createElement('tr')
       row.forEach(col => {
-        const td = document.createElement('td')
-        td.innerHTML = [...col.keys()].filter(s => !!s).join(', ')
+        const td = document.createElement('td');
+
+        [...col.keys()].filter(s => !!s).forEach(s => {
+          const span = document.createElement('span')
+          span.classList.add(s.toLowerCase())
+          span.innerHTML = `${s} `
+          td.appendChild(span)
+        })
+        
 
         tr.appendChild(td)
       })
