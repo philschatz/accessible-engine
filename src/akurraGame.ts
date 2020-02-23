@@ -141,7 +141,11 @@ export class MyGame implements Game {
     const TreeBottom = instances.simple(sprites, 'TreeBottom', obZ)
     const Water = instances.simple(sprites, 'Water', obZ)
 
-    const Grass = Land // Just because we do not have all the sprites
+    const GrassCorner = instances.simple(sprites, 'GrassCorner', obZ)
+    const GrassBottom = instances.simple(sprites, 'GrassBottom', obZ)
+    const GrassMid = instances.simple(sprites, 'Grass', obZ)
+    const GrassLeft = instances.simple(sprites, 'GrassLeft', obZ)
+    const NextRoomArrow = instances.simple(sprites, 'NextRoomArrow', obZ)
 
     function g (item: GameObject<any, any>, pos: IPosition) {
       // convert from grid coordinates to pixels
@@ -162,34 +166,35 @@ export class MyGame implements Game {
 
     // Row0
     g(Rock, { x: x++, y })
-    g(Grass, { x: x++, y })
-    g(Grass, { x: x++, y })
-    g(Grass, { x: x++, y })
-    g(Grass, { x: x++, y })
-    g(Grass, { x: x++, y })
-    g(Grass, { x: x++, y })
-    g(Grass, { x: x++, y })
-    g(Grass, { x: x++, y })
+    g(GrassLeft, { x: x++, y })
+    g(GrassMid, { x: x++, y })
+    g(GrassMid, { x: x++, y })
+    g(GrassMid, { x: x++, y })
+    g(GrassMid, { x: x++, y })
+    g(GrassMid, { x: x++, y })
+    g(GrassMid, { x: x++, y })
+    g(GrassMid, { x: x++, y })
     g(WallTopUpDown, { x: x++, y })
-    g(Grass, { x: x++, y })
-    g(Grass, { x: x++, y })
-    g(Grass, { x: x++, y })
-    g(Grass, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(NextRoomArrow, { x, y }).offsetPos = { x: 8, y: 0 }
+    g(Land, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(Land, { x: x++, y })
     g(WallTopUpDown, { x: x++, y }).hFlip = true
-    g(Grass, { x: x++, y })
-    g(Grass, { x: x++, y })
-    g(Grass, { x: x++, y })
-    g(Grass, { x: x++, y })
-    g(Grass, { x: x++, y })
-    g(Grass, { x: x++, y })
-    g(Grass, { x: x++, y })
-    g(Grass, { x: x++, y })
+    g(GrassMid, { x: x++, y })
+    g(GrassMid, { x: x++, y })
+    g(GrassMid, { x: x++, y })
+    g(GrassMid, { x: x++, y })
+    g(GrassMid, { x: x++, y })
+    g(GrassMid, { x: x++, y })
+    g(GrassMid, { x: x++, y })
+    g(GrassLeft, { x: x++, y }).hFlip = true
     g(Rock, { x: x++, y })
 
     // Row1
     x = 0; y += 1
     g(Rock, { x: x++, y })
-    g(Grass, { x: x++, y })
+    g(GrassLeft, { x: x++, y })
     g(WallTopRightDown, { x: x++, y })
     g(WallTopLeftRight, { x: x++, y })
     g(WallTopLeftRight, { x: x++, y })
@@ -209,14 +214,14 @@ export class MyGame implements Game {
     g(WallTopLeftRight, { x: x++, y })
     g(WallTopLeftRight, { x: x++, y })
     g(WallTopRightDown, { x: x++, y }).hFlip = true
-    g(Grass, { x: x++, y })
-    g(Grass, { x: x++, y })
+    g(GrassMid, { x: x++, y })
+    g(GrassLeft, { x: x++, y }).hFlip = true
     g(Rock, { x: x++, y })
 
     // Row2
     x = 0; y += 1
     g(Bush, { x: x++, y })
-    g(Grass, { x: x++, y })
+    g(GrassLeft, { x: x++, y })
     g(WallTopUpDown, { x: x++, y })
     g(Wall, { x: x++, y })
     g(Wall, { x: x++, y })
@@ -236,14 +241,14 @@ export class MyGame implements Game {
     g(Wall, { x: x++, y })
     g(Wall, { x: x++, y })
     g(WallTopUpDown, { x: x++, y }).hFlip = true
-    g(Grass, { x: x++, y })
-    g(Grass, { x: x++, y })
+    g(GrassMid, { x: x++, y })
+    g(GrassLeft, { x: x++, y }).hFlip = true
     g(Bush, { x: x++, y })
 
     // Row3
     x = 0; y += 1
     g(Bush, { x: x++, y })
-    g(Grass, { x: x++, y })
+    g(GrassCorner, { x: x++, y })
     g(WallTopUpDown, { x: x++, y })
     g(Wall, { x: x++, y })
     g(Wall, { x: x++, y })
@@ -267,8 +272,8 @@ export class MyGame implements Game {
     g(Wall, { x: x++, y })
     g(Wall, { x: x++, y })
     g(WallTopUpDown, { x: x++, y }).hFlip = true
-    g(Grass, { x: x++, y })
-    g(Grass, { x: x++, y })
+    g(GrassBottom, { x: x++, y })
+    g(GrassCorner, { x: x++, y }).hFlip = true
     g(Bush, { x: x++, y })
 
     // Row4

@@ -1222,6 +1222,96 @@ export function loadImages () {
     [p, p, p, p, p, p, p, p, p, p, p, p, p, p, p, p],
     [f, f, f, f, f, f, f, f, f, f, f, f, f, f, f, f]
   ]))
+  images.add('GrassCorner', new Image([
+    [b, e, r, e, r, e, r, r, r, e, e, e, r, e, r, e],
+    [b, b, e, r, e, e, e, r, e, r, e, e, e, e, e, e],
+    [b, r, r, r, r, e, e, e, r, e, r, e, r, r, r, e],
+    [b, b, r, e, e, r, e, e, r, e, r, r, e, r, e, e],
+    [b, b, e, r, e, e, e, e, e, e, r, e, r, e, e, e],
+    [r, r, r, r, e, r, r, r, e, e, e, e, e, r, r, e],
+    [b, r, e, r, e, e, r, e, r, e, e, e, r, r, e, e],
+    [b, e, r, e, r, e, e, r, e, r, e, e, r, r, e, e],
+    [b, e, r, e, e, e, e, e, e, r, e, e, r, e, e, e],
+    [b, e, r, e, e, e, e, r, e, e, e, e, e, e, e, e],
+    [b, e, r, e, r, e, r, r, e, r, e, e, r, e, e, r],
+    [b, e, r, e, r, r, r, r, e, r, r, e, r, r, e, r],
+    [b, e, e, r, r, r, e, r, r, e, r, r, r, r, e, r],
+    [b, b, e, e, e, e, e, e, e, b, e, e, e, r, r, r],
+    [b, b, b, b, b, b, b, b, b, b, b, b, b, e, e, r],
+    [b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, e]
+  ]))
+  images.add('GrassBottom', new Image([
+    [e, r, e, r, e, e, r, r, r, e, e, r, e, e, e, e],
+    [e, e, e, e, e, r, e, r, e, e, e, e, e, r, r, r],
+    [r, r, r, e, r, e, r, e, r, r, r, e, r, e, r, e],
+    [e, r, e, r, r, e, r, r, e, r, e, e, r, e, r, e],
+    [e, e, r, e, r, e, r, e, r, r, r, r, e, e, e, e],
+    [e, e, e, e, e, e, e, e, r, e, r, e, e, e, e, e],
+    [r, r, r, e, e, e, e, r, e, r, e, e, e, e, e, r],
+    [r, e, e, r, e, e, e, r, e, e, e, r, r, r, e, e],
+    [e, r, e, r, e, e, e, e, e, r, e, e, r, e, e, e],
+    [e, e, e, e, e, r, e, r, e, r, e, r, e, e, r, e],
+    [e, e, r, e, e, r, e, r, e, r, e, r, e, e, r, e],
+    [r, e, r, e, r, r, e, r, r, r, e, r, r, e, r, e],
+    [r, e, r, r, r, e, r, r, e, e, r, r, r, e, r, e],
+    [r, r, e, e, e, b, e, e, b, b, e, e, r, r, r, e],
+    [r, e, b, b, b, b, b, b, b, b, b, b, e, e, e, r],
+    [e, b, b, b, b, b, b, b, b, b, b, b, b, b, b, e]
+  ]))
+  images.add('Grass', new Image([
+    [e, e, r, e, r, e, e, r, r, r, e, e, r, e, e, e],
+    [r, e, e, e, e, e, r, e, r, e, e, e, e, e, r, r],
+    [e, r, r, r, e, r, e, r, e, r, r, r, e, r, r, e],
+    [e, e, r, e, r, r, e, r, r, e, r, e, e, r, r, e],
+    [e, e, e, r, e, r, e, r, e, r, r, r, r, e, e, e],
+    [e, e, e, e, e, e, e, e, e, r, e, r, e, e, e, e],
+    [r, r, r, r, e, e, e, e, r, e, r, e, e, e, e, e],
+    [e, r, e, e, r, e, e, e, r, e, r, e, r, r, r, e],
+    [e, e, r, e, r, e, e, e, e, e, e, r, e, r, e, e],
+    [r, r, e, e, e, e, r, r, r, e, r, e, r, e, e, r],
+    [r, e, e, e, e, e, e, e, r, r, r, e, r, e, r, e],
+    [r, r, r, e, r, r, r, e, e, r, r, e, r, r, e, r],
+    [e, r, e, r, r, r, e, e, e, e, e, e, e, e, e, e],
+    [e, e, e, e, e, e, e, e, r, r, r, e, r, r, r, e],
+    [e, r, r, r, e, e, e, e, e, r, e, r, e, r, e, e],
+    [e, e, r, e, r, e, e, e, e, e, r, e, r, e, e, e]
+  ]))
+  images.add('GrassLeft', new Image([
+    [b, b, r, e, r, e, e, r, r, r, e, e, r, e, e, e],
+    [b, b, e, r, e, e, r, e, r, e, e, e, e, e, r, r],
+    [b, r, r, r, e, r, e, r, e, r, r, r, e, r, e, r],
+    [b, b, r, e, r, r, e, r, r, e, r, e, e, r, e, r],
+    [b, b, e, r, e, r, e, r, e, r, r, r, r, e, e, e],
+    [b, b, e, r, e, e, e, e, e, r, e, r, e, e, e, e],
+    [r, r, r, r, e, e, e, e, r, e, r, e, e, e, e, e],
+    [b, r, e, e, r, e, e, e, r, e, r, e, r, r, r, e],
+    [b, e, r, e, r, e, e, e, e, e, e, r, e, r, e, e],
+    [r, r, e, r, e, e, r, r, r, e, r, e, r, e, e, r],
+    [b, r, e, e, e, e, e, e, r, r, r, e, r, e, r, e],
+    [b, r, r, e, r, r, e, e, e, r, r, e, r, r, e, r],
+    [b, r, e, r, r, e, e, r, r, e, e, e, r, e, e, e],
+    [b, e, r, e, e, e, e, e, r, r, e, e, e, r, r, r],
+    [b, r, r, r, e, e, e, e, r, r, e, e, r, e, r, e],
+    [b, e, r, e, r, e, e, e, e, e, e, e, r, e, r, e]
+  ]))
+  images.add('NextRoomArrow', new Image([
+    [Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z],
+    [Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z],
+    [Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z],
+    [Z, Z, Z, Z, Z, Z, Z, a, a, Z, Z, Z, Z, Z, Z, Z],
+    [Z, Z, Z, Z, Z, Z, a, a, a, a, Z, Z, Z, Z, Z, Z],
+    [Z, Z, Z, Z, Z, a, a, a, a, a, a, Z, Z, Z, Z, Z],
+    [Z, Z, Z, Z, a, a, a, a, a, a, a, a, Z, Z, Z, Z],
+    [Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z],
+    [Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z],
+    [Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z],
+    [Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z],
+    [Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z],
+    [Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z],
+    [Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z],
+    [Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z],
+    [Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z]
+  ]))
 
   return images
 }

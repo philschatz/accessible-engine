@@ -3,12 +3,13 @@ START: Items in the Inventory.
   item keyCount has value 0.
 END: Items in the Inventory.
 START: Initial Room Information.
+  1 PLAYER sprite.
   1 PillarRed sprite.
+  1 NextRoomArrow sprite.
   1 GongRed sprite.
+  1 Key sprite.
   1 Lock sprite.
   1 ArrowLeft sprite.
-  1 Key sprite.
-  1 PLAYER sprite.
   2 Crate sprites.
   2 ArrowLeftDisabled sprites.
   65 Water sprites.
