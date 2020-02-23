@@ -1,5 +1,4 @@
 import { IOutputter, IPosition, Game, ObjectInstance, Camera, Size, SimpleObject, SimpleValue, Opt, Dialog, SpriteController } from './engine'
-import { DoubleArray } from './doubleArray'
 
 export interface IRenderer {
   drawStart(): void
@@ -30,52 +29,15 @@ categories.set('Pedestal', null)
 categories.set('PlayerWalkingRight', 'PLAYER')
 categories.set('PlayerWalkingUp', 'PLAYER')
 categories.set('PlayerWalkingDown', 'PLAYER')
-categories.set('PlayerPushingUp', 'PlayerPushing')
-categories.set('PlayerPushingDown', 'PlayerPushing')
-categories.set('PlayerPushingRight', 'PlayerPushing')
+categories.set('PlayerPushingUp', 'PLAYER')
+categories.set('PlayerPushingDown', 'PLAYER')
+categories.set('PlayerPushingRight', 'PLAYER')
 
 export function categorize (spriteName: string) {
   if (categories.has(spriteName)) {
     return categories.get(spriteName)
   }
   return spriteName
-}
-
-export class TableOutputter implements IOutputter {
-  draw (game: Game, tiles: Array<ObjectInstance<any, any>>, camera: Camera, curTick: number, grid: Size, overlayState: SimpleObject, pendingDialog: Opt<Dialog>) {
-    const table = new DoubleArray<string[]>()
-
-    for (const t of tiles) {
-      const pos = t.pos
-      const s = categorize(t.sprite._name)
-      if (s) { // could be null
-        table.get(pos, []).push(s)
-      }
-    }
-
-    const dialogMessage = pendingDialog ? pendingDialog.message : null
-    console.log('---------------')
-    console.log('<table>')
-    table.forEach(row => {
-      const tr = ['<tr>']
-      row.forEach(col => {
-        tr.push('<td>')
-        col.forEach(sprite => {
-          tr.push(`${sprite} `)
-        })
-        tr.push('</td>')
-      })
-      tr.push('</tr>')
-      console.log(tr.join(''))
-    })
-    console.log('</table>')
-    console.log(`<p>Overlay Info: ${JSON.stringify(overlayState)}</p>`)
-    if (dialogMessage) console.log(`<p>Dialog message: ${dialogMessage}</p>`)
-  }
-}
-
-function positionToString (pos: IPosition) {
-  return `x ${pos.x}, y ${pos.y}`
 }
 
 export type LoggerFn = (message?: any, ...optionalParams: any[]) => void
@@ -109,19 +71,20 @@ export class AudioOutputter implements IOutputter {
     // Old thing disappeared
     // Thing moved
     // Thing changed sprite category
+    const messages: string[] = []
 
     if (this.prev.size === 0) {
       // Output the initial stats
       this.prevOverlay = currentOverlay
       if (currentOverlay.size > 0) {
-        this.logger('START: Items in the Overlay');
+        messages.push('START: Items in the Inventory');
         [...currentOverlay.entries()].forEach(([key, value]) => {
-          this.logger(`  item ${key} has value ${value}`)
+          messages.push(`  item ${key} has value ${value}`)
         })
-        this.logger('END: Items in the Overlay')
+        messages.push('END: Items in the Inventory')
       }
 
-      this.logger('START: Initial Room Information')
+      messages.push('START: Initial Room Information')
       const catPositions = new Map<string, IPosition[]>()
       for (const v of current.values()) {
         let p = catPositions.get(v.category)
@@ -139,15 +102,15 @@ export class AudioOutputter implements IOutputter {
         const positions = v[1]
         const category = v[0]
         if (positions.length === 1) {
-          this.logger(`  1 ${category} sprite @ ${positionToString(positions[0])}`)
-        } else if (positions.length === 2) {
-          this.logger(`  2 ${category} sprites @ ${positionToString(positions[0])} and @ ${positionToString(positions[1])}`)
+          messages.push(`  1 ${category} sprite`)
+        // } else if (positions.length === 2) {
+        //   messages.push(`  2 ${category} sprites @ ${positionToString(positions[0])} and @ ${positionToString(positions[1])}`)
         } else {
-          this.logger(`  ${positions.length} ${category} sprites`)
+          messages.push(`  ${positions.length} ${category} sprites`)
         }
       }
 
-      this.logger('END: Initial Room Information')
+      messages.push('END: Initial Room Information')
     } else {
       // Do the changed for the overlay info
       {
@@ -168,29 +131,29 @@ export class AudioOutputter implements IOutputter {
         }
 
         if (appeared.size + disappeared.size + changed.size > 0) {
-          this.logger('START: Overlay updates')
+          messages.push('START Inventory updates')
 
           if (appeared.size > 0) {
             [...appeared.keys()].forEach((key) => {
               const value = currentOverlay.get(key)
-              this.logger(`  Item ${key} added with value ${value}`)
+              messages.push(`  Item ${key} added with value ${value}`)
             })
           }
 
           if (disappeared.size > 0) {
             [...disappeared.keys()].forEach((key) => {
               const value = this.prevOverlay.get(key)
-              this.logger(`  Item ${key} removed with value ${value}`)
+              messages.push(`  Item ${key} removed with value ${value}`)
             })
           }
 
           if (changed.size > 0) {
             [...changed.entries()].forEach(([key, { from, to }]) => {
-              this.logger(`  Item ${key} changed from ${from} to ${to}`)
+              messages.push(`  Item ${key} changed from ${from} to ${to}`)
             })
           }
 
-          this.logger('END: Overlay Updates')
+          messages.push('END Inventory Updates')
         }
 
         this.prevOverlay = currentOverlay
@@ -220,14 +183,14 @@ export class AudioOutputter implements IOutputter {
       const appearedSprites = [...appeared].map(i => current.get(i).category).filter(s => !!s) // remove nulls
       const disappearedSprites = [...disappeared].map(i => this.prev.get(i).category).filter(s => !!s) // remove nulls
       if (appearedSprites.length === 1) {
-        this.logger(`1 thing appeared: ${appearedSprites[0]}`)
+        messages.push(`1 thing appeared: ${appearedSprites[0]}`)
       } else if (appearedSprites.length > 0) {
-        this.logger(`${appearedSprites.length} things appeared: ${JSON.stringify(appearedSprites)}`)
+        messages.push(`${appearedSprites.length} things appeared: ${JSON.stringify(appearedSprites)}`)
       }
       if (disappearedSprites.length === 1) {
-        this.logger(`1 thing disappeared: ${disappearedSprites[0]}`)
+        messages.push(`1 thing disappeared: ${disappearedSprites[0]}`)
       } else if (disappearedSprites.length > 0) {
-        this.logger(`${disappearedSprites.length} things disappeared: ${disappearedSprites.join(', ')}`)
+        messages.push(`${disappearedSprites.length} things disappeared: ${disappearedSprites.join(', ')}`)
       }
       if (moved.size > 0) {
         const movedMessages = [...moved.entries()].map(([i, { from, to }]) => {
@@ -235,24 +198,24 @@ export class AudioOutputter implements IOutputter {
           if (!c) { return '' }
           const msg = [c]
           if (to.x < from.x) {
-            msg.push(`LEFT ${from.x - to.x}`)
+            msg.push('LEFT')
           } else if (to.x > from.x) {
-            msg.push(`RIGHT ${to.x - from.x}`)
+            msg.push('RIGHT')
           }
 
           if (to.y < from.y) {
             if (msg.length > 1) { msg.push('and') }
-            msg.push(`UP ${from.y - to.y}`)
+            msg.push('UP')
           } else if (to.y > from.y) {
             if (msg.length > 1) { msg.push('and') }
-            msg.push(`DOWN ${to.y - from.y}`)
+            msg.push('DOWN')
           }
           return msg.join(' ')
         })
         if (moved.size === 1) {
-          this.logger(`Moved ${movedMessages[0]}`)
+          messages.push(`Moved ${movedMessages[0]}`)
         } else {
-          this.logger(`${moved.size} things moved: ${movedMessages.join(', ')}`)
+          messages.push(`${moved.size} things moved: ${movedMessages.join(', ')}`)
         }
       }
 
@@ -261,11 +224,15 @@ export class AudioOutputter implements IOutputter {
           return `FROM ${from} TO ${to}`
         })
         if (changed.size === 1) {
-          this.logger(`changed ${changedMessages[0]}`)
+          messages.push(`changed ${changedMessages[0]}`)
         } else {
-          this.logger(`${changed.size} things changed: ${changedMessages.join(', ')}`)
+          messages.push(`${changed.size} things changed: ${changedMessages.join(', ')}`)
         }
       }
+    }
+    // only log when actual messages occurred
+    if (messages.length > 0) {
+      this.logger(messages.join('.\n'))
     }
     this.prev = current
   }

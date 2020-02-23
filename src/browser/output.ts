@@ -17,7 +17,7 @@ export class GridTableOutputter implements IOutputter {
       spritenames.add(categorize(t.sprite._name))
     })
 
-    const overlayInfo = ['Overlay Info:']
+    const overlayInfo = ['Inventory Info:']
     for (const key in overlayState) {
       const v = overlayState[key]
       overlayInfo.push(`Item ${key} is ${v}`)
@@ -39,7 +39,6 @@ export class GridTableOutputter implements IOutputter {
           span.innerHTML = `${s} `
           td.appendChild(span)
         })
-        
 
         tr.appendChild(td)
       })
@@ -71,7 +70,7 @@ export class CanvasRenderer implements IRenderer {
 
   drawPixel (pos: IPosition, hex: string) {
     // if (!(pos.x >= 0 && pos.y >= 0)) { throw new Error(`BUG: Tried to draw outside of the camera range ${JSON.stringify(pos)}`) }
-    
+
     // this.ctx.fillStyle = hex
     // this.ctx.fillRect(pos.x * this.pixelSize, pos.y * this.pixelSize, this.pixelSize, this.pixelSize)
 

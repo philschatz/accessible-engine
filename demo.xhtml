@@ -2,12 +2,22 @@
 
 <head>
   <style>
-    #my_audio { height: 10rem; overflow: scroll; }
     #my_table { border-spacing: 0; }
-    #my_table caption { font-weight: bold }
+    #my_table caption { font-weight: bold; }
     #my_table td { border: 1px solid black; }
     #my_table td .player { font-weight: bold; }
-    #my_audio > *:last-child { font-weight: bold; }
+    #my_audio_messages { height: 10rem; overflow: scroll; }
+    #my_audio_messages > *:last-child { font-weight: bold; }
+
+    .hidden-for-all { display: none; }
+    .hidden-visually { 
+      position: absolute;
+      left: -10000px;
+      top: auto;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+    }
   </style>
 </head>
 
@@ -18,13 +28,19 @@
     <label for="play_sprites">Visually with Sprites</label><br/>
     <input id="play_table" type="checkbox" name="play_style" value="table"/>
     <label for="play_table">In an Accessible Table (for low vision users or blind people that enjoy navigating in tables)</label><br/>
-    <input id="play_screenreader" type="checkbox" name="play_style" value="screenreader"/>
+    <input id="play_screenreader" type="checkbox" name="play_style" value="screenreader" checked="checked"/>
     <label for="play_screenreader">Using Audio read by a screenreader</label><br/>
-    <p><strong>How to use this</strong> . Try completing the level without using the graphical option. Note what happens when you push against a wall, or when you get/use a key. Creating a sokoban-style games to be accessible only requires a minimal amount of accessible hoops to jump through; game devs can just write game code for the most part. For more on how to build accessible videogames check out the repository.</p>
+    <p><strong tabindex="0" aria-controls="my_audio_messages">How to use this</strong> . Try completing the level without using the graphical option. Note what happens when you push against a wall, or when you get/use a key. Creating a sokoban-style games to be accessible only requires a minimal amount of accessible hoops to jump through; game devs can just write game code for the most part. For more on how to build accessible videogames check out the repository.</p>
   </fieldset>
-  <canvas id="my_canvas" width="500" height="250"></canvas>
+  <canvas tabindex="0" id="my_canvas" width="500" height="250"></canvas>
   <table id="my_table"></table>
-  <div id="my_audio" role="log" aria-live="polite"></div>
+  <div id="my_audio_wrapper" role="log">
+    <ul id="my_audio_messages" aria-live="polite" aria-atomic="false">
+      <!-- <li>Please choose a user name to begin using AJAX Chat.</li> -->
+    </ul>
+    <ul aria-live="off" aria-relevant="additions removals text">
+    </ul>
+  </div>
   <script src="browser.bundle.js"></script>
 
   <script>
@@ -34,13 +50,19 @@
 
       const myCanvas = document.querySelector('#my_canvas')
       const myTable = document.querySelector('#my_table')
-      const myAudio = document.querySelector('#my_audio')
+      const myAudioWrapper = document.querySelector('#my_audio_wrapper')
+      const myAudioMessages = document.querySelector('#my_audio_messages')
 
       const logger = (msg) => {
-        const line = document.createElement('p')
+        // remove all but the last 2 messages (might still be reading them out)
+        const old = [...myAudioMessages.querySelectorAll('li')]
+        const toRemove = old.slice(0, old.length - 10)
+        toRemove.forEach(el => el.remove())
+
+        const line = document.createElement('li')
         line.innerHTML = msg
-        myAudio.appendChild(line)
-        myAudio.scrollTop = myAudio.scrollHeight
+        myAudioMessages.appendChild(line)
+        myAudioMessages.scrollTop = myAudioMessages.scrollHeight
       }
       const outputter = new AndOutputter([
         new AudioOutputter(logger), 
@@ -61,7 +83,11 @@
       
       function toggle(checkbox, renderer) {
         const fn = () => {
-          renderer.style.display = checkbox.checked ? '' : 'none'
+          if (checkbox.checked) {
+            renderer.classList.remove('hidden-visually')
+          } else {
+            renderer.classList.add('hidden-visually')
+          }
           // in case we enabled the logger, scroll to the bottom
           renderer.scrollTop = renderer.scrollHeight
         }
@@ -70,7 +96,7 @@
       }
       toggle(playSprites, myCanvas)
       toggle(playTable, myTable)
-      toggle(playScreenreader, myAudio)
+      toggle(playScreenreader, myAudioWrapper)
 
     })()
   </script>

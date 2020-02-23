@@ -601,9 +601,8 @@ interface PlayerProps {
 }
 
 function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, showDialog: ShowDialogFn, overlayState: SimpleObject, curTick: number) {
-
-  const room = {width: 24, height: 14}
-  camera.pos = {x: room.width / 2, y: room.height / 2 - 3}
+  const room = { width: 24, height: 14 }
+  camera.pos = { x: room.width / 2, y: room.height / 2 - 3 }
   camera.resize(room)
 
   const PlayerWalkingUp = sprites.get('PlayerWalkingUp')

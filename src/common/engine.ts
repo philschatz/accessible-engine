@@ -368,7 +368,7 @@ export class Camera {
       y: bbox.minY
     }
   }
-  
+
   public topLeftPixelPos (grid: Size): IPosition {
     return posTimes(this.topLeft(), grid)
   }

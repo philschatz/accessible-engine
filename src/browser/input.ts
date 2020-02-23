@@ -1,5 +1,5 @@
-import { IGamepad, BUTTON_TYPE, STICK_TYPE } from "../common/gamepad";
-import { Opt } from "../common/engine";
+import { IGamepad, BUTTON_TYPE, STICK_TYPE } from '../common/gamepad'
+import { Opt } from '../common/engine'
 
 const keyConfig = new Map<BUTTON_TYPE, string[]>()
 keyConfig.set(BUTTON_TYPE.DPAD_UP, ['W', 'w', 'ArrowUp'])
@@ -15,13 +15,12 @@ for (const [button, keys] of keyConfig.entries()) {
   keys.forEach(key => keyMap.set(key, button))
 }
 
-
 const checkActiveElement = (root: Element, current: Element | null): boolean => {
   if (root === current) {
-      return true
+    return true
   }
-  if (current !== null && current.parentElement) {
-      return checkActiveElement(root, current.parentElement)
+  if (current?.parentElement) {
+    return checkActiveElement(root, current.parentElement)
   }
   return false
 }
@@ -30,7 +29,7 @@ export class KeyGamepad implements IGamepad {
   private readonly context: Opt<HTMLElement>
   private readonly pressed = new Set<BUTTON_TYPE>()
 
-  constructor(context: Opt<HTMLElement>) {
+  constructor (context: Opt<HTMLElement>) {
     this.context = context
     this.onKeyDown = this.onKeyDown.bind(this)
     this.onKeyUp = this.onKeyUp.bind(this)
@@ -38,30 +37,34 @@ export class KeyGamepad implements IGamepad {
     window.addEventListener('keyup', this.onKeyUp)
   }
 
-  dispose() {
+  dispose () {
     window.removeEventListener('keydown', this.onKeyDown)
     window.removeEventListener('keyup', this.onKeyUp)
   }
 
-  private onKeyDown(evt: KeyboardEvent) {
+  private onKeyDown (evt: KeyboardEvent) {
     const button = keyMap.get(evt.key)
     if (button && (!this.context || checkActiveElement(this.context, window.document.activeElement))) {
       this.pressed.add(button)
     }
   }
 
-  private onKeyUp(evt: KeyboardEvent) {
+  private onKeyUp (evt: KeyboardEvent) {
     const button = keyMap.get(evt.key)
     if (button && (!this.context || checkActiveElement(this.context, window.document.activeElement))) {
       this.pressed.delete(button)
     }
   }
 
-  tick() { }
-  isButtonPressed(btn: BUTTON_TYPE) {
+  tick () {
+    // no polling necessary. They on('keydown') handles this async
+  }
+
+  isButtonPressed (btn: BUTTON_TYPE) {
     return this.pressed.has(btn)
   }
-  getStickCoordinates(stick: STICK_TYPE) {
+
+  getStickCoordinates (stick: STICK_TYPE) {
     return null
   }
 
@@ -70,5 +73,4 @@ export class KeyGamepad implements IGamepad {
   axes: number[]
   mapping: string
   timestamp: number
-
 }
