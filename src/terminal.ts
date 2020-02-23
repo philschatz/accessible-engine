@@ -21,7 +21,7 @@ import { OrGamepad, BUTTON_TYPE } from './common/gamepad'
 // import { MyGame } from './fuzGame'
 import { MyGame } from './akurraGame'
 
-import { AudioOutputter, AndOutputter } from './common/table'
+import { AudioOutputter, AndOutputter } from './common/output'
 
 const keyConfig = {}
 keyConfig[BUTTON_TYPE.DPAD_UP] = ['W', 'w', '\u001B\u005B\u0041']

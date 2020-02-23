@@ -1,5 +1,5 @@
 import { IOutputter, Game, ObjectInstance, Camera, Size, SimpleObject, Opt, Dialog, SpriteController, IPosition } from '../common/engine'
-import { categorize } from '../common/table'
+import { categorize } from '../common/output'
 import { DoubleArray } from '../common/doubleArray'
 import { IRenderer, hexToRgb } from '../common/visual'
 
