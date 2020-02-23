@@ -2,10 +2,10 @@
 
 <head>
   <style>
-    #my_table { border-spacing: 0; }
-    #my_table caption { font-weight: bold; }
-    #my_table td { border: 1px solid black; }
-    #my_table td .player { font-weight: bold; }
+    #my_table table { border-spacing: 0; }
+    #my_table table caption { font-weight: bold; }
+    #my_table table td { border: 1px solid black; }
+    #my_table table td .player { font-weight: bold; }
     #my_audio { height: 10rem; overflow: scroll; list-style-type: none; }
     #my_audio > *:last-child { font-weight: bold; }
 
@@ -33,7 +33,7 @@
     <p><strong tabindex="0" aria-controls="my_audio_messages">How to use this</strong> . Try completing the level without using the graphical option. Note what happens when you push against a wall, or when you get/use a key. Creating a sokoban-style games to be accessible only requires a minimal amount of accessible hoops to jump through; game devs can just write game code for the most part. For more on how to build accessible videogames check out the repository.</p>
   </fieldset>
   <canvas tabindex="0" id="my_canvas" width="500" height="250"></canvas>
-  <table id="my_table"></table>
+  <div id="my_table"></div>
   <ol id="my_audio" role="log" aria-live="polite" aria-atomic="false">
   </ol>
   <script src="browser.bundle.js"></script>
@@ -70,9 +70,11 @@
       const inputter = new KeyGamepad() // new OrGamepad([new KeyGamepad()])
       const engine = new Engine(new MyGame(), allOutputters, inputter)
 
-      setInterval(() => {
+      const fn = () => {
         engine.tick()
-      }, 1)
+        window.requestAnimationFrame(fn)
+      }
+      fn()
 
       // Show/Hide the games based on the checkboxes
       const playSprites = document.querySelector('#play_sprites')

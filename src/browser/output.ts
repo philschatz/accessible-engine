@@ -2,11 +2,14 @@ import { IOutputter, Game, ObjectInstance, Camera, Size, SimpleObject, Opt, Dial
 import { categorize } from '../common/output'
 import { DoubleArray } from '../common/doubleArray'
 import { IRenderer, hexToRgb } from '../common/visual'
+import { h, patch } from './vdom'
 
 export class GridTableOutputter implements IOutputter {
-  private readonly table: HTMLTableElement
-  constructor (table: HTMLTableElement) {
-    this.table = table
+  private readonly root: HTMLElement
+  private prevDom: any
+
+  constructor (root: HTMLElement) {
+    this.root = root
   }
 
   draw (game: Game, tiles: Array<ObjectInstance<any, any>>, camera: Camera, curTick: number, grid: Size, overlayState: SimpleObject, pendingDialog: Opt<Dialog>, sprites: SpriteController) {
@@ -23,27 +26,19 @@ export class GridTableOutputter implements IOutputter {
       overlayInfo.push(`Item ${key} is ${v}`)
     }
 
-    this.table.innerHTML = ''
-    const caption = document.createElement('caption')
-    caption.innerHTML = overlayInfo.join(' ')
+    const next = h('table', null,
+      h('caption', null, overlayInfo.join(' ')),
+      h('tbody', null, model.asArray().map(row => {
+        return h('tr', null, row.map(col => {
+          return h('td', null, [...col.keys()].filter(s => !!s).map(s => {
+            return h('span', { className: s.toLowerCase() }, `${s} `)
+          }))
+        }))
+      }))
+    )
 
-    this.table.appendChild(caption)
-    model.forEach(row => {
-      const tr = document.createElement('tr')
-      row.forEach(col => {
-        const td = document.createElement('td');
-
-        [...col.keys()].filter(s => !!s).forEach(s => {
-          const span = document.createElement('span')
-          span.classList.add(s.toLowerCase())
-          span.innerHTML = `${s} `
-          td.appendChild(span)
-        })
-
-        tr.appendChild(td)
-      })
-      this.table.appendChild(tr)
-    })
+    patch(this.root, next, this.prevDom)
+    this.prevDom = next
   }
 }
 
