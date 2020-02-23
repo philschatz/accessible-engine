@@ -6,8 +6,8 @@
     #my_table caption { font-weight: bold; }
     #my_table td { border: 1px solid black; }
     #my_table td .player { font-weight: bold; }
-    #my_audio_messages { height: 10rem; overflow: scroll; }
-    #my_audio_messages > *:last-child { font-weight: bold; }
+    #my_audio { height: 10rem; overflow: scroll; list-style-type: none; }
+    #my_audio > *:last-child { font-weight: bold; }
 
     .hidden-for-all { display: none; }
     .hidden-visually { 
@@ -34,13 +34,8 @@
   </fieldset>
   <canvas tabindex="0" id="my_canvas" width="500" height="250"></canvas>
   <table id="my_table"></table>
-  <div id="my_audio_wrapper" role="log">
-    <ul id="my_audio_messages" aria-live="polite" aria-atomic="false">
-      <!-- <li>Please choose a user name to begin using AJAX Chat.</li> -->
-    </ul>
-    <ul aria-live="off" aria-relevant="additions removals text">
-    </ul>
-  </div>
+  <ol id="my_audio" role="log" aria-live="polite" aria-atomic="false">
+  </ol>
   <script src="browser.bundle.js"></script>
 
   <script>
@@ -50,27 +45,30 @@
 
       const myCanvas = document.querySelector('#my_canvas')
       const myTable = document.querySelector('#my_table')
-      const myAudioWrapper = document.querySelector('#my_audio_wrapper')
-      const myAudioMessages = document.querySelector('#my_audio_messages')
+      const myAudio = document.querySelector('#my_audio')
 
       const logger = (msg) => {
         // remove all but the last 2 messages (might still be reading them out)
-        const old = [...myAudioMessages.querySelectorAll('li')]
+        const old = [...myAudio.querySelectorAll('li')]
         const toRemove = old.slice(0, old.length - 10)
         toRemove.forEach(el => el.remove())
 
         const line = document.createElement('li')
         line.innerHTML = msg
-        myAudioMessages.appendChild(line)
-        myAudioMessages.scrollTop = myAudioMessages.scrollHeight
+        myAudio.appendChild(line)
+        myAudio.scrollTop = myAudio.scrollHeight
       }
-      const outputter = new AndOutputter([
-        new AudioOutputter(logger), 
-        new VisualOutputter(new CanvasRenderer(myCanvas, 1)), 
-        new GridTableOutputter(myTable)
+
+      const audioOut = new AudioOutputter(logger)
+      const visualOut = new VisualOutputter(new CanvasRenderer(myCanvas, 1))
+      const tableOut = new GridTableOutputter(myTable)
+      const allOutputters = new AndOutputter([
+        audioOut, 
+        visualOut, 
+        tableOut
       ])
       const inputter = new KeyGamepad() // new OrGamepad([new KeyGamepad()])
-      const engine = new Engine(new MyGame(), outputter, inputter)
+      const engine = new Engine(new MyGame(), allOutputters, inputter)
 
       setInterval(() => {
         engine.tick()
@@ -81,12 +79,14 @@
       const playTable = document.querySelector('#play_table')
       const playScreenreader = document.querySelector('#play_screenreader')
       
-      function toggle(checkbox, renderer) {
+      function toggle(checkbox, renderer, outputter) {
         const fn = () => {
           if (checkbox.checked) {
             renderer.classList.remove('hidden-visually')
+            allOutputters.outs.add(outputter)
           } else {
             renderer.classList.add('hidden-visually')
+            allOutputters.outs.delete(outputter)
           }
           // in case we enabled the logger, scroll to the bottom
           renderer.scrollTop = renderer.scrollHeight
@@ -94,9 +94,9 @@
         checkbox.addEventListener('change', fn)
         fn()
       }
-      toggle(playSprites, myCanvas)
-      toggle(playTable, myTable)
-      toggle(playScreenreader, myAudioWrapper)
+      toggle(playSprites, myCanvas, visualOut)
+      toggle(playTable, myTable, tableOut)
+      toggle(playScreenreader, myAudio, audioOut)
 
     })()
   </script>

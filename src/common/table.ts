@@ -268,9 +268,9 @@ function setIntersection<T> (s1: Set<T>, s2: Set<T>) {
 }
 
 export class AndOutputter implements IOutputter {
-  private readonly outs: IOutputter[]
+  private readonly outs: Set<IOutputter>
   constructor (outs: IOutputter[]) {
-    this.outs = outs
+    this.outs = new Set(outs)
   }
 
   draw (game: Game, tiles: Array<ObjectInstance<any, any>>, camera: Camera, curTick: number, grid: Size, overlayState: SimpleObject, pendingDialog: Opt<Dialog>, sprites: SpriteController) {
