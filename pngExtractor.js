@@ -107,7 +107,7 @@ fs.createReadStream('akurra-tiles.png')
     ['OverlayTopLeft1', 'OverlayTopLeft2', 'OverlayTop', 'OverlayTopCrack', 'OverlayTopRight1', 'OverlayTopRight2'],
     ['OverlayBottomLeft1', 'OverlayBottomLeft2', 'OverlayBottom', 'OverlayBottomCrack', 'OverlayBottomRight1', 'OverlayBottomRight2'],
     ['GrassCorner', 'GrassBottom', 'Grass', 'GrassLeft', 'GrassTopLeft', 'GrassTop', 'GrassTopRight'],
-    ['FieldCorner', 'FieldBottom', 'Field', 'Field2', 'FieldTopLeft', 'FieldTop', 'FieldTopRight'],
+    ['FieldCorner', 'FieldBottom', 'Field', 'Field2', 'FieldTopLeft', 'FieldTop', 'FieldTopRight', 'FieldLeft'],
     ['LandCorner', 'LandBottom', 'Land', 'Land2', 'LandLeft'],
     ['SandBottom', 'Sand', 'SandLeft', ]
   ]

@@ -208,29 +208,29 @@ export class AudioOutputter implements IOutputter {
         }
 
         if (appeared.size + disappeared.size + changed.size > 0) {
-          messages.push('START Inventory updates')
+          // messages.push('START Inventory updates')
 
           if (appeared.size > 0) {
             [...appeared.keys()].forEach((key) => {
               const value = currentOverlay.get(key)
-              messages.push(`  Item ${key} added with value ${value}`)
+              messages.push(`  ${key} in inventory was added with value ${value}`)
             })
           }
 
           if (disappeared.size > 0) {
             [...disappeared.keys()].forEach((key) => {
               const value = this.prevOverlay.get(key)
-              messages.push(`  Item ${key} removed with value ${value}`)
+              messages.push(`  ${key} in inventory was removed with value ${value}`)
             })
           }
 
           if (changed.size > 0) {
             [...changed.entries()].forEach(([key, { from, to }]) => {
-              messages.push(`  Item ${key} changed from ${from} to ${to}`)
+              messages.push(`  ${key} in inventory changed from ${from} to ${to}`)
             })
           }
 
-          messages.push('END Inventory Updates')
+          // messages.push('END Inventory Updates')
         }
 
         this.prevOverlay = currentOverlay
