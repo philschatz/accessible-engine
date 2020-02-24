@@ -97,8 +97,8 @@ fs.createReadStream('akurra-tiles.png')
   const sprites = [
     ['Sand', 'Rock', 'Bush', 'Pedestal', 'WallTopRightDown', 'Background'],
     ['SandEdge', 'Crate', 'GongRed', 'PillarRed', 'WallTopUpDown', 'PlayerPushingRight'],
-    ['Land', 'Lock', 'ArrowLeft', 'WallTopLeftRight', 'WallTopUpLeft', 'PlayerPushingUp'],
-    ['LandCorner', 'LandBottom', 'ArrowLeftDisabled', 'Wall', 'WallVert', 'PlayerPushingDown'],
+    [null, 'Lock', 'ArrowLeft', 'WallTopLeftRight', 'WallTopUpLeft', 'PlayerPushingUp'],
+    ['Hole', 'HoleCrate', 'ArrowLeftDisabled', 'Wall', 'WallVert', 'PlayerPushingDown'],
     ['Water0', 'Water1', 'Water2', 'Water3', 'Water4', 'TreeTop'],
     ['PlayerStoppedDown', 'PlayerWalkingRight1', 'PlayerWalkingRight2', 'PlayerWalkingUp', 'PlayerWalkingDown', 'TreeBottom'],
     ['GongDisabled1', 'GongDisabled2', 'GongDisabled3', 'GongDisabled4', 'GongDisabled5', 'GongDisabled6'],
@@ -106,7 +106,9 @@ fs.createReadStream('akurra-tiles.png')
     ['FloorSquareDone', 'FloorDiamondDone', 'FloorPoof1', 'FloorPoof2', 'FloorPoof3Diamond', 'FloorPoof3Square'],
     ['OverlayTopLeft1', 'OverlayTopLeft2', 'OverlayTop', 'OverlayTopCrack', 'OverlayTopRight1', 'OverlayTopRight2'],
     ['OverlayBottomLeft1', 'OverlayBottomLeft2', 'OverlayBottom', 'OverlayBottomCrack', 'OverlayBottomRight1', 'OverlayBottomRight2'],
-    ['GrassCorner', 'GrassBottom', 'Grass', 'GrassLeft', 'NextRoomArrow'],
+    ['GrassCorner', 'GrassBottom', 'Grass', 'GrassLeft', 'NextRoomArrowVert'],
+    ['FieldCorner', 'FieldBottom', 'Field', 'Field2', 'NextRoomArrowHoriz'],
+    ['LandCorner', 'LandBottom', 'Land', 'Land2'],
   ]
   const letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXY' // Z is null
 

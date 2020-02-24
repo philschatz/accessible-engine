@@ -36,6 +36,7 @@ export class ObjectInstance<P, S> {
   isGrayscale: boolean
   public props: P
   public hFlip: boolean
+  public vFlip: boolean
 
   constructor (t: GameObject<P, S>, pos: IPosition, props: P) {
     this._zIndex = null
@@ -44,6 +45,7 @@ export class ObjectInstance<P, S> {
     this.pos = pos
     this.props = props
     this.hFlip = false
+    this.vFlip = false
     this.offsetPos = { x: 0, y: 0 }
   }
 
@@ -79,6 +81,11 @@ export class ObjectInstance<P, S> {
 
   getPixelPos (grid: Size) {
     return posAdd(posTimes(this.pos, grid), this.offsetPos)
+  }
+
+  flip (hFlip: boolean, vFlip: boolean) {
+    this.hFlip = hFlip
+    this.vFlip = vFlip
   }
 }
 

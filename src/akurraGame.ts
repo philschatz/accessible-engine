@@ -1,9 +1,11 @@
-import { Game, Camera, SpriteController, Sprite, InstanceController, ObjectInstance, CollisionChecker, IPosition, GameObject, DrawPixelsFn, ShowDialogFn, SimpleObject, Opt, DrawTextFn } from './common/engine'
+import { Game, Camera, SpriteController, Sprite, InstanceController, ObjectInstance, CollisionChecker, IPosition, GameObject, DrawPixelsFn, ShowDialogFn, SimpleObject, Opt, DrawTextFn, posAdd } from './common/engine'
 import { IGamepad, BUTTON_TYPE } from './common/gamepad'
 import { loadImages } from './akurraImages'
 
 // https://stackoverflow.com/questions/521295/seeding-the-random-number-generator-in-javascript/47593316#47593316
 var LCG = (s: number) => () => (2 ** 31 - 1 & (s = Math.imul(48271, s))) / 2 ** 31
+
+const ROOM_SIZE = { width: 24, height: 12 }
 
 const EVERYTHING_BBOX = {
   minX: -1000,
@@ -134,6 +136,7 @@ export class MyGame implements Game {
     const Pedestal = instances.simple(sprites, 'Pedestal', obZ)
     const LandCorner = instances.simple(sprites, 'LandCorner', bgZ)
     const LandBottom = instances.simple(sprites, 'LandBottom', bgZ)
+    const Land2 = instances.simple(sprites, 'Land2', bgZ)
     const ArrowLeftDisabled = instances.simple(sprites, 'ArrowLeftDisabled', obZ)
     const Wall = instances.simple(sprites, 'Wall', obZ)
     const WallVert = instances.simple(sprites, 'WallVert', obZ)
@@ -145,7 +148,21 @@ export class MyGame implements Game {
     const GrassBottom = instances.simple(sprites, 'GrassBottom', obZ)
     const GrassMid = instances.simple(sprites, 'Grass', obZ)
     const GrassLeft = instances.simple(sprites, 'GrassLeft', obZ)
-    const NextRoomArrow = instances.simple(sprites, 'NextRoomArrow', obZ)
+    const NextRoomArrowVert = instances.simple(sprites, 'NextRoomArrowVert', obZ)
+    const NextRoomArrowHoriz = instances.simple(sprites, 'NextRoomArrowHoriz', obZ)
+
+    const FieldCorner = instances.simple(sprites, 'FieldCorner', obZ)
+    const FieldBottom = instances.simple(sprites, 'FieldBottom', obZ)
+    const Field = instances.simple(sprites, 'Field', obZ)
+    const Field2 = instances.simple(sprites, 'Field2', obZ)
+
+    const Hole = instances.simple(sprites, 'Hole', obZ)
+    const HoleCrate = instances.simple(sprites, 'HoleCrate', obZ)
+
+    const ArrowDown = ArrowLeft
+    const ArrowDownDisabled = ArrowLeftDisabled
+    const ArrowUp = ArrowLeft
+    const ArrowUpDisabled = ArrowLeftDisabled
 
     function g (item: GameObject<any, any>, pos: IPosition) {
       // convert from grid coordinates to pixels
@@ -163,6 +180,354 @@ export class MyGame implements Game {
 
     let y = 0
     let x = 0
+    let xStart = 0
+
+    // -------------------------------
+    // Big Door Room
+    // -------------------------------
+    y = 0
+    xStart = 0
+
+    // Row 0
+    g(WallTopLeftRight, { x: x++, y })
+    g(WallTopLeftRight, { x: x++, y })
+    g(WallTopLeftRight, { x: x++, y })
+    g(WallTopLeftRight, { x: x++, y })
+    g(WallTopLeftRight, { x: x++, y })
+    g(WallTopLeftRight, { x: x++, y })
+    g(WallTopLeftRight, { x: x++, y })
+    g(WallTopLeftRight, { x: x++, y })
+    g(WallTopLeftRight, { x: x++, y })
+    g(WallTopUpLeft, { x: x++, y })
+    x++
+    x++
+    x++
+    x++
+    g(WallTopUpLeft, { x: x++, y }).hFlip = true
+    g(WallTopLeftRight, { x: x++, y })
+    g(WallTopLeftRight, { x: x++, y })
+    g(WallTopLeftRight, { x: x++, y })
+    g(WallTopLeftRight, { x: x++, y })
+    g(WallTopLeftRight, { x: x++, y })
+    g(WallTopLeftRight, { x: x++, y })
+    g(WallTopLeftRight, { x: x++, y })
+    g(WallTopLeftRight, { x: x++, y })
+    g(WallTopLeftRight, { x: x++, y })
+
+    // Row 1
+    x = xStart; y += 1
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(WallVert, { x: x++, y })
+    x++
+    x++
+    x++
+    x++
+    g(WallVert, { x: x++, y }).hFlip = true
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    
+    // Row 2
+    x = xStart; y += 1
+    g(GrassMid, { x: x++, y })
+    g(WallTopUpDown, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(WallVert, { x: x++, y })
+    x++
+    x++
+    x++
+    x++
+    g(WallVert, { x: x++, y }).hFlip = true
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(WallTopUpDown, { x: x++, y }).hFlip = true
+    g(GrassMid, { x: x++, y })
+
+    // Row 3
+    x = xStart; y += 1
+    g(WallTopLeftRight, { x: x++, y })
+    g(WallTopUpLeft, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(WallVert, { x: x++, y })
+    x++
+    x++
+    x++
+    x++
+    g(WallVert, { x: x++, y }).hFlip = true
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(WallTopUpLeft, { x: x++, y }).hFlip = true
+    g(WallTopLeftRight, { x: x++, y })
+
+    // Row 4
+    x = xStart; y += 1
+    g(Wall, { x: x++, y })
+    g(WallVert, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(WallVert, { x: x++, y })
+    g(Field, { x: x++, y })
+    g(Field, { x: x++, y })
+    g(Field, { x: x++, y })
+    g(Field, { x: x++, y })
+    g(WallVert, { x: x++, y }).hFlip = true
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(Wall, { x: x++, y })
+    g(WallVert, { x: x++, y }).hFlip = true
+    g(Wall, { x: x++, y })
+    
+    // Row 5
+    x = xStart; y += 1
+    g(Wall, { x: x++, y })
+    g(WallVert, { x: x++, y })
+    g(PillarRed, { x: x++, y })
+    g(FieldCorner, { x: x++, y })
+    g(Field, { x: x++, y })
+    g(Field, { x: x++, y })
+    g(Field2, { x: x++, y })
+    g(Field2, { x: x++, y })
+    g(Field, { x: x++, y })
+    g(Field2, { x: x++, y })
+    g(Field, { x: x++, y })
+    g(Field, { x: x++, y })
+    g(Field, { x: x++, y })
+    g(Field2, { x: x++, y })
+    g(Field, { x: x++, y })
+    g(Field, { x: x++, y })
+    g(Field, { x: x++, y })
+    g(Field2, { x: x++, y })
+    g(Field, { x: x++, y })
+    g(FieldBottom, { x: x++, y })
+    g(FieldCorner, { x: x++, y }).hFlip = true
+    g(Rock, { x: x++, y })
+    g(WallVert, { x: x++, y }).hFlip = true
+    g(Wall, { x: x++, y })
+    
+    // Row 7
+    x = xStart; y += 1
+    g(Land, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(ArrowDown, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(FieldCorner, { x: x++, y })
+    g(Field, { x: x++, y })
+    g(Field, { x: x++, y })
+    g(Field2, { x: x++, y })
+    g(Field, { x: x++, y })
+    g(Field, { x: x++, y })
+    g(Field2, { x: x++, y })
+    g(Field, { x: x++, y })
+    g(Field, { x: x++, y })
+    g(Field, { x: x++, y })
+    g(Field, { x: x++, y })
+    g(Field, { x: x++, y })
+    g(Field2, { x: x++, y })
+    g(Field, { x: x++, y })
+    g(FieldCorner, { x: x++, y }).hFlip = true
+    g(Land2, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(ArrowUpDisabled, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(NextRoomArrowHoriz, { x, y }).offsetPos = { x: 0, y: 8 }
+    g(Land, { x: x++, y })
+
+    // Row 8
+    x = xStart; y += 1
+    g(Land, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(ArrowDownDisabled, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(FieldCorner, { x: x++, y })
+    g(FieldBottom, { x: x++, y })
+    g(FieldBottom, { x: x++, y })
+    g(Field, { x: x++, y })
+    g(Field, { x: x++, y })
+    g(Field, { x: x++, y })
+    g(Field, { x: x++, y })
+    g(Field, { x: x++, y })
+    g(Field, { x: x++, y })
+    g(Field2, { x: x++, y })
+    g(Field, { x: x++, y })
+    g(FieldBottom, { x: x++, y })
+    g(FieldCorner, { x: x++, y }).hFlip = true
+    g(Land, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(ArrowUp, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(Land, { x: x++, y })
+
+    // Row 9
+    x = xStart; y += 1
+    g(WallTopLeftRight, { x: x++, y }).vFlip = true
+    g(WallTopUpLeft, { x: x++, y }).vFlip = true
+    g(Rock, { x: x++, y })
+    g(Rock, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(FieldCorner, { x: x++, y })
+    g(FieldBottom, { x: x++, y })
+    g(FieldBottom, { x: x++, y })
+    g(FieldBottom, { x: x++, y })
+    g(FieldBottom, { x: x++, y })
+    g(FieldBottom, { x: x++, y })
+    g(FieldBottom, { x: x++, y })
+    g(FieldCorner, { x: x++, y }).hFlip = true
+    g(Land, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(Rock, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(WallTopUpLeft, { x: x++, y }).flip(true, true)
+    g(WallTopLeftRight, { x: x++, y }).vFlip = true
+
+
+    // Row 10
+    x = xStart; y += 1
+    g(GrassMid, { x: x++, y })
+    g(WallTopUpDown, { x: x++, y })
+    g(GongRed, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(Hole, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(Crate, { x, y })
+    g(Land, { x: x++, y })
+    g(Land2, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(Land2, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(Lock, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(WallTopUpDown, { x: x++, y }).hFlip = true
+    g(GrassMid, { x: x++, y })
+
+    // Row 11
+    x = xStart; y += 1
+    g(GrassMid, { x: x++, y })
+    g(WallTopRightDown, { x: x++, y }).vFlip = true
+    g(WallTopLeftRight, { x: x++, y }).vFlip = true
+    g(WallTopLeftRight, { x: x++, y }).vFlip = true
+    g(WallTopLeftRight, { x: x++, y }).vFlip = true
+    g(WallTopLeftRight, { x: x++, y }).vFlip = true
+    g(WallTopLeftRight, { x: x++, y }).vFlip = true
+    g(WallTopLeftRight, { x: x++, y }).vFlip = true
+    g(WallTopLeftRight, { x: x++, y }).vFlip = true
+    g(WallTopUpLeft, { x: x++, y }).vFlip = true
+    g(Land, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(WallTopUpLeft, { x: x++, y }).flip(true, true)
+    g(WallTopLeftRight, { x: x++, y }).vFlip = true
+    g(WallTopLeftRight, { x: x++, y }).vFlip = true
+    g(WallTopLeftRight, { x: x++, y }).vFlip = true
+    g(WallTopLeftRight, { x: x++, y }).vFlip = true
+    g(WallTopLeftRight, { x: x++, y }).vFlip = true
+    g(WallTopLeftRight, { x: x++, y }).vFlip = true
+    g(WallTopLeftRight, { x: x++, y }).vFlip = true
+    g(WallTopRightDown, { x: x++, y }).flip(true, true)
+    g(GrassMid, { x: x++, y })
+
+    // Row 12
+    x = xStart; y += 1
+    g(GrassMid, { x: x++, y })
+    g(GrassMid, { x: x++, y })
+    g(GrassMid, { x: x++, y })
+    g(GrassMid, { x: x++, y })
+    g(GrassMid, { x: x++, y })
+    g(GrassMid, { x: x++, y })
+    g(GrassMid, { x: x++, y })
+    g(GrassMid, { x: x++, y })
+    g(GrassMid, { x: x++, y })
+    g(WallTopUpDown, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(Land, { x: x++, y })
+    g(WallTopUpDown, { x: x++, y }).hFlip = true
+    g(GrassMid, { x: x++, y })
+    g(GrassMid, { x: x++, y })
+    g(GrassMid, { x: x++, y })
+    g(GrassMid, { x: x++, y })
+    g(GrassMid, { x: x++, y })
+    g(GrassMid, { x: x++, y })
+    g(GrassMid, { x: x++, y })
+    g(GrassMid, { x: x++, y })
+    g(GrassMid, { x: x++, y })
+
+
+
+
+
+
+
+
+
+
+        
+    // -------------------------------
+    // Initial Shipwreck Room
+    // -------------------------------
+    x = xStart; y += 1
 
     // Row0
     g(Rock, { x: x++, y })
@@ -176,7 +541,7 @@ export class MyGame implements Game {
     g(GrassMid, { x: x++, y })
     g(WallTopUpDown, { x: x++, y })
     g(Land, { x: x++, y })
-    g(NextRoomArrow, { x, y }).offsetPos = { x: 8, y: 0 }
+    g(NextRoomArrowVert, { x, y }).offsetPos = { x: 8, y: 0 }
     g(Land, { x: x++, y })
     g(Land, { x: x++, y })
     g(Land, { x: x++, y })
@@ -192,7 +557,7 @@ export class MyGame implements Game {
     g(Rock, { x: x++, y })
 
     // Row1
-    x = 0; y += 1
+    x = xStart; y += 1
     g(Rock, { x: x++, y })
     g(GrassLeft, { x: x++, y })
     g(WallTopRightDown, { x: x++, y })
@@ -219,7 +584,7 @@ export class MyGame implements Game {
     g(Rock, { x: x++, y })
 
     // Row2
-    x = 0; y += 1
+    x = xStart; y += 1
     g(Bush, { x: x++, y })
     g(GrassLeft, { x: x++, y })
     g(WallTopUpDown, { x: x++, y })
@@ -246,7 +611,7 @@ export class MyGame implements Game {
     g(Bush, { x: x++, y })
 
     // Row3
-    x = 0; y += 1
+    x = xStart; y += 1
     g(Bush, { x: x++, y })
     g(GrassCorner, { x: x++, y })
     g(WallTopUpDown, { x: x++, y })
@@ -277,7 +642,7 @@ export class MyGame implements Game {
     g(Bush, { x: x++, y })
 
     // Row4
-    x = 0; y += 1
+    x = xStart; y += 1
     g(Bush, { x: x++, y })
     g(Bush, { x: x++, y })
     g(WallTopUpDown, { x: x++, y })
@@ -307,7 +672,7 @@ export class MyGame implements Game {
     g(Bush, { x: x++, y })
 
     // Row5
-    x = 0; y += 1
+    x = xStart; y += 1
     g(Bush, { x: x++, y })
     g(TreeTop, { x: x++, y })
     g(WallTopUpDown, { x: x++, y })
@@ -335,7 +700,7 @@ export class MyGame implements Game {
     g(TreeTop, { x: x++, y })
 
     // Row6
-    x = 0; y += 1
+    x = xStart; y += 1
     g(Bush, { x: x++, y })
     g(TreeBottom, { x: x++, y })
     g(WallTopUpDown, { x: x++, y })
@@ -364,7 +729,7 @@ export class MyGame implements Game {
     g(TreeBottom, { x: x++, y })
 
     // Row7
-    x = 0; y += 1
+    x = xStart; y += 1
     g(WallTopLeftRight, { x: x++, y })
     g(WallTopLeftRight, { x: x++, y })
     g(WallTopUpLeft, { x: x++, y })
@@ -376,8 +741,8 @@ export class MyGame implements Game {
     g(Sand, { x: x++, y })
     g(Sand, { x: x++, y })
     g(Sand, { x: x++, y })
-    g(Sand, { x, y })
-    g(player, { x: x++, y })
+    g(Sand, { x: x++, y })
+    g(player, { x, y: y })
     g(Sand, { x: x++, y })
     g(Sand, { x: x++, y })
     g(Sand, { x: x++, y })
@@ -392,7 +757,7 @@ export class MyGame implements Game {
     g(WallTopLeftRight, { x: x++, y })
 
     // Row8
-    x = 0; y += 1
+    x = xStart; y += 1
     g(Wall, { x: x++, y })
     g(Wall, { x: x++, y })
     g(WallVert, { x: x++, y })
@@ -419,7 +784,7 @@ export class MyGame implements Game {
     g(Wall, { x: x++, y })
 
     // Row9
-    x = 0; y += 1
+    x = xStart; y += 1
     g(Wall, { x: x++, y })
     g(Wall, { x: x++, y })
     g(WallVert, { x: x++, y })
@@ -446,7 +811,7 @@ export class MyGame implements Game {
     g(Wall, { x: x++, y })
 
     // Row10
-    x = 0; y += 1
+    x = xStart; y += 1
     waterAnim(g(Water, { x: x++, y }))
     waterAnim(g(Water, { x: x++, y }))
     waterAnim(g(Water, { x: x++, y }))
@@ -473,7 +838,7 @@ export class MyGame implements Game {
     waterAnim(g(Water, { x: x++, y }))
 
     // Row11
-    x = 0; y += 1
+    x = xStart; y += 1
     waterAnim(g(Water, { x: x++, y }))
     waterAnim(g(Water, { x: x++, y }))
     waterAnim(g(Water, { x: x++, y }))
@@ -605,10 +970,33 @@ interface PlayerProps {
   // keyCount: number  stored in the overlayState
 }
 
+function currentRoomCorner(playerGridPos: IPosition) {
+  return {
+    x: Math.floor(playerGridPos.x / ROOM_SIZE.width) * ROOM_SIZE.width,
+    y: Math.floor(playerGridPos.y / ROOM_SIZE.height) * ROOM_SIZE.height,
+  }
+}
+
+function currentRoomBBox(playerGridPos: IPosition) {
+  const pos = currentRoomCorner(playerGridPos)
+  return {
+    minX: pos.x,
+    minY: pos.y,
+    maxX: pos.x + ROOM_SIZE.width,
+    maxY: pos.y + ROOM_SIZE.height,
+  }
+}
+
 function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, showDialog: ShowDialogFn, overlayState: SimpleObject, curTick: number) {
-  const room = { width: 24, height: 14 }
-  camera.pos = { x: room.width / 2, y: room.height / 2 - 3 }
-  camera.resize(room)
+  camera.resize({
+    width: ROOM_SIZE.width,
+    height: ROOM_SIZE.height + 2,
+  })
+
+  const playerGridPos = o.pos
+  const playerRoomPos = currentRoomCorner(o.pos)
+
+  camera.pos = posAdd(playerRoomPos, { x: ROOM_SIZE.width / 2, y: ROOM_SIZE.height / 2 - 2 })
 
   const PlayerWalkingUp = sprites.get('PlayerWalkingUp')
   const PlayerWalkingDown = sprites.get('PlayerWalkingDown')
@@ -642,12 +1030,12 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
     ArrowLeftDisabled,
     sprites.get('Rock'),
     sprites.get('Bush'),
-    sprites.get('WallTopRightDown'),
-    sprites.get('WallTopUpDown'),
-    sprites.get('WallTopLeftRight'),
-    sprites.get('WallTopUpLeft'),
-    sprites.get('Wall'),
-    sprites.get('WallVert'),
+    // sprites.get('WallTopRightDown'),
+    // sprites.get('WallTopUpDown'),
+    // sprites.get('WallTopLeftRight'),
+    // sprites.get('WallTopUpLeft'),
+    // sprites.get('Wall'),
+    // sprites.get('WallVert'),
     sprites.get('Water')
   ]
 
@@ -713,8 +1101,8 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
 
     if (GongRed === wallNeighbor.sprite) {
       o.offsetPos = { x: 0, y: 0 }
-      // remove all the pillars
-      const pillars = collisionChecker.searchBBox(EVERYTHING_BBOX).filter(t => t.sprite === PillarRed)
+      // remove all the pillars in the current room
+      const pillars = collisionChecker.searchBBox(currentRoomBBox(o.pos)).filter(t => t.sprite === PillarRed)
       pillars.forEach(p => p.setSprite(FloorSquare))
       // wallNeighbor.setMask(null, true)
       wallNeighbor.setSprite(GongDisabled)

@@ -35,7 +35,7 @@ export class VisualOutputter implements IOutputter {
       if (t.isGrayscale) {
         pixels = pixels.map(row => row.map(c => c === null ? null : toGrayscale(c)))
       }
-      this.drawPixels(screenPos, pixels, t.hFlip, false)
+      this.drawPixels(screenPos, pixels, t.hFlip, t.vFlip)
     }
 
     game.drawOverlay(this.drawPixels, this.drawText, overlayState, sprites)
