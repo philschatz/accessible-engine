@@ -1,4 +1,4 @@
-import { Game, Camera, SpriteController, Sprite, InstanceController, ObjectInstance, CollisionChecker, IPosition, GameObject, DrawPixelsFn, ShowDialogFn, SimpleObject, Opt, DrawTextFn, posAdd } from './common/engine'
+import { Game, Camera, SpriteController, Sprite, InstanceController, ObjectInstance, CollisionChecker, IPosition, GameObject, DrawPixelsFn, ShowDialogFn, SimpleObject, Opt, DrawTextFn, posAdd, ROTATION_AMOUNT } from './common/engine'
 import { IGamepad, BUTTON_TYPE } from './common/gamepad'
 import { loadImages } from './akurraImages'
 
@@ -122,7 +122,7 @@ export class MyGame implements Game {
     const Rock = instances.simple(sprites, 'Rock', obZ)
     const Bush = instances.simple(sprites, 'Bush', obZ)
     const WallTopRightDown = instances.simple(sprites, 'WallTopRightDown', obZ)
-    const SandEdge = instances.simple(sprites, 'SandEdge', bgZ)
+    const SandBottom = instances.simple(sprites, 'SandBottom', bgZ)
     const Crate = instances.factory('Crate', sprites.get('Crate'), obZ, crateUpdateFn)
     const GongRed = instances.simple(sprites, 'GongRed', obZ)
     const PillarRed = instances.simple(sprites, 'PillarRed', obZ)
@@ -146,8 +146,7 @@ export class MyGame implements Game {
     const GrassBottom = instances.simple(sprites, 'GrassBottom', obZ)
     const GrassMid = instances.simple(sprites, 'Grass', obZ)
     const GrassLeft = instances.simple(sprites, 'GrassLeft', obZ)
-    const NextRoomArrowVert = instances.simple(sprites, 'NextRoomArrowVert', obZ)
-    const NextRoomArrowHoriz = instances.simple(sprites, 'NextRoomArrowHoriz', obZ)
+    const NextRoomArrow = instances.simple(sprites, 'NextRoomArrow', obZ)
 
     const FieldCorner = instances.simple(sprites, 'FieldCorner', obZ)
     const FieldBottom = instances.simple(sprites, 'FieldBottom', obZ)
@@ -369,6 +368,7 @@ export class MyGame implements Game {
     
     // Row 7
     x = xStart; y += 1
+    g(NextRoomArrow, { x, y }).setOffset({ x: 0, y: 8 }).rotate(ROTATION_AMOUNT.LEFT)
     g(Land, { x: x++, y })
     g(Land, { x: x++, y })
     g(ArrowDown, { x: x++, y })
@@ -392,7 +392,7 @@ export class MyGame implements Game {
     g(Land, { x: x++, y })
     g(ArrowUpDisabled, { x: x++, y })
     g(Land, { x: x++, y })
-    g(NextRoomArrowHoriz, { x, y }).offsetPos = { x: 0, y: 8 }
+    g(NextRoomArrow, { x, y }).setOffset({ x: 0, y: 8 })
     g(Land, { x: x++, y })
 
     // Row 8
@@ -559,7 +559,7 @@ export class MyGame implements Game {
     g(GrassMid, { x: x++, y })
     g(WallTopUpDown, { x: x++, y })
     g(Land, { x: x++, y })
-    g(NextRoomArrowVert, { x, y }).offsetPos = { x: 8, y: 0 }
+    g(NextRoomArrow, { x, y }).setOffset({ x: 8, y: 0 }).rotate(ROTATION_AMOUNT.UP)
     g(Land, { x: x++, y })
     g(Land, { x: x++, y })
     g(Land, { x: x++, y })
@@ -779,23 +779,23 @@ export class MyGame implements Game {
     g(Wall, { x: x++, y })
     g(Wall, { x: x++, y })
     g(WallVert, { x: x++, y })
-    g(SandEdge, { x: x++, y })
-    g(SandEdge, { x: x++, y })
-    g(SandEdge, { x: x++, y })
-    g(SandEdge, { x: x++, y })
-    g(SandEdge, { x: x++, y })
-    g(SandEdge, { x: x++, y })
-    g(SandEdge, { x: x++, y })
-    g(SandEdge, { x: x++, y })
-    g(SandEdge, { x: x++, y })
-    g(SandEdge, { x: x++, y })
-    g(SandEdge, { x: x++, y })
-    g(SandEdge, { x: x++, y })
-    g(SandEdge, { x: x++, y })
-    g(SandEdge, { x: x++, y })
-    g(SandEdge, { x: x++, y })
-    g(SandEdge, { x: x++, y })
-    g(SandEdge, { x: x++, y })
+    g(SandBottom, { x: x++, y })
+    g(SandBottom, { x: x++, y })
+    g(SandBottom, { x: x++, y })
+    g(SandBottom, { x: x++, y })
+    g(SandBottom, { x: x++, y })
+    g(SandBottom, { x: x++, y })
+    g(SandBottom, { x: x++, y })
+    g(SandBottom, { x: x++, y })
+    g(SandBottom, { x: x++, y })
+    g(SandBottom, { x: x++, y })
+    g(SandBottom, { x: x++, y })
+    g(SandBottom, { x: x++, y })
+    g(SandBottom, { x: x++, y })
+    g(SandBottom, { x: x++, y })
+    g(SandBottom, { x: x++, y })
+    g(SandBottom, { x: x++, y })
+    g(SandBottom, { x: x++, y })
     g(WallVert, { x: x++, y }).hFlip = true
     g(Wall, { x: x++, y })
     g(Wall, { x: x++, y })

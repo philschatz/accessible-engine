@@ -2,7 +2,7 @@
 
 <head>
   <style>
-    #my_canvas { width: 100%; }
+    #my_canvas { width: 100%; max-width: 800px !important; }
     #my_table table { border-spacing: 0; }
     #my_table table caption { font-weight: bold; }
     #my_table table td { border: 1px solid black; }
@@ -33,7 +33,7 @@
     <label for="play_screenreader">Using Audio read by a screenreader</label><br/>
     <p><strong tabindex="0" aria-controls="my_audio_messages">How to use this</strong> . Try completing the level without using the graphical option. Note what happens when you push against a wall, or when you get/use a key. Creating a sokoban-style games to be accessible only requires a minimal amount of accessible hoops to jump through; game devs can just write game code for the most part. For more on how to build accessible videogames check out the repository.</p>
   </fieldset>
-  <canvas tabindex="0" id="my_canvas" width="500" height="250"></canvas>
+  <canvas tabindex="0" id="my_canvas" width="384" height="224"></canvas>
   <div id="my_table"></div>
   <ol id="my_audio" role="log" aria-live="polite" aria-atomic="false">
   </ol>

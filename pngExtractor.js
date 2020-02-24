@@ -95,20 +95,21 @@ fs.createReadStream('akurra-tiles.png')
 
   // Output code for each of the sprites. Use single-letter variables (lower/uppercase) for the colors
   const sprites = [
-    ['Sand', 'Rock', 'Bush', 'Pedestal', 'WallTopRightDown', 'Background', 'BigDoor0', 'BigDoor1', 'BigDoor2', 'BigDoor3'],
-    ['SandEdge', 'Crate', 'GongRed', 'PillarRed', 'WallTopUpDown', 'PlayerPushingRight', 'BigDoor4', 'BigDoor5', 'BigDoor6', 'BigDoor7'],
-    [null, 'Lock', null, 'WallTopLeftRight', 'WallTopUpLeft', 'PlayerPushingUp', 'BigDoor8', 'BigDoor9', 'BigDoor10', 'BigDoor11'],
-    ['Hole', 'HoleCrate', null, 'Wall', 'WallVert', 'PlayerPushingDown', 'BigDoor12', 'BigDoor13', 'BigDoor14', 'BigDoor15'],
+    ['Stump', 'Rock', 'Bush', 'Pedestal', 'WallTopRightDown', 'Background', 'BigDoor0', 'BigDoor1', 'BigDoor2', 'BigDoor3'],
+    ['Pit', 'Crate', 'OrangeRock', null, 'WallTopUpDown', 'PlayerPushingRight', 'BigDoor4', 'BigDoor5', 'BigDoor6', 'BigDoor7'],
+    ['NextRoomArrow', 'Lock', 'WallLadder', 'WallTopLeftRight', 'WallTopUpLeft', 'PlayerPushingUp', 'BigDoor8', 'BigDoor9', 'BigDoor10', 'BigDoor11'],
+    ['Hole', 'HoleCrate', 'HoleStraw', 'Wall', 'WallVert', 'PlayerPushingDown', 'BigDoor12', 'BigDoor13', 'BigDoor14', 'BigDoor15'],
     ['Water0', 'Water1', 'Water2', 'Water3', 'Water4', 'TreeTop', 'ArrowRight', 'ArrowUp', 'ArrowLeft', 'ArrowDown'],
     ['PlayerStoppedDown', 'PlayerWalkingRight1', 'PlayerWalkingRight2', 'PlayerWalkingUp', 'PlayerWalkingDown', 'TreeBottom', 'ArrowRightDisabled', 'ArrowUpDisabled', 'ArrowLeftDisabled', 'ArrowDownDisabled'],
-    ['GongDisabled1', 'GongDisabled2', 'GongDisabled3', 'GongDisabled4', 'GongDisabled5', 'GongDisabled6'],
-    ['Key1', 'Key2', 'Key3', 'Key4', 'Key5', 'Key6'],
+    ['GongDisabled1', 'GongDisabled2', 'GongDisabled3', 'GongDisabled4', 'GongDisabled5', 'GongDisabled6', 'GongRed', 'PillarRed', 'ChimeRed', 'ChimePillarRed'],
+    ['Key1', 'Key2', 'Key3', 'Key4', 'Key5', 'Key6', 'GongBlue', 'PillarBlue', 'ChimeBlue', 'ChimePillarBlue'],
     ['FloorSquareDone', 'FloorDiamondDone', 'FloorPoof1', 'FloorPoof2', 'FloorPoof3Diamond', 'FloorPoof3Square'],
     ['OverlayTopLeft1', 'OverlayTopLeft2', 'OverlayTop', 'OverlayTopCrack', 'OverlayTopRight1', 'OverlayTopRight2'],
     ['OverlayBottomLeft1', 'OverlayBottomLeft2', 'OverlayBottom', 'OverlayBottomCrack', 'OverlayBottomRight1', 'OverlayBottomRight2'],
-    ['GrassCorner', 'GrassBottom', 'Grass', 'GrassLeft', 'NextRoomArrowVert'],
-    ['FieldCorner', 'FieldBottom', 'Field', 'Field2', 'NextRoomArrowHoriz'],
-    ['LandCorner', 'LandBottom', 'Land', 'Land2'],
+    ['GrassCorner', 'GrassBottom', 'Grass', 'GrassLeft', 'GrassTopLeft', 'GrassTop', 'GrassTopRight'],
+    ['FieldCorner', 'FieldBottom', 'Field', 'Field2', 'FieldTopLeft', 'FieldTop', 'FieldTopRight'],
+    ['LandCorner', 'LandBottom', 'Land', 'Land2', 'LandLeft'],
+    ['SandBottom', 'Sand', 'SandLeft', ]
   ]
   const letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXY' // Z is null
 

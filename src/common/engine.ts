@@ -95,6 +95,17 @@ export class ObjectInstance<P, S> {
   flip (hFlip: boolean, vFlip: boolean) {
     this.hFlip = hFlip
     this.vFlip = vFlip
+    return this
+  }
+
+  rotate (amt: ROTATION_AMOUNT) {
+    this.rotation = amt
+    return this
+  }
+
+  setOffset (pixels: IPosition) {
+    this.offsetPos = pixels
+    return this
   }
 }
 
