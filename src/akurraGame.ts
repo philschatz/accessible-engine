@@ -123,7 +123,7 @@ export class MyGame implements Game {
     const Bush = instances.simple(sprites, 'Bush', obZ)
     const WallTopRightDown = instances.simple(sprites, 'WallTopRightDown', obZ)
     const SandEdge = instances.simple(sprites, 'SandEdge', bgZ)
-    const Crate = instances.simple(sprites, 'Crate', obZ)
+    const Crate = instances.factory('Crate', sprites.get('Crate'), obZ, crateUpdateFn)
     const GongRed = instances.simple(sprites, 'GongRed', obZ)
     const PillarRed = instances.simple(sprites, 'PillarRed', obZ)
     const WallTopUpDown = instances.simple(sprites, 'WallTopUpDown', obZ)
@@ -1045,7 +1045,7 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
   const FloorSquare = sprites.get('FloorSquare')
   const FloorDiamond = sprites.get('FloorDiamond')
 
-  const wallSprites = [...pushableSprites,
+  const pushableWallSprites = [...pushableSprites,
     GongRed,
     GongDisabled,
     PillarRed,
@@ -1071,6 +1071,11 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
     sprites.get('BigDoor13'),
     sprites.get('BigDoor14'),
     sprites.get('BigDoor15'),
+  ]
+
+  const playerWallSprites = [
+    ...pushableWallSprites, 
+    sprites.get('Hole')
   ]
 
   // initialize the props
@@ -1127,7 +1132,7 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
   // If there is a collision then move the player back
   const neighborSprites = collisionChecker.searchPoint(o.pos)
   const wallNeighbor = neighborSprites
-    .find((obj) => wallSprites.includes(obj.sprite))
+    .find((obj) => playerWallSprites.includes(obj.sprite))
 
   if (wallNeighbor) {
     o.moveTo(oldPos)
@@ -1144,18 +1149,10 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
       // start pushing the box. Just immediately push it for now (if it is empty behind it)
       const neighborOld = wallNeighbor.pos
 
-      let newNeighborPos: IPosition
-
-      switch (p.dir) {
-        case PLAYER_DIR.UP: newNeighborPos = { x: wallNeighbor.pos.x, y: wallNeighbor.pos.y - 1 }; break
-        case PLAYER_DIR.DOWN: newNeighborPos = { x: wallNeighbor.pos.x, y: wallNeighbor.pos.y + 1 }; break
-        case PLAYER_DIR.LEFT: newNeighborPos = { x: wallNeighbor.pos.x - 1, y: wallNeighbor.pos.y }; break
-        case PLAYER_DIR.RIGHT: newNeighborPos = { x: wallNeighbor.pos.x + 1, y: wallNeighbor.pos.y }; break
-        default: throw new Error(`BUG: Invalid direction ${p.dir}`)
-      }
+      let newNeighborPos = posAdd(wallNeighbor.pos, neighborPos(p.dir))
 
       const isBehindNeighborFilled = collisionChecker.searchPoint(newNeighborPos)
-        .find((obj) => wallSprites.includes(obj.sprite))
+        .find((obj) => pushableWallSprites.includes(obj.sprite))
 
       if (isBehindNeighborFilled === wallNeighbor) {
         throw new Error('Should have .... oh, we already moved the neighbor... grrr')
@@ -1190,7 +1187,7 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
   }
 
   // Unlock the arrow locks when pushing the correct direction
-  function checkArrow(sprite: Sprite, disabledSprite: Sprite, playerDir: PLAYER_DIR, stepRelPos: IPosition) {
+  function checkArrow(sprite: Sprite, disabledSprite: Sprite, playerDir: PLAYER_DIR) {
     const maybeArrow = neighborSprites.find(obj => obj.sprite === sprite)
     if (maybeArrow && p.dir === playerDir) {
       // loop and delete all the disabled arrowlefts
@@ -1198,15 +1195,15 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
       while (cur) {
         const pos = cur.pos
         cur.setSprite(FloorDiamond)
-        cur = collisionChecker.searchPoint(posAdd(pos, stepRelPos)).find(obj => obj.sprite === disabledSprite)
+        cur = collisionChecker.searchPoint(posAdd(pos, neighborPos(playerDir))).find(obj => obj.sprite === disabledSprite)
       }
     }
   }
 
-  checkArrow(ArrowUp,    ArrowUpDisabled, PLAYER_DIR.UP, {x: 0, y: -1})
-  checkArrow(ArrowDown,  ArrowDownDisabled, PLAYER_DIR.DOWN, {x: 0, y: 1})
-  checkArrow(ArrowLeft,  ArrowLeftDisabled, PLAYER_DIR.LEFT, {x: -1, y: 0})
-  checkArrow(ArrowRight,  ArrowRightDisabled, PLAYER_DIR.RIGHT, {x: 1, y: 0})
+  checkArrow(ArrowUp,    ArrowUpDisabled, PLAYER_DIR.UP)
+  checkArrow(ArrowDown,  ArrowDownDisabled, PLAYER_DIR.DOWN)
+  checkArrow(ArrowLeft,  ArrowLeftDisabled, PLAYER_DIR.LEFT)
+  checkArrow(ArrowRight,  ArrowRightDisabled, PLAYER_DIR.RIGHT)
 
   o.hFlip = false
   switch (p.state) {
@@ -1235,4 +1232,27 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
   } else {
     o.sprite.loop = false
   }
+}
+
+function crateUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, showDialog: ShowDialogFn, overlayState: SimpleObject, curTick: number) {
+  const Hole = sprites.get('Hole')
+  const HoleCrate = sprites.get('HoleCrate')
+
+  const maybeHole = collisionChecker.searchPoint(o.pos).find(obj => obj.sprite === Hole)
+  if (maybeHole) {
+    maybeHole.setSprite(HoleCrate)
+    o.destroy()
+  }
+}
+
+
+function neighborPos(dir: PLAYER_DIR) {
+  switch (dir) {
+    case PLAYER_DIR.UP: return {x: 0, y: -1}
+    case PLAYER_DIR.DOWN: return {x: 0, y: 1}
+    case PLAYER_DIR.LEFT: return {x: -1, y: 0}
+    case PLAYER_DIR.RIGHT: return {x: 1, y: 0}
+    default: throw new Error(`BUG: Invalid dir ${dir}`)
+  }
+
 }
