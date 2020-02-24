@@ -95,10 +95,10 @@ fs.createReadStream('akurra-tiles.png')
 
   // Output code for each of the sprites. Use single-letter variables (lower/uppercase) for the colors
   const sprites = [
-    ['Sand', 'Rock', 'Bush', 'Pedestal', 'WallTopRightDown', 'Background'],
-    ['SandEdge', 'Crate', 'GongRed', 'PillarRed', 'WallTopUpDown', 'PlayerPushingRight'],
-    [null, 'Lock', 'ArrowLeft', 'WallTopLeftRight', 'WallTopUpLeft', 'PlayerPushingUp'],
-    ['Hole', 'HoleCrate', 'ArrowLeftDisabled', 'Wall', 'WallVert', 'PlayerPushingDown'],
+    ['Sand', 'Rock', 'Bush', 'Pedestal', 'WallTopRightDown', 'Background', 'BigDoor0', 'BigDoor1', 'BigDoor2', 'BigDoor3'],
+    ['SandEdge', 'Crate', 'GongRed', 'PillarRed', 'WallTopUpDown', 'PlayerPushingRight', 'BigDoor4', 'BigDoor5', 'BigDoor6', 'BigDoor7'],
+    [null, 'Lock', 'ArrowLeft', 'WallTopLeftRight', 'WallTopUpLeft', 'PlayerPushingUp', 'BigDoor8', 'BigDoor9', 'BigDoor10', 'BigDoor11'],
+    ['Hole', 'HoleCrate', 'ArrowLeftDisabled', 'Wall', 'WallVert', 'PlayerPushingDown', 'BigDoor12', 'BigDoor13', 'BigDoor14', 'BigDoor15'],
     ['Water0', 'Water1', 'Water2', 'Water3', 'Water4', 'TreeTop'],
     ['PlayerStoppedDown', 'PlayerWalkingRight1', 'PlayerWalkingRight2', 'PlayerWalkingUp', 'PlayerWalkingDown', 'TreeBottom'],
     ['GongDisabled1', 'GongDisabled2', 'GongDisabled3', 'GongDisabled4', 'GongDisabled5', 'GongDisabled6'],

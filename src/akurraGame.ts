@@ -159,6 +159,23 @@ export class MyGame implements Game {
     const Hole = instances.simple(sprites, 'Hole', obZ)
     const HoleCrate = instances.simple(sprites, 'HoleCrate', obZ)
 
+    const BigDoor0 = instances.simple(sprites, 'BigDoor0', obZ)
+    const BigDoor1 = instances.simple(sprites, 'BigDoor1', obZ)
+    const BigDoor2 = instances.simple(sprites, 'BigDoor2', obZ)
+    const BigDoor3 = instances.simple(sprites, 'BigDoor3', obZ)
+    const BigDoor4 = instances.simple(sprites, 'BigDoor4', obZ)
+    const BigDoor5 = instances.simple(sprites, 'BigDoor5', obZ)
+    const BigDoor6 = instances.simple(sprites, 'BigDoor6', obZ)
+    const BigDoor7 = instances.simple(sprites, 'BigDoor7', obZ)
+    const BigDoor8 = instances.simple(sprites, 'BigDoor8', obZ)
+    const BigDoor9 = instances.simple(sprites, 'BigDoor9', obZ)
+    const BigDoor10 = instances.simple(sprites, 'BigDoor10', obZ)
+    const BigDoor11 = instances.simple(sprites, 'BigDoor11', obZ)
+    const BigDoor12 = instances.simple(sprites, 'BigDoor12', obZ)
+    const BigDoor13 = instances.simple(sprites, 'BigDoor13', obZ)
+    const BigDoor14 = instances.simple(sprites, 'BigDoor14', obZ)
+    const BigDoor15 = instances.simple(sprites, 'BigDoor15', obZ)
+
     const ArrowDown = ArrowLeft
     const ArrowDownDisabled = ArrowLeftDisabled
     const ArrowUp = ArrowLeft
@@ -199,10 +216,10 @@ export class MyGame implements Game {
     g(WallTopLeftRight, { x: x++, y })
     g(WallTopLeftRight, { x: x++, y })
     g(WallTopUpLeft, { x: x++, y })
-    x++
-    x++
-    x++
-    x++
+    g(BigDoor0, { x: x++, y })
+    g(BigDoor1, { x: x++, y })
+    g(BigDoor2, { x: x++, y })
+    g(BigDoor3, { x: x++, y })
     g(WallTopUpLeft, { x: x++, y }).hFlip = true
     g(WallTopLeftRight, { x: x++, y })
     g(WallTopLeftRight, { x: x++, y })
@@ -226,10 +243,10 @@ export class MyGame implements Game {
     g(Wall, { x: x++, y })
     g(Wall, { x: x++, y })
     g(WallVert, { x: x++, y })
-    x++
-    x++
-    x++
-    x++
+    g(BigDoor4, { x: x++, y })
+    g(BigDoor5, { x: x++, y })
+    g(BigDoor6, { x: x++, y })
+    g(BigDoor7, { x: x++, y })
     g(WallVert, { x: x++, y }).hFlip = true
     g(Wall, { x: x++, y })
     g(Wall, { x: x++, y })
@@ -253,10 +270,10 @@ export class MyGame implements Game {
     g(Wall, { x: x++, y })
     g(Wall, { x: x++, y })
     g(WallVert, { x: x++, y })
-    x++
-    x++
-    x++
-    x++
+    g(BigDoor8, { x: x++, y })
+    g(BigDoor9, { x: x++, y })
+    g(BigDoor10, { x: x++, y })
+    g(BigDoor11, { x: x++, y })
     g(WallVert, { x: x++, y }).hFlip = true
     g(Wall, { x: x++, y })
     g(Wall, { x: x++, y })
@@ -280,10 +297,10 @@ export class MyGame implements Game {
     g(Wall, { x: x++, y })
     g(Wall, { x: x++, y })
     g(WallVert, { x: x++, y })
-    x++
-    x++
-    x++
-    x++
+    g(BigDoor12, { x: x++, y })
+    g(BigDoor13, { x: x++, y })
+    g(BigDoor14, { x: x++, y })
+    g(BigDoor15, { x: x++, y })
     g(WallVert, { x: x++, y }).hFlip = true
     g(Wall, { x: x++, y })
     g(Wall, { x: x++, y })
@@ -1036,7 +1053,11 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
     // sprites.get('WallTopUpLeft'),
     // sprites.get('Wall'),
     // sprites.get('WallVert'),
-    sprites.get('Water')
+    sprites.get('Water'),
+    sprites.get('BigDoor12'),
+    sprites.get('BigDoor13'),
+    sprites.get('BigDoor14'),
+    sprites.get('BigDoor15'),
   ]
 
   // initialize the props
