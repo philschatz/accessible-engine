@@ -22,6 +22,13 @@ export interface IPosition {
   readonly y: number
 }
 
+export enum ROTATION_AMOUNT {
+  NONE = 'NONE',
+  UP = 'UP',
+  LEFT = 'LEFT',
+  DOWN = 'DOWN'
+}
+
 export type Opt<T> = null | T
 
 export class ObjectInstance<P, S> {
@@ -37,6 +44,7 @@ export class ObjectInstance<P, S> {
   public props: P
   public hFlip: boolean
   public vFlip: boolean
+  public rotation: ROTATION_AMOUNT
 
   constructor (t: GameObject<P, S>, pos: IPosition, props: P) {
     this._zIndex = null
@@ -46,6 +54,7 @@ export class ObjectInstance<P, S> {
     this.props = props
     this.hFlip = false
     this.vFlip = false
+    this.rotation = ROTATION_AMOUNT.NONE
     this.offsetPos = { x: 0, y: 0 }
   }
 

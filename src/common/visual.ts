@@ -1,4 +1,4 @@
-import { IOutputter, IPosition, Game, ObjectInstance, Camera, Size, SimpleObject, Opt, Dialog, IPixel, SpriteController } from './engine'
+import { IOutputter, IPosition, Game, ObjectInstance, Camera, Size, SimpleObject, Opt, Dialog, IPixel, SpriteController, ROTATION_AMOUNT } from './engine'
 import { LETTERS } from './letters'
 
 export interface IRenderer {
@@ -35,7 +35,7 @@ export class VisualOutputter implements IOutputter {
       if (t.isGrayscale) {
         pixels = pixels.map(row => row.map(c => c === null ? null : toGrayscale(c)))
       }
-      this.drawPixels(screenPos, pixels, t.hFlip, t.vFlip)
+      this.drawPixels(screenPos, pixels, t.hFlip, t.vFlip, t.rotation)
     }
 
     game.drawOverlay(this.drawPixels, this.drawText, overlayState, sprites)
@@ -48,7 +48,7 @@ export class VisualOutputter implements IOutputter {
     this.renderer.drawEnd()
   }
 
-  private drawPixels (screenPos: IPosition, pixels: IPixel[][], hFlip: boolean, vFlip: boolean) {
+  private drawPixels (screenPos: IPosition, pixels: IPixel[][], hFlip: boolean, vFlip: boolean, rotationAmount: ROTATION_AMOUNT = ROTATION_AMOUNT.NONE) {
     const height = pixels.length
     let relY = 0
     for (const row of pixels) {
@@ -59,11 +59,22 @@ export class VisualOutputter implements IOutputter {
       const width = row.length
       let relX = 0
       for (const pixel of row) {
-        const x = screenPos.x + (hFlip ? width - 1 - relX : relX)
-        const y = screenPos.y + (vFlip ? height - 1 - relY : relY)
+        const x1 = (hFlip ? width - 1 - relX : relX)
+        const y1 = (vFlip ? height - 1 - relY : relY)
+
+        let pos
+        switch (rotationAmount) {
+          case ROTATION_AMOUNT.NONE: pos = { x: x1, y: y1 }; break
+          case ROTATION_AMOUNT.UP: pos = { x: y1, y: width - x1 }; break
+          case ROTATION_AMOUNT.LEFT: pos = { x: width - x1, y: height - y1 }; break
+          case ROTATION_AMOUNT.DOWN: pos = { x: height - y1, y: x1 }; break
+          default: throw new Error('ERROR: Can only rotate by 0,1,2,3. each is a 90-degrees amount')
+        }
+
+        const x = screenPos.x + pos.x
+        const y = screenPos.y + pos.y
         if (pixel !== null && pixel !== undefined && x >= 0 && y >= 0) {
-          const pos = { x, y }
-          this.renderer.drawPixel(pos, pixel)
+          this.renderer.drawPixel({ x, y }, pixel)
         }
         relX++
       }

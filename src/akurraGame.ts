@@ -130,14 +130,12 @@ export class MyGame implements Game {
     const Key = instances.simple(sprites, 'Key', hoverZ)
     const Land = instances.simple(sprites, 'Land', bgZ)
     const Lock = instances.simple(sprites, 'Lock', obZ)
-    const ArrowLeft = instances.simple(sprites, 'ArrowLeft', obZ)
     const WallTopLeftRight = instances.simple(sprites, 'WallTopLeftRight', obZ)
     const WallTopUpLeft = instances.simple(sprites, 'WallTopUpLeft', obZ)
     const Pedestal = instances.simple(sprites, 'Pedestal', obZ)
     const LandCorner = instances.simple(sprites, 'LandCorner', bgZ)
     const LandBottom = instances.simple(sprites, 'LandBottom', bgZ)
     const Land2 = instances.simple(sprites, 'Land2', bgZ)
-    const ArrowLeftDisabled = instances.simple(sprites, 'ArrowLeftDisabled', obZ)
     const Wall = instances.simple(sprites, 'Wall', obZ)
     const WallVert = instances.simple(sprites, 'WallVert', obZ)
     const TreeTop = instances.simple(sprites, 'TreeTop', hoverZ)
@@ -176,10 +174,13 @@ export class MyGame implements Game {
     const BigDoor14 = instances.simple(sprites, 'BigDoor14', obZ)
     const BigDoor15 = instances.simple(sprites, 'BigDoor15', obZ)
 
-    const ArrowDown = ArrowLeft
-    const ArrowDownDisabled = ArrowLeftDisabled
-    const ArrowUp = ArrowLeft
-    const ArrowUpDisabled = ArrowLeftDisabled
+    const ArrowLeft = instances.simple(sprites, 'ArrowLeft', obZ)
+    const ArrowLeftDisabled = instances.simple(sprites, 'ArrowLeftDisabled', obZ)
+
+    const ArrowDown = instances.simple(sprites, 'ArrowDown', obZ)
+    const ArrowDownDisabled = instances.simple(sprites, 'ArrowDownDisabled', obZ)
+    const ArrowUp = instances.simple(sprites, 'ArrowUp', obZ)
+    const ArrowUpDisabled = instances.simple(sprites, 'ArrowUpDisabled', obZ)
 
     function g (item: GameObject<any, any>, pos: IPosition) {
       // convert from grid coordinates to pixels
@@ -1010,7 +1011,6 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
     height: ROOM_SIZE.height + 2,
   })
 
-  const playerGridPos = o.pos
   const playerRoomPos = currentRoomCorner(o.pos)
 
   camera.pos = posAdd(playerRoomPos, { x: ROOM_SIZE.width / 2, y: ROOM_SIZE.height / 2 - 2 })
@@ -1034,6 +1034,13 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
   const Lock = sprites.get('Lock')
   const ArrowLeft = sprites.get('ArrowLeft')
   const ArrowLeftDisabled = sprites.get('ArrowLeftDisabled')
+  const ArrowUp = sprites.get('ArrowUp')
+  const ArrowUpDisabled = sprites.get('ArrowUpDisabled')
+  const ArrowRight = sprites.get('ArrowRight')
+  const ArrowRightDisabled = sprites.get('ArrowRightDisabled')
+  const ArrowDown = sprites.get('ArrowDown')
+  const ArrowDownDisabled = sprites.get('ArrowDownDisabled')
+
 
   const FloorSquare = sprites.get('FloorSquare')
   const FloorDiamond = sprites.get('FloorDiamond')
@@ -1045,6 +1052,12 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
     Lock,
     ArrowLeft,
     ArrowLeftDisabled,
+    ArrowUp,
+    ArrowUpDisabled,
+    ArrowRight,
+    ArrowRightDisabled,
+    ArrowDown,
+    ArrowDownDisabled,
     sprites.get('Rock'),
     sprites.get('Bush'),
     // sprites.get('WallTopRightDown'),
@@ -1177,16 +1190,23 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
   }
 
   // Unlock the arrow locks when pushing the correct direction
-  const maybeArrowLeft = neighborSprites.find(obj => obj.sprite === ArrowLeft)
-  if (maybeArrowLeft && p.dir === PLAYER_DIR.LEFT) {
-    // loop and delete all the disabled arrowlefts
-    let cur = maybeArrowLeft
-    while (cur) {
-      const pos = cur.pos
-      cur.setSprite(FloorDiamond)
-      cur = collisionChecker.searchPoint({ x: pos.x - 1, y: pos.y }).find(obj => obj.sprite === ArrowLeftDisabled)
+  function checkArrow(sprite: Sprite, disabledSprite: Sprite, playerDir: PLAYER_DIR, stepRelPos: IPosition) {
+    const maybeArrow = neighborSprites.find(obj => obj.sprite === sprite)
+    if (maybeArrow && p.dir === playerDir) {
+      // loop and delete all the disabled arrowlefts
+      let cur = maybeArrow
+      while (cur) {
+        const pos = cur.pos
+        cur.setSprite(FloorDiamond)
+        cur = collisionChecker.searchPoint(posAdd(pos, stepRelPos)).find(obj => obj.sprite === disabledSprite)
+      }
     }
   }
+
+  checkArrow(ArrowUp,    ArrowUpDisabled, PLAYER_DIR.UP, {x: 0, y: -1})
+  checkArrow(ArrowDown,  ArrowDownDisabled, PLAYER_DIR.DOWN, {x: 0, y: 1})
+  checkArrow(ArrowLeft,  ArrowLeftDisabled, PLAYER_DIR.LEFT, {x: -1, y: 0})
+  checkArrow(ArrowRight,  ArrowRightDisabled, PLAYER_DIR.RIGHT, {x: 1, y: 0})
 
   o.hFlip = false
   switch (p.state) {

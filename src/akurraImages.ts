@@ -27,14 +27,14 @@ export function loadImages () {
   const t = '#ffffe2'
   const u = '#3f6d54'
   const v = '#93c453'
-  const w = '#213531'
-  const x = '#26100d'
-  const y = '#599388'
-  const z = '#70e4ff'
-  const A = '#e6001c'
-  const B = '#3b1711'
-  const C = '#852d21'
-  const D = '#69faf8'
+  const w = '#26100d'
+  const x = '#70e4ff'
+  const y = '#e6001c'
+  const z = '#3b1711'
+  const A = '#852d21'
+  const B = '#69faf8'
+  const C = '#213531'
+  const D = '#599388'
   const E = '#8ec2ac'
   const F = '#282828'
   const G = '#c934ea'
@@ -423,24 +423,6 @@ export function loadImages () {
     [e, v, v, v, v, v, v, t, u, v, v, v, v, v, v, e],
     [t, e, e, e, e, e, e, e, e, e, e, e, e, e, e, t]
   ]))
-  images.add('ArrowLeft', new Image([
-    [t, e, e, e, e, e, e, e, e, e, e, e, e, e, e, t],
-    [e, u, u, t, t, t, t, t, t, t, t, t, t, u, u, e],
-    [e, u, u, u, u, u, u, u, u, u, u, u, u, u, t, e],
-    [e, u, u, u, v, v, v, e, e, e, e, v, u, t, t, e],
-    [e, u, u, u, v, e, e, t, t, t, e, v, u, t, t, e],
-    [e, u, u, u, e, t, t, t, t, e, v, v, u, t, t, e],
-    [e, u, u, u, e, u, u, u, u, e, v, v, u, t, t, e],
-    [e, u, u, u, u, e, e, u, u, u, e, v, u, t, t, e],
-    [e, u, u, u, v, u, u, e, e, e, e, v, u, t, t, e],
-    [e, u, u, u, v, v, v, u, u, u, u, v, u, t, t, e],
-    [e, u, u, u, v, v, v, v, v, v, v, v, u, t, t, e],
-    [e, u, u, u, u, u, u, u, u, u, u, u, u, t, t, e],
-    [e, u, u, v, v, v, v, v, v, v, v, v, v, u, t, e],
-    [e, u, v, u, u, v, u, u, u, u, v, u, u, v, u, e],
-    [e, v, u, v, u, u, u, v, v, u, u, u, v, u, v, e],
-    [t, e, e, e, e, e, e, e, e, e, e, e, e, e, e, t]
-  ]))
   images.add('WallTopLeftRight', new Image([
     [c, c, c, c, c, c, c, c, c, c, c, c, c, c, c, c],
     [c, c, c, c, c, c, c, c, c, c, c, c, c, c, c, c],
@@ -569,57 +551,39 @@ export function loadImages () {
   ]))
   images.add('Hole', new Image([
     [b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b],
-    [b, b, b, b, b, x, b, x, x, b, x, b, b, b, b, b],
-    [b, x, x, x, x, x, x, x, x, x, x, x, x, x, x, b],
-    [x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x],
-    [x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x],
-    [x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x],
-    [x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x],
-    [x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x],
-    [x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x],
-    [x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x],
-    [x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x],
-    [x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x],
-    [b, x, x, x, x, x, x, x, x, x, x, x, x, x, x, b],
-    [b, b, x, b, x, x, x, x, x, x, x, x, b, x, b, b],
-    [b, b, b, b, b, x, b, x, x, b, x, b, b, b, b, b],
-    [b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b]
+    [b, b, b, b, k, k, b, k, k, b, k, k, b, b, b, b],
+    [b, b, b, k, k, k, b, k, k, b, k, k, k, b, b, b],
+    [b, b, e, k, k, e, k, e, e, k, e, k, k, e, b, b],
+    [b, k, k, e, k, e, k, e, e, k, e, k, e, k, k, b],
+    [b, e, e, e, e, e, e, e, e, e, e, e, e, e, e, b],
+    [b, k, e, e, e, e, e, e, e, e, e, e, e, e, k, b],
+    [b, b, k, e, e, e, e, e, e, e, e, e, e, k, b, b],
+    [b, k, e, e, e, e, e, e, e, e, e, e, e, e, k, b],
+    [b, e, e, e, e, e, e, e, e, e, e, e, e, e, e, b],
+    [b, b, e, e, e, e, e, e, e, e, e, e, e, e, b, b],
+    [b, k, e, e, e, e, e, e, e, e, e, e, e, e, k, b],
+    [b, e, e, e, e, e, e, e, e, e, e, e, e, e, e, b],
+    [b, b, e, e, e, e, e, e, e, e, e, e, e, e, b, b],
+    [b, b, b, e, e, e, e, e, e, e, e, e, e, b, b, b],
+    [b, b, b, b, b, e, e, e, e, e, e, b, b, b, b, b]
   ]))
   images.add('HoleCrate', new Image([
     [b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b],
-    [b, b, b, b, b, x, b, x, x, b, x, b, b, b, b, b],
-    [b, x, x, x, x, x, x, x, x, x, x, x, x, x, x, b],
-    [x, x, B, C, C, C, C, C, C, C, C, C, C, B, x, x],
-    [x, B, B, x, x, x, x, x, x, x, x, x, x, B, B, x],
-    [x, C, x, x, C, B, C, C, C, C, C, C, x, x, C, x],
-    [x, C, x, C, C, B, C, B, B, B, B, C, C, x, C, x],
-    [x, C, x, C, C, B, B, B, B, C, B, C, C, x, C, x],
-    [x, C, x, x, C, C, C, C, C, C, B, C, x, x, C, x],
-    [x, B, B, x, x, x, x, x, x, x, x, x, x, B, B, x],
-    [x, x, B, C, C, C, C, C, C, C, C, C, C, B, x, x],
-    [x, B, x, x, x, x, x, x, x, x, x, x, x, x, B, x],
-    [b, x, B, x, B, x, B, x, x, B, x, B, x, B, x, b],
-    [b, b, x, b, x, x, x, x, x, x, x, x, b, x, b, b],
-    [b, b, b, b, b, x, b, x, x, b, x, b, b, b, b, b],
+    [b, b, b, b, b, w, b, w, w, b, w, b, b, b, b, b],
+    [b, w, w, w, w, w, w, w, w, w, w, w, w, w, w, b],
+    [w, w, z, A, A, A, A, A, A, A, A, A, A, z, w, w],
+    [w, z, z, w, w, w, w, w, w, w, w, w, w, z, z, w],
+    [w, A, w, w, A, z, A, A, A, A, A, A, w, w, A, w],
+    [w, A, w, A, A, z, A, z, z, z, z, A, A, w, A, w],
+    [w, A, w, A, A, z, z, z, z, A, z, A, A, w, A, w],
+    [w, A, w, w, A, A, A, A, A, A, z, A, w, w, A, w],
+    [w, z, z, w, w, w, w, w, w, w, w, w, w, z, z, w],
+    [w, w, z, A, A, A, A, A, A, A, A, A, A, z, w, w],
+    [w, z, w, w, w, w, w, w, w, w, w, w, w, w, z, w],
+    [b, w, z, w, z, w, z, w, w, z, w, z, w, z, w, b],
+    [b, b, w, b, w, w, w, w, w, w, w, w, b, w, b, b],
+    [b, b, b, b, b, w, b, w, w, b, w, b, b, b, b, b],
     [b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b]
-  ]))
-  images.add('ArrowLeftDisabled', new Image([
-    [a, w, w, w, w, w, w, w, w, w, w, w, w, w, w, a],
-    [w, y, y, a, a, a, a, a, a, a, a, a, a, y, y, w],
-    [w, y, y, y, y, y, y, y, y, y, y, y, y, y, a, w],
-    [w, y, y, y, a, a, a, w, w, w, w, a, y, a, a, w],
-    [w, y, y, y, a, w, w, a, a, a, w, a, y, a, a, w],
-    [w, y, y, y, w, a, a, a, a, w, a, a, y, a, a, w],
-    [w, y, y, y, w, y, y, y, y, w, a, a, y, a, a, w],
-    [w, y, y, y, y, w, w, y, y, y, w, a, y, a, a, w],
-    [w, y, y, y, a, y, y, w, w, w, w, a, y, a, a, w],
-    [w, y, y, y, a, a, a, y, y, y, y, a, y, a, a, w],
-    [w, y, y, y, a, a, a, a, a, a, a, a, y, a, a, w],
-    [w, y, y, y, y, y, y, y, y, y, y, y, y, a, a, w],
-    [w, y, y, a, a, a, a, a, a, a, a, a, a, y, a, w],
-    [w, y, a, y, y, a, y, y, y, y, a, y, y, a, y, w],
-    [w, a, y, a, y, y, y, a, a, y, y, y, a, y, a, w],
-    [a, w, w, w, w, w, w, w, w, w, w, w, w, w, w, a]
   ]))
   images.add('Wall', new Image([
     [b, b, b, b, b, b, c, c, c, c, b, b, b, b, b, b],
@@ -677,11 +641,11 @@ export function loadImages () {
   ]))
   images.add('BigDoor12', new Image([
     [e, e, i, i, e, f, i, i, i, i, e, f, e, e, e, e],
-    [e, e, i, i, e, f, i, i, i, e, f, e, e, z, f, e],
-    [e, e, i, i, e, f, i, i, i, i, e, f, f, e, z, z],
+    [e, e, i, i, e, f, i, i, i, e, f, e, e, x, f, e],
+    [e, e, i, i, e, f, i, i, i, i, e, f, f, e, x, x],
     [e, e, i, i, e, f, i, i, i, i, i, e, e, f, e, e],
-    [e, e, i, i, e, f, i, i, i, i, i, e, z, e, z, z],
-    [e, e, i, i, e, f, i, i, i, i, i, e, z, z, e, e],
+    [e, e, i, i, e, f, i, i, i, i, i, e, x, e, x, x],
+    [e, e, i, i, e, f, i, i, i, i, i, e, x, x, e, e],
     [e, e, i, i, e, f, i, i, i, i, i, i, e, e, i, i],
     [e, e, i, i, e, f, i, i, i, i, i, i, i, i, i, i],
     [e, e, i, i, e, f, i, i, i, i, i, i, i, i, i, i],
@@ -695,11 +659,11 @@ export function loadImages () {
   ]))
   images.add('BigDoor13', new Image([
     [e, f, f, e, e, e, e, e, i, e, i, i, i, i, i, f],
-    [z, z, z, f, e, z, f, e, e, i, e, i, i, i, i, f],
-    [e, z, z, e, z, z, e, i, i, e, i, i, i, i, i, f],
-    [z, e, e, z, e, e, i, e, e, i, i, i, i, i, i, f],
-    [e, e, e, e, z, z, e, z, e, i, i, i, i, i, i, f],
-    [z, z, z, z, e, e, z, z, e, i, i, i, i, i, i, f],
+    [x, x, x, f, e, x, f, e, e, i, e, i, i, i, i, f],
+    [e, x, x, e, x, x, e, i, i, e, i, i, i, i, i, f],
+    [x, e, e, x, e, e, i, e, e, i, i, i, i, i, i, f],
+    [e, e, e, e, x, x, e, x, e, i, i, i, i, i, i, f],
+    [x, x, x, x, e, e, x, x, e, i, i, i, i, i, i, f],
     [e, e, e, e, i, i, e, e, i, i, i, i, i, i, i, f],
     [i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, f],
     [i, i, i, i, i, i, i, i, i, i, i, i, i, i, f, e],
@@ -713,11 +677,11 @@ export function loadImages () {
   ]))
   images.add('BigDoor14', new Image([
     [e, i, i, i, i, i, e, f, e, e, e, e, e, f, f, e],
-    [e, i, i, i, i, e, f, e, e, A, f, e, A, A, A, f],
-    [e, i, i, i, i, i, e, f, f, e, A, A, e, A, A, e],
-    [e, i, i, i, i, i, i, e, e, f, e, e, A, e, e, A],
-    [e, i, i, i, i, i, i, e, A, e, A, A, e, e, e, e],
-    [e, i, i, i, i, i, i, e, A, A, e, e, A, A, A, A],
+    [e, i, i, i, i, e, f, e, e, y, f, e, y, y, y, f],
+    [e, i, i, i, i, i, e, f, f, e, y, y, e, y, y, e],
+    [e, i, i, i, i, i, i, e, e, f, e, e, y, e, e, y],
+    [e, i, i, i, i, i, i, e, y, e, y, y, e, e, e, e],
+    [e, i, i, i, i, i, i, e, y, y, e, e, y, y, y, y],
     [e, i, i, i, i, i, i, i, e, e, i, i, e, e, e, e],
     [e, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i],
     [e, f, i, i, i, i, i, i, i, i, i, i, i, i, i, i],
@@ -731,11 +695,11 @@ export function loadImages () {
   ]))
   images.add('BigDoor15', new Image([
     [e, e, e, e, i, e, i, i, i, i, e, e, i, i, e, e],
-    [e, A, f, e, e, i, e, i, i, i, e, e, i, i, e, e],
-    [A, A, e, i, i, e, i, i, i, i, e, e, i, i, e, e],
+    [e, y, f, e, e, i, e, i, i, i, e, e, i, i, e, e],
+    [y, y, e, i, i, e, i, i, i, i, e, e, i, i, e, e],
     [e, e, i, e, e, i, i, i, i, i, e, e, i, i, e, e],
-    [A, A, e, A, e, i, i, i, i, i, e, e, i, i, e, e],
-    [e, e, A, A, e, i, i, i, i, i, e, e, i, i, e, e],
+    [y, y, e, y, e, i, i, i, i, i, e, e, i, i, e, e],
+    [e, e, y, y, e, i, i, i, i, i, e, e, i, i, e, e],
     [i, i, e, e, i, i, i, i, i, i, e, e, i, i, e, e],
     [i, i, i, i, i, i, i, i, i, i, e, e, i, i, e, e],
     [i, i, i, i, i, i, i, i, i, i, e, e, i, i, e, e],
@@ -831,7 +795,7 @@ export function loadImages () {
     [q, q, q, q, q, q, q, q, q, q, q, h, q, h, q, q],
     [q, q, q, q, q, q, q, q, q, q, h, h, h, q, q, q],
     [q, q, q, q, q, q, q, q, h, h, q, q, h, h, q, q],
-    [q, q, q, q, q, q, h, h, h, q, q, q, q, q, h, D],
+    [q, q, q, q, q, q, h, h, h, q, q, q, q, q, h, B],
     [q, q, q, q, h, q, q, q, q, q, q, q, q, q, q, q],
     [q, q, q, q, q, q, q, q, q, q, q, q, q, q, q, q],
     [q, q, q, q, q, q, q, q, q, q, q, q, q, q, q, q],
@@ -854,6 +818,78 @@ export function loadImages () {
     [b, b, b, b, b, b, c, c, b, c, b, b, b, b, b, b],
     [b, b, b, b, b, b, c, c, c, c, b, b, b, b, b, b],
     [b, b, b, b, b, b, c, c, b, c, b, b, b, b, b, b]
+  ]))
+  images.add('ArrowRight', new Image([
+    [t, e, e, e, e, e, e, e, e, e, e, e, e, e, e, t],
+    [e, u, u, t, t, t, t, t, t, t, t, t, t, u, u, e],
+    [e, u, u, u, u, u, u, u, u, u, u, u, u, u, t, e],
+    [e, u, u, u, v, e, e, e, e, v, v, v, u, t, t, e],
+    [e, u, u, u, v, e, t, t, t, e, e, v, u, t, t, e],
+    [e, u, u, u, v, v, e, t, t, t, t, e, u, t, t, e],
+    [e, u, u, u, v, v, e, u, u, u, u, e, u, t, t, e],
+    [e, u, u, u, v, e, u, u, u, e, e, u, u, t, t, e],
+    [e, u, u, u, v, e, e, e, e, u, u, v, u, t, t, e],
+    [e, u, u, u, v, u, u, u, u, v, v, v, u, t, t, e],
+    [e, u, u, u, v, v, v, v, v, v, v, v, u, t, t, e],
+    [e, u, u, u, u, u, u, u, u, u, u, u, u, t, t, e],
+    [e, u, u, v, v, v, v, v, v, v, v, v, v, u, t, e],
+    [e, u, v, u, u, v, u, u, u, u, v, u, u, v, u, e],
+    [e, v, u, v, u, u, u, v, v, u, u, u, v, u, v, e],
+    [t, e, e, e, e, e, e, e, e, e, e, e, e, e, e, t]
+  ]))
+  images.add('ArrowUp', new Image([
+    [t, e, e, e, e, e, e, e, e, e, e, e, e, e, e, t],
+    [e, u, u, t, t, t, t, t, t, t, t, t, t, u, u, e],
+    [e, u, u, u, u, u, u, u, u, u, u, u, u, u, t, e],
+    [e, u, u, u, v, v, u, e, e, v, v, v, u, t, t, e],
+    [e, u, u, u, v, u, e, u, t, e, v, v, u, t, t, e],
+    [e, u, u, u, v, u, e, u, t, e, v, v, u, t, t, e],
+    [e, u, u, u, u, e, u, u, t, t, e, v, u, t, t, e],
+    [e, u, u, u, u, e, u, u, t, t, e, v, u, t, t, e],
+    [e, u, u, u, u, e, u, e, e, t, e, v, u, t, t, e],
+    [e, u, u, u, u, e, e, v, v, e, e, v, u, t, t, e],
+    [e, u, u, u, v, v, v, v, v, v, v, v, u, t, t, e],
+    [e, u, u, u, u, u, u, u, u, u, u, u, u, t, t, e],
+    [e, u, u, v, v, v, v, v, v, v, v, v, v, u, t, e],
+    [e, u, v, u, u, v, u, u, u, u, v, u, u, v, u, e],
+    [e, v, u, v, u, u, u, v, v, u, u, u, v, u, v, e],
+    [t, e, e, e, e, e, e, e, e, e, e, e, e, e, e, t]
+  ]))
+  images.add('ArrowLeft', new Image([
+    [t, e, e, e, e, e, e, e, e, e, e, e, e, e, e, t],
+    [e, u, u, t, t, t, t, t, t, t, t, t, t, u, u, e],
+    [e, u, u, u, u, u, u, u, u, u, u, u, u, u, t, e],
+    [e, u, u, u, v, v, v, e, e, e, e, v, u, t, t, e],
+    [e, u, u, u, v, e, e, t, t, t, e, v, u, t, t, e],
+    [e, u, u, u, e, t, t, t, t, e, v, v, u, t, t, e],
+    [e, u, u, u, e, u, u, u, u, e, v, v, u, t, t, e],
+    [e, u, u, u, u, e, e, u, u, u, e, v, u, t, t, e],
+    [e, u, u, u, v, u, u, e, e, e, e, v, u, t, t, e],
+    [e, u, u, u, v, v, v, u, u, u, u, v, u, t, t, e],
+    [e, u, u, u, v, v, v, v, v, v, v, v, u, t, t, e],
+    [e, u, u, u, u, u, u, u, u, u, u, u, u, t, t, e],
+    [e, u, u, v, v, v, v, v, v, v, v, v, v, u, t, e],
+    [e, u, v, u, u, v, u, u, u, u, v, u, u, v, u, e],
+    [e, v, u, v, u, u, u, v, v, u, u, u, v, u, v, e],
+    [t, e, e, e, e, e, e, e, e, e, e, e, e, e, e, t]
+  ]))
+  images.add('ArrowDown', new Image([
+    [t, e, e, e, e, e, e, e, e, e, e, e, e, e, e, t],
+    [e, u, u, t, t, t, t, t, t, t, t, t, t, u, u, e],
+    [e, u, u, u, u, u, u, u, u, u, u, u, u, u, t, e],
+    [e, u, u, u, v, v, v, v, v, v, v, v, u, t, t, e],
+    [e, u, u, u, u, e, e, v, v, e, e, v, u, t, t, e],
+    [e, u, u, u, u, e, u, e, e, t, e, v, u, t, t, e],
+    [e, u, u, u, u, e, u, u, t, t, e, v, u, t, t, e],
+    [e, u, u, u, u, e, u, u, t, t, e, v, u, t, t, e],
+    [e, u, u, u, v, u, e, u, t, e, v, v, u, t, t, e],
+    [e, u, u, u, v, u, e, u, t, e, v, v, u, t, t, e],
+    [e, u, u, u, v, v, u, e, e, v, v, v, u, t, t, e],
+    [e, u, u, u, u, u, u, u, u, u, u, u, u, t, t, e],
+    [e, u, u, v, v, v, v, v, v, v, v, v, v, u, t, e],
+    [e, u, v, u, u, v, u, u, u, u, v, u, u, v, u, e],
+    [e, v, u, v, u, u, u, v, v, u, u, u, v, u, v, e],
+    [t, e, e, e, e, e, e, e, e, e, e, e, e, e, e, t]
   ]))
   images.add('PlayerStoppedDown', new Image([
     [Z, Z, Z, Z, Z, e, e, e, e, e, e, e, e, Z, Z, Z],
@@ -963,6 +999,78 @@ export function loadImages () {
     [b, b, b, b, b, b, b, b, a, a, b, b, b, b, b, b],
     [b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b]
   ]))
+  images.add('ArrowRightDisabled', new Image([
+    [a, C, C, C, C, C, C, C, C, C, C, C, C, C, C, a],
+    [C, D, D, a, a, a, a, a, a, a, a, a, a, D, D, C],
+    [C, D, D, D, D, D, D, D, D, D, D, D, D, D, a, C],
+    [C, D, D, D, a, C, C, C, C, a, a, a, D, a, a, C],
+    [C, D, D, D, a, C, a, a, a, C, C, a, D, a, a, C],
+    [C, D, D, D, a, a, C, a, a, a, a, C, D, a, a, C],
+    [C, D, D, D, a, a, C, D, D, D, D, C, D, a, a, C],
+    [C, D, D, D, a, C, D, D, D, C, C, D, D, a, a, C],
+    [C, D, D, D, a, C, C, C, C, D, D, a, D, a, a, C],
+    [C, D, D, D, a, D, D, D, D, a, a, a, D, a, a, C],
+    [C, D, D, D, a, a, a, a, a, a, a, a, D, a, a, C],
+    [C, D, D, D, D, D, D, D, D, D, D, D, D, a, a, C],
+    [C, D, D, a, a, a, a, a, a, a, a, a, a, D, a, C],
+    [C, D, a, D, D, a, D, D, D, D, a, D, D, a, D, C],
+    [C, a, D, a, D, D, D, a, a, D, D, D, a, D, a, C],
+    [a, C, C, C, C, C, C, C, C, C, C, C, C, C, C, a]
+  ]))
+  images.add('ArrowUpDisabled', new Image([
+    [a, C, C, C, C, C, C, C, C, C, C, C, C, C, C, a],
+    [C, D, D, a, a, a, a, a, a, a, a, a, a, D, D, C],
+    [C, D, D, D, D, D, D, D, D, D, D, D, D, D, a, C],
+    [C, D, D, D, a, a, D, C, C, a, a, a, D, a, a, C],
+    [C, D, D, D, a, D, C, D, a, C, a, a, D, a, a, C],
+    [C, D, D, D, a, D, C, D, a, C, a, a, D, a, a, C],
+    [C, D, D, D, D, C, D, D, a, a, C, a, D, a, a, C],
+    [C, D, D, D, D, C, D, D, a, a, C, a, D, a, a, C],
+    [C, D, D, D, D, C, D, C, C, a, C, a, D, a, a, C],
+    [C, D, D, D, D, C, C, a, a, C, C, a, D, a, a, C],
+    [C, D, D, D, a, a, a, a, a, a, a, a, D, a, a, C],
+    [C, D, D, D, D, D, D, D, D, D, D, D, D, a, a, C],
+    [C, D, D, a, a, a, a, a, a, a, a, a, a, D, a, C],
+    [C, D, a, D, D, a, D, D, D, D, a, D, D, a, D, C],
+    [C, a, D, a, D, D, D, a, a, D, D, D, a, D, a, C],
+    [a, C, C, C, C, C, C, C, C, C, C, C, C, C, C, a]
+  ]))
+  images.add('ArrowLeftDisabled', new Image([
+    [a, C, C, C, C, C, C, C, C, C, C, C, C, C, C, a],
+    [C, D, D, a, a, a, a, a, a, a, a, a, a, D, D, C],
+    [C, D, D, D, D, D, D, D, D, D, D, D, D, D, a, C],
+    [C, D, D, D, a, a, a, C, C, C, C, a, D, a, a, C],
+    [C, D, D, D, a, C, C, a, a, a, C, a, D, a, a, C],
+    [C, D, D, D, C, a, a, a, a, C, a, a, D, a, a, C],
+    [C, D, D, D, C, D, D, D, D, C, a, a, D, a, a, C],
+    [C, D, D, D, D, C, C, D, D, D, C, a, D, a, a, C],
+    [C, D, D, D, a, D, D, C, C, C, C, a, D, a, a, C],
+    [C, D, D, D, a, a, a, D, D, D, D, a, D, a, a, C],
+    [C, D, D, D, a, a, a, a, a, a, a, a, D, a, a, C],
+    [C, D, D, D, D, D, D, D, D, D, D, D, D, a, a, C],
+    [C, D, D, a, a, a, a, a, a, a, a, a, a, D, a, C],
+    [C, D, a, D, D, a, D, D, D, D, a, D, D, a, D, C],
+    [C, a, D, a, D, D, D, a, a, D, D, D, a, D, a, C],
+    [a, C, C, C, C, C, C, C, C, C, C, C, C, C, C, a]
+  ]))
+  images.add('ArrowDownDisabled', new Image([
+    [a, C, C, C, C, C, C, C, C, C, C, C, C, C, C, a],
+    [C, D, D, a, a, a, a, a, a, a, a, a, a, D, D, C],
+    [C, D, D, D, D, D, D, D, D, D, D, D, D, D, a, C],
+    [C, D, D, D, a, a, a, a, a, a, a, a, D, a, a, C],
+    [C, D, D, D, D, C, C, a, a, C, C, a, D, a, a, C],
+    [C, D, D, D, D, C, D, C, C, a, C, a, D, a, a, C],
+    [C, D, D, D, D, C, D, D, a, a, C, a, D, a, a, C],
+    [C, D, D, D, D, C, D, D, a, a, C, a, D, a, a, C],
+    [C, D, D, D, a, D, C, D, a, C, a, a, D, a, a, C],
+    [C, D, D, D, a, D, C, D, a, C, a, a, D, a, a, C],
+    [C, D, D, D, a, a, D, C, C, a, a, a, D, a, a, C],
+    [C, D, D, D, D, D, D, D, D, D, D, D, D, a, a, C],
+    [C, D, D, a, a, a, a, a, a, a, a, a, a, D, a, C],
+    [C, D, a, D, D, a, D, D, D, D, a, D, D, a, D, C],
+    [C, a, D, a, D, D, D, a, a, D, D, D, a, D, a, C],
+    [a, C, C, C, C, C, C, C, C, C, C, C, C, C, C, a]
+  ]))
   images.add('GongDisabled1', new Image([
     [F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F],
     [F, H, H, H, H, H, H, F, F, H, H, H, H, H, H, F],
@@ -987,12 +1095,12 @@ export function loadImages () {
     [Z, F, G, F, F, F, F, F, F, F, G, F, F, G, F, Z],
     [Z, G, J, F, Z, Z, F, F, F, G, G, Z, F, H, G, Z],
     [G, F, J, F, Z, F, F, H, H, F, G, Z, F, H, F, G],
-    [G, F, J, D, Z, F, D, D, D, G, G, Z, D, H, F, G],
-    [G, F, D, F, Z, F, D, F, F, G, G, Z, F, D, F, G],
-    [G, F, D, F, Z, F, D, J, J, F, D, Z, F, D, F, G],
-    [G, J, D, F, Z, D, D, F, F, D, D, Z, F, D, H, G],
-    [G, J, D, F, Z, D, D, J, J, D, D, Z, F, D, H, G],
-    [G, J, H, D, Z, F, J, F, F, H, F, Z, D, J, J, G],
+    [G, F, J, B, Z, F, B, B, B, G, G, Z, B, H, F, G],
+    [G, F, B, F, Z, F, B, F, F, G, G, Z, F, B, F, G],
+    [G, F, B, F, Z, F, B, J, J, F, B, Z, F, B, F, G],
+    [G, J, B, F, Z, B, B, F, F, B, B, Z, F, B, H, G],
+    [G, J, B, F, Z, B, B, J, J, B, B, Z, F, B, H, G],
+    [G, J, H, B, Z, F, J, F, F, H, F, Z, B, J, J, G],
     [G, J, J, F, Z, Z, F, F, F, F, Z, Z, F, J, J, G],
     [F, G, J, F, Z, Z, Z, Z, Z, Z, Z, Z, F, J, G, F],
     [F, J, G, F, Z, F, F, F, F, Z, Z, Z, F, G, J, F],
@@ -1001,27 +1109,27 @@ export function loadImages () {
   ]))
   images.add('GongDisabled3', new Image([
     [F, F, F, F, F, F, F, F, F, F, F, G, G, F, F, F],
-    [F, H, H, H, D, D, D, D, D, H, H, H, G, H, H, F],
-    [Z, F, D, F, D, F, F, F, D, F, F, G, G, D, F, Z],
-    [Z, D, J, F, D, Z, F, F, D, F, Z, G, G, H, D, Z],
-    [D, F, J, D, D, F, F, D, D, F, F, Z, F, H, F, D],
-    [D, F, J, D, D, F, J, D, D, H, F, Z, I, H, F, D],
-    [D, F, I, F, Z, F, J, F, F, H, F, Z, F, I, F, D],
-    [D, F, I, F, Z, F, F, J, J, F, F, Z, F, I, F, D],
-    [D, J, I, F, Z, F, J, F, F, H, F, Z, F, I, H, D],
-    [D, J, I, F, Z, F, F, J, J, F, F, Z, F, I, H, D],
-    [D, J, H, I, Z, F, J, F, F, H, F, Z, I, J, J, D],
-    [D, J, J, F, Z, Z, F, F, F, F, Z, Z, F, J, J, D],
-    [F, D, J, F, Z, Z, Z, Z, Z, Z, Z, Z, F, J, D, F],
-    [F, J, D, F, Z, F, F, F, F, Z, Z, Z, F, D, J, F],
+    [F, H, H, H, B, B, B, B, B, H, H, H, G, H, H, F],
+    [Z, F, B, F, B, F, F, F, B, F, F, G, G, B, F, Z],
+    [Z, B, J, F, B, Z, F, F, B, F, Z, G, G, H, B, Z],
+    [B, F, J, B, B, F, F, B, B, F, F, Z, F, H, F, B],
+    [B, F, J, B, B, F, J, B, B, H, F, Z, I, H, F, B],
+    [B, F, I, F, Z, F, J, F, F, H, F, Z, F, I, F, B],
+    [B, F, I, F, Z, F, F, J, J, F, F, Z, F, I, F, B],
+    [B, J, I, F, Z, F, J, F, F, H, F, Z, F, I, H, B],
+    [B, J, I, F, Z, F, F, J, J, F, F, Z, F, I, H, B],
+    [B, J, H, I, Z, F, J, F, F, H, F, Z, I, J, J, B],
+    [B, J, J, F, Z, Z, F, F, F, F, Z, Z, F, J, J, B],
+    [F, B, J, F, Z, Z, Z, Z, Z, Z, Z, Z, F, J, B, F],
+    [F, J, B, F, Z, F, F, F, F, Z, Z, Z, F, B, J, F],
     [F, J, J, F, Z, Z, Z, F, F, F, F, Z, F, J, J, F],
     [Z, F, F, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, F, F, Z]
   ]))
   images.add('GongDisabled4', new Image([
     [F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F],
-    [F, H, H, D, D, D, D, F, F, H, H, H, H, H, H, F],
-    [Z, F, I, D, F, F, D, F, F, F, F, F, F, I, F, Z],
-    [Z, I, D, D, Z, D, D, F, F, F, Z, Z, F, H, I, Z],
+    [F, H, H, B, B, B, B, F, F, H, H, H, H, H, H, F],
+    [Z, F, I, B, F, F, B, F, F, F, F, F, F, I, F, Z],
+    [Z, I, B, B, Z, B, B, F, F, F, Z, Z, F, H, I, Z],
     [I, F, J, F, Z, F, F, H, H, F, F, Z, F, H, F, I],
     [I, F, J, F, Z, F, J, J, I, H, F, Z, F, H, F, I],
     [I, F, J, F, Z, F, J, I, I, H, F, Z, F, H, F, I],
@@ -1186,9 +1294,9 @@ export function loadImages () {
     [b, b, b, b, a, b, a, a, a, a, b, a, b, b, b, b],
     [b, b, b, a, b, b, b, b, b, b, b, b, a, b, b, b],
     [b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b],
-    [b, b, b, a, b, b, b, w, w, b, b, b, a, b, b, b],
-    [b, b, b, a, b, b, w, b, b, w, b, b, a, b, b, b],
-    [b, b, b, a, b, b, b, w, w, b, b, b, a, b, b, b],
+    [b, b, b, a, b, b, b, C, C, b, b, b, a, b, b, b],
+    [b, b, b, a, b, b, C, b, b, C, b, b, a, b, b, b],
+    [b, b, b, a, b, b, b, C, C, b, b, b, a, b, b, b],
     [b, b, b, a, b, b, b, b, b, b, b, b, a, b, b, b],
     [b, b, b, b, b, b, b, b, b, b, b, b, b, b, b, b],
     [b, b, b, a, b, b, b, b, b, b, b, b, a, b, b, b],
