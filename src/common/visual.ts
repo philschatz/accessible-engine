@@ -20,12 +20,14 @@ export class VisualOutputter implements IOutputter {
 
     game.drawBackground(tiles, camera, this.drawPixels)
 
+    const cameraCache = posAdd({x: -camera.screenPixelPos.x, y: -camera.screenPixelPos.y}, camera.topLeftPixelPos(grid))
+
     for (const t of tiles) {
       if (t.startTick === 0) { t.startTick = curTick }
       const image = t.sprite.tick(t.startTick, curTick)
       if (!image) { throw new Error('BUG: Could not find image for the sprite.') }
       const pixelPos = t.getPixelPos(grid)
-      const screenPos = relativeTo({ x: pixelPos.x, y: pixelPos.y }, posAdd({x: -camera.screenPixelPos.x, y: -camera.screenPixelPos.y}, camera.topLeftPixelPos(grid)))
+      const screenPos = relativeTo({ x: pixelPos.x, y: pixelPos.y }, cameraCache)
       // const screenPos = pixelPos
 
       let pixels = image.pixels
