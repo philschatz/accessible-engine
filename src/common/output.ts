@@ -116,7 +116,6 @@ export class AudioOutputter implements IOutputter {
 
       messages.push('END: Initial Room Information')
     } else {
-
       const cur = new Set(current.keys())
       const prev = new Set(this.prev.keys())
 

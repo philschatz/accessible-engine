@@ -62,7 +62,7 @@ export class VisualOutputter implements IOutputter {
         const x1 = (hFlip ? width - 1 - relX : relX)
         const y1 = (vFlip ? height - 1 - relY : relY)
 
-        let pos
+        let pos: IPosition
         switch (rotationAmount) {
           case ROTATION_AMOUNT.NONE: pos = { x: x1, y: y1 }; break
           case ROTATION_AMOUNT.UP: pos = { x: y1, y: width - x1 }; break

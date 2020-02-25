@@ -378,8 +378,8 @@ export class Camera {
 
   public toBBox (): BBox {
     const { width, height } = this.dim
-    const w = width / 2
-    const h = height / 2
+    const w = Math.floor(width / 2)
+    const h = Math.floor(height / 2)
     return {
       minX: this.pos.x - w,
       maxX: this.pos.x + w,

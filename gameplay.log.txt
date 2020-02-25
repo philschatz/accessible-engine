@@ -3,32 +3,28 @@ START: Items in the Inventory.
   item keyCount has value 0.
 END: Items in the Inventory.
 START: Initial Room Information.
-  1 PLAYER sprite.
   1 PillarRed sprite.
-  1 NextRoomArrow sprite.
-  1 GongRed sprite.
+  1 PLAYER sprite.
   1 Key sprite.
-  1 Lock sprite.
+  1 Hole sprite.
   1 ArrowLeft sprite.
-  2 Crate sprites.
+  1 NextRoomArrow sprite.
   2 ArrowLeftDisabled sprites.
+  2 Lock sprites.
+  2 GongRed sprites.
+  2 Land2 sprites.
+  3 Crate sprites.
+  17 SandBottom sprites.
   65 Water sprites.
-  112 Wall sprites.
+  134 Wall sprites.
 END: Initial Room Information
 Moved PLAYER LEFT
 Moved PLAYER LEFT
 Moved PLAYER LEFT
 Moved PLAYER LEFT
 Moved PLAYER LEFT
-2 things moved: Crate UP, PLAYER UP
-2 things moved: Crate LEFT, PLAYER LEFT
 Moved PLAYER UP
-Moved PLAYER UP
-Moved PLAYER LEFT
-1 thing disappeared: PillarRed.
-changed FROM GongRed TO GongDisabled
 Moved PLAYER RIGHT
-Moved PLAYER DOWN
 Moved PLAYER DOWN
 Moved PLAYER DOWN
 Moved PLAYER RIGHT
@@ -42,13 +38,8 @@ Moved PLAYER RIGHT
 Moved PLAYER RIGHT
 Moved PLAYER RIGHT
 Moved PLAYER RIGHT
-Moved PLAYER RIGHT
 Moved PLAYER UP
 Moved PLAYER UP
-START Inventory updates.
-  Item keyCount changed from 0 to 1.
-END Inventory Updates.
-1 thing disappeared: Key.
 Moved PLAYER UP
 Moved PLAYER DOWN
 Moved PLAYER DOWN
@@ -58,11 +49,6 @@ Moved PLAYER UP
 Moved PLAYER LEFT
 Moved PLAYER LEFT
 Moved PLAYER UP
-START Inventory updates.
-  Item keyCount changed from 1 to 0.
-END Inventory Updates.
-1 thing disappeared: Lock
 Moved PLAYER UP
-3 things disappeared: ArrowLeftDisabled, ArrowLeftDisabled, ArrowLeft
 Moved PLAYER LEFT
-Moved PLAYER UP
+Moved PLAYER LEFT
