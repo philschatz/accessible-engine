@@ -1,4 +1,4 @@
-import { IOutputter, IPosition, Game, ObjectInstance, Camera, Size, SimpleObject, Opt, Dialog, IPixel, SpriteController, ROTATION_AMOUNT } from './engine'
+import { IOutputter, IPosition, Game, ObjectInstance, Camera, Size, SimpleObject, Opt, Dialog, IPixel, SpriteController, ROTATION_AMOUNT, posAdd } from './engine'
 import { LETTERS } from './letters'
 
 export interface IRenderer {
@@ -25,7 +25,7 @@ export class VisualOutputter implements IOutputter {
       const image = t.sprite.tick(t.startTick, curTick)
       if (!image) { throw new Error('BUG: Could not find image for the sprite.') }
       const pixelPos = t.getPixelPos(grid)
-      const screenPos = relativeTo({ x: pixelPos.x, y: pixelPos.y - image.pixels.length + 1 /* Shift the image up because it might not be a 8x8 sprite, like if it is a tall person */ }, camera.topLeftPixelPos(grid))
+      const screenPos = relativeTo({ x: pixelPos.x, y: pixelPos.y }, posAdd({x: -camera.screenPixelPos.x, y: -camera.screenPixelPos.y}, camera.topLeftPixelPos(grid)))
       // const screenPos = pixelPos
 
       let pixels = image.pixels

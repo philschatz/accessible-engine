@@ -1234,7 +1234,6 @@ export class MyGame implements Game {
   }
 
   drawOverlay (drawPixelsFn: DrawPixelsFn, drawTextFn: DrawTextFn, fields: SimpleObject, sprites: SpriteController) {
-    return
     const Key = sprites.get('Key')
 
     const OverlayTopLeft1 = sprites.get('OverlayTopLeft1')
@@ -1348,14 +1347,15 @@ function currentRoomBBox (playerGridPos: IPosition) {
 }
 
 function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, showDialog: ShowDialogFn, overlayState: SimpleObject, curTick: number) {
+  camera.screenPixelPos = { x: 0, y: 16 * 2 /* for the overlay */}
   camera.resize({
     width: ROOM_SIZE.width,
-    height: ROOM_SIZE.height + 2
+    height: ROOM_SIZE.height
   })
 
   const playerRoomPos = currentRoomCorner(o.pos)
 
-  camera.pos = posAdd(playerRoomPos, { x: Math.round(ROOM_SIZE.width / 2), y: Math.round(ROOM_SIZE.height / 2) - 2 })
+  camera.pos = posAdd(playerRoomPos, { x: Math.round(ROOM_SIZE.width / 2), y: Math.round(ROOM_SIZE.height / 2) })
 
   const PlayerWalkingUp = sprites.get('PlayerWalkingUp')
   const PlayerWalkingDown = sprites.get('PlayerWalkingDown')
@@ -1415,12 +1415,12 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
     sprites.get('Stump'),
     sprites.get('Rock'),
     sprites.get('Bush'),
-    sprites.get('WallTopRightDown'),
-    sprites.get('WallTopUpDown'),
-    sprites.get('WallTopLeftRight'),
-    sprites.get('WallTopUpLeft'),
-    sprites.get('Wall'),
-    sprites.get('WallVert'),
+    // sprites.get('WallTopRightDown'),
+    // sprites.get('WallTopUpDown'),
+    // sprites.get('WallTopLeftRight'),
+    // sprites.get('WallTopUpLeft'),
+    // sprites.get('Wall'),
+    // sprites.get('WallVert'),
     sprites.get('Water'),
     sprites.get('BigDoor12'),
     sprites.get('BigDoor13'),

@@ -365,12 +365,14 @@ export interface Game {
 }
 
 export class Camera {
+  public screenPixelPos: IPosition
   public pos: IPosition
   private dim: Size
 
   constructor (dim: Size) {
     this.dim = dim
     this.pos = { x: 0, y: 0 }
+    this.screenPixelPos = { x: 0, y: 0 }
   }
 
   public size () { return this.dim }
