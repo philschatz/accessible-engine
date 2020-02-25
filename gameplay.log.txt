@@ -1,32 +1,38 @@
 NOTE: Keyboards in a terminal do not work well for platformers (holding down a key). So when you run & jump you should tap up and then keep tapping left/right to keep moving in that direction
 START: Items in the Inventory.
-  item keyCount has value 0.
+  item keys has value 0.
 END: Items in the Inventory.
 START: Initial Room Information.
-  1 PillarRed sprite.
-  1 PLAYER sprite.
-  1 Key sprite.
-  1 Hole sprite.
-  1 ArrowLeft sprite.
   1 NextRoomArrow sprite.
+  1 PLAYER sprite.
+  1 PillarRed sprite.
+  1 Lock sprite.
+  1 Key sprite.
+  1 GongRed sprite.
+  1 ArrowLeft sprite.
+  2 Crate sprites.
   2 ArrowLeftDisabled sprites.
-  2 Lock sprites.
-  2 GongRed sprites.
-  2 Land2 sprites.
-  3 Crate sprites.
-  17 SandBottom sprites.
   65 Water sprites.
-  134 Wall sprites.
+  112 Wall sprites.
 END: Initial Room Information
 Moved PLAYER LEFT
 Moved PLAYER LEFT
 Moved PLAYER LEFT
 Moved PLAYER LEFT
 Moved PLAYER LEFT
+Moved PLAYER LEFT
+2 things moved: Crate UP, PLAYER UP
+2 things moved: Crate LEFT, PLAYER LEFT
 Moved PLAYER UP
+Moved PLAYER UP
+Moved PLAYER LEFT
+changed FROM GongRed TO GongDisabled.
+1 thing disappeared: PillarRed
 Moved PLAYER RIGHT
 Moved PLAYER DOWN
 Moved PLAYER DOWN
+Moved PLAYER DOWN
+Moved PLAYER RIGHT
 Moved PLAYER RIGHT
 Moved PLAYER RIGHT
 Moved PLAYER RIGHT
@@ -40,7 +46,9 @@ Moved PLAYER RIGHT
 Moved PLAYER RIGHT
 Moved PLAYER UP
 Moved PLAYER UP
-Moved PLAYER UP
+Moved PLAYER UP.
+1 thing disappeared: Key.
+  keys in inventory changed from 0 to 1
 Moved PLAYER DOWN
 Moved PLAYER DOWN
 Moved PLAYER LEFT
@@ -49,6 +57,11 @@ Moved PLAYER UP
 Moved PLAYER LEFT
 Moved PLAYER LEFT
 Moved PLAYER UP
+1 thing disappeared: Lock.
+  keys in inventory changed from 1 to 0
 Moved PLAYER UP
+3 things disappeared: ArrowLeftDisabled, ArrowLeftDisabled, ArrowLeft
 Moved PLAYER LEFT
-Moved PLAYER LEFT
+Moved PLAYER UP
+Moved PLAYER UP
+Moved PLAYER UP

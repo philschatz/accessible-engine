@@ -1347,7 +1347,7 @@ function currentRoomBBox (playerGridPos: IPosition) {
 }
 
 function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, showDialog: ShowDialogFn, overlayState: SimpleObject, curTick: number) {
-  camera.screenPixelPos = { x: 0, y: 16 * 2 /* for the overlay */}
+  camera.screenPixelPos = { x: 0, y: 16 * 2 /* for the overlay */ }
   camera.resize({
     width: ROOM_SIZE.width,
     height: ROOM_SIZE.height
@@ -1415,12 +1415,12 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
     sprites.get('Stump'),
     sprites.get('Rock'),
     sprites.get('Bush'),
-    // sprites.get('WallTopRightDown'),
-    // sprites.get('WallTopUpDown'),
-    // sprites.get('WallTopLeftRight'),
-    // sprites.get('WallTopUpLeft'),
-    // sprites.get('Wall'),
-    // sprites.get('WallVert'),
+    sprites.get('WallTopRightDown'),
+    sprites.get('WallTopUpDown'),
+    sprites.get('WallTopLeftRight'),
+    sprites.get('WallTopUpLeft'),
+    sprites.get('Wall'),
+    sprites.get('WallVert'),
     sprites.get('Water'),
     sprites.get('BigDoor12'),
     sprites.get('BigDoor13'),
@@ -1527,7 +1527,7 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
         o.moveTo(neighborOld)
         wallNeighbor.moveTo(newNeighborPos)
       } else {
-
+        o.offsetPos = { x: 0, y: 0 }
       }
     } else {
       o.offsetPos = { x: 0, y: 0 }

@@ -20,7 +20,7 @@ export class VisualOutputter implements IOutputter {
 
     game.drawBackground(tiles, camera, this.drawPixels)
 
-    const cameraCache = posAdd({x: -camera.screenPixelPos.x, y: -camera.screenPixelPos.y}, camera.topLeftPixelPos(grid))
+    const cameraCache = posAdd({ x: -camera.screenPixelPos.x, y: -camera.screenPixelPos.y }, camera.topLeftPixelPos(grid))
 
     for (const t of tiles) {
       if (t.startTick === 0) { t.startTick = curTick }
