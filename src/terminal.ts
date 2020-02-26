@@ -19,7 +19,7 @@ import { TerminalRenderer } from './terminal/renderer'
 import { KeyboardGamepad, AnyGamepad } from './terminal/gamepad'
 import { OrGamepad, BUTTON_TYPE } from './common/gamepad'
 // import { MyGame } from './fuzGame'
-import { MyGame } from './akurraGame'
+import { MyGame } from './akurra/game'
 
 import { AudioOutputter, AndOutputter } from './common/output'
 

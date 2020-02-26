@@ -1,5 +1,5 @@
 import Rbush from 'rbush'
-import { IGamepad } from './gamepad'
+import { IGamepad, BUTTON_TYPE } from './gamepad'
 
 // From https://github.com/mourner/rbush
 interface RBush<I> {
@@ -357,7 +357,7 @@ export interface SimpleObject {
 }
 
 export interface Game {
-  load(gamepad: IGamepad, sprites: SpriteController): {grid: Size}
+  load(gamepad: IGamepad, sprites: SpriteController): {grid: Size, buttons: Set<BUTTON_TYPE>}
   init(sprites: SpriteController, instances: InstanceController)
   drawBackground(tiles: Array<ObjectInstance<any, any>>, camera: Camera, drawPixelsFn: DrawPixelsFn)
   drawOverlay(drawPixelsFn: DrawPixelsFn, drawTextFn: DrawTextFn, additional: SimpleObject, sprites: SpriteController)

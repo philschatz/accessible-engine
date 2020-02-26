@@ -1,5 +1,25 @@
 # Accessible Game Engine
 
+
+## Run in a Windows Powershell terminal
+
+Yes, you read that right! You can play the game inside a terminal.
+
+1. Install NodeJS by either:
+  - via https://nodejs.org
+  - or install https://chocolatey.org/install and then run `cinst node.install`
+1. Get the source code by either:
+  - `git clone https://github.com/philschatz/{this_repo_name}`
+  - run `npx {this_repo_name}` to download and run it all in one
+1. Install packages and run
+  - run `npm install`
+  - run `npm start`
+
+If your powershell is too small (it probably is) you can press Ctrl+C
+and set it to be at least 384x224.
+
+
+
 Needs to have the following properties (unlike pico-8 or puzzlescript):
 
 - **Engine knows about Objects** : Objects that the engine knows about and move around instead of just sprites that are drawn
