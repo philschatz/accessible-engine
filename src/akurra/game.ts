@@ -8,85 +8,85 @@ export class MyGame implements Game {
   load (gamepad: IGamepad, sprites: SpriteController) {
     const images = loadImages()
 
-    sprites.add('Water', new Sprite(20, true, [
-      images.get('Water0'),
-      images.get('Water0'),
-      images.get('Water0'),
-      images.get('Water0'),
-      images.get('Water0'),
-      images.get('Water0'),
-      images.get('Water0'),
-      images.get('Water0'),
-      images.get('Water0'),
-      images.get('Water0'),
-      images.get('Water1'),
-      images.get('Water2'),
-      images.get('Water3'),
-      images.get('Water4')
-    ]))
+    sprites.add('Water', new Sprite(20, true, images.getAll([
+      'Water0',
+      'Water0',
+      'Water0',
+      'Water0',
+      'Water0',
+      'Water0',
+      'Water0',
+      'Water0',
+      'Water0',
+      'Water0',
+      'Water1',
+      'Water2',
+      'Water3',
+      'Water4'
+    ])))
 
-    sprites.add('Key', new Sprite(1, true, [
-      images.get('Key1'),
-      images.get('Key1'),
-      images.get('Key1'),
-      images.get('Key1'),
-      images.get('Key1'),
-      images.get('Key1'),
-      images.get('Key1'),
-      images.get('Key1'),
-      images.get('Key1'),
-      images.get('Key1'),
-      images.get('Key1'),
-      images.get('Key1'),
-      images.get('Key1'),
-      images.get('Key1'),
-      images.get('Key1'),
-      images.get('Key1'),
-      images.get('Key1'),
-      images.get('Key1'),
-      images.get('Key1'),
-      images.get('Key1'),
-      images.get('Key1'),
-      images.get('Key1'),
-      images.get('Key1'),
-      images.get('Key1'),
-      images.get('Key1'),
-      images.get('Key1'),
-      images.get('Key1'),
-      images.get('Key2'),
-      images.get('Key3'),
-      images.get('Key4'),
-      images.get('Key5'),
-      images.get('Key6')
-    ]))
+    sprites.add('Key', new Sprite(1, true, images.getAll([
+      'Key1',
+      'Key1',
+      'Key1',
+      'Key1',
+      'Key1',
+      'Key1',
+      'Key1',
+      'Key1',
+      'Key1',
+      'Key1',
+      'Key1',
+      'Key1',
+      'Key1',
+      'Key1',
+      'Key1',
+      'Key1',
+      'Key1',
+      'Key1',
+      'Key1',
+      'Key1',
+      'Key1',
+      'Key1',
+      'Key1',
+      'Key1',
+      'Key1',
+      'Key1',
+      'Key1',
+      'Key2',
+      'Key3',
+      'Key4',
+      'Key5',
+      'Key6'
+    ])))
 
-    sprites.add('GongDisabled', new Sprite(1, false, [
-      images.get('GongDisabled1'),
-      images.get('GongDisabled2'),
-      images.get('GongDisabled3'),
-      images.get('GongDisabled4'),
-      images.get('GongDisabled5'),
-      images.get('GongDisabled6')
-    ]))
+    sprites.add('GongDisabled', new Sprite(1, false, images.getAll([
+      'GongDisabled1',
+      'GongDisabled2',
+      'GongDisabled3',
+      'GongDisabled4',
+      'GongDisabled5',
+      'GongDisabled6'
+    ])))
 
-    sprites.add('PlayerWalkingRight', new Sprite(1, true, [
-      images.get('PlayerWalkingRight1'),
-      images.get('PlayerWalkingRight2')
-    ]))
+    sprites.add('PlayerWalkingRight', new Sprite(1, true, images.getAll([
+      'PlayerWalkingRight1',
+      'PlayerWalkingRight2'
+    ])))
 
-    sprites.add('FloorSquare', new Sprite(2, false, [
-      images.get('FloorPoof1'),
-      images.get('FloorPoof2'),
-      images.get('FloorPoof3Square'),
-      images.get('FloorSquareDone')
-    ]))
+    sprites.add('FloorSquare', new Sprite(2, false, images.getAll([
+      'FloorPoof1',
+      'FloorPoof2',
+      'FloorPoof3Square',
+      'FloorSquareDone'
+    ])))
 
-    sprites.add('FloorDiamond', new Sprite(2, false, [
-      images.get('FloorPoof1'),
-      images.get('FloorPoof2'),
-      images.get('FloorPoof3Diamond'),
-      images.get('FloorDiamondDone')
-    ]))
+    sprites.add('FloorDiamond', new Sprite(2, false, images.getAll([
+      'FloorPoof1',
+      'FloorPoof2',
+      'FloorPoof3Diamond',
+      'FloorDiamondDone'
+    ])))
 
     // Add all the images as single-image sprites too.
     for (const [name, image] of images.entries()) {
@@ -108,19 +108,31 @@ export class MyGame implements Game {
   }
 
   drawOverlay (drawPixelsFn: DrawPixelsFn, drawTextFn: DrawTextFn, fields: SimpleObject, sprites: SpriteController) {
-    const Key = sprites.get('Key')
-
-    const OverlayTopLeft1 = sprites.get('OverlayTopLeft1')
-    const OverlayTopLeft2 = sprites.get('OverlayTopLeft2')
-    const OverlayTopRight1 = sprites.get('OverlayTopRight1')
-    const OverlayTopRight2 = sprites.get('OverlayTopRight2')
-    const OverlayTop = sprites.get('OverlayTop')
-
-    const OverlayBottomLeft1 = sprites.get('OverlayBottomLeft1')
-    const OverlayBottomLeft2 = sprites.get('OverlayBottomLeft2')
-    const OverlayBottomRight1 = sprites.get('OverlayBottomRight1')
-    const OverlayBottomRight2 = sprites.get('OverlayBottomRight2')
-    const OverlayBottom = sprites.get('OverlayBottom')
+    const [
+      Key,
+      OverlayTopLeft1,
+      OverlayTopLeft2,
+      OverlayTopRight1,
+      OverlayTopRight2,
+      OverlayTop,
+      OverlayBottomLeft1,
+      OverlayBottomLeft2,
+      OverlayBottomRight1,
+      OverlayBottomRight2,
+      OverlayBottom
+    ] = sprites.getAll([
+      'Key',
+      'OverlayTopLeft1',
+      'OverlayTopLeft2',
+      'OverlayTopRight1',
+      'OverlayTopRight2',
+      'OverlayTop',
+      'OverlayBottomLeft1',
+      'OverlayBottomLeft2',
+      'OverlayBottomRight1',
+      'OverlayBottomRight2',
+      'OverlayBottom'
+    ])
 
     let x = 0
     let y = 0

@@ -10,8 +10,6 @@ const CAMERA_SIZE = {
 
 export class MyGame implements Game {
   load (gamepad: IGamepad, sprites: SpriteController) {
-    // gamepad.listenTo([BUTTON_TYPE.ARROW_LEFT, BUTTON_TYPE.ARROW_RIGHT, BUTTON_TYPE.ARROW_DOWN, BUTTON_TYPE.ARROW_UP, BUTTON_TYPE.CLUSTER_BOTTOM])
-
     const images = new DefiniteMap<Image>()
 
     const z = null // transparent
@@ -563,7 +561,8 @@ export class MyGame implements Game {
     }
 
     return {
-      grid: { width: 8, height: 8 }
+      grid: { width: 8, height: 8 },
+      buttons: new Set([BUTTON_TYPE.DPAD_UP, BUTTON_TYPE.DPAD_DOWN, BUTTON_TYPE.DPAD_LEFT, BUTTON_TYPE.DPAD_RIGHT, BUTTON_TYPE.CLUSTER_DOWN])
     }
   }
 

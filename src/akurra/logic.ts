@@ -13,41 +13,67 @@ export function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IG
 
   camera.pos = posAdd(playerRoomPos, { x: Math.round(ROOM_SIZE.width / 2), y: Math.round(ROOM_SIZE.height / 2) })
 
-  const PlayerWalkingUp = sprites.get('PlayerWalkingUp')
-  const PlayerWalkingDown = sprites.get('PlayerWalkingDown')
-  const PlayerWalkingRight = sprites.get('PlayerWalkingRight')
-
-  const PushingRight = sprites.get('PlayerPushingRight')
-  const PushingUp = sprites.get('PlayerPushingUp')
-  const PushingDown = sprites.get('PlayerPushingDown')
+  const [
+    PlayerWalkingUp,
+    PlayerWalkingDown,
+    PlayerWalkingRight,
+    PushingRight,
+    PushingUp,
+    PushingDown,
+    GongRed,
+    PillarRed,
+    GongBlue,
+    PillarBlue,
+    ChimeRed,
+    ChimePillarRed,
+    ChimeBlue,
+    ChimePillarBlue,
+    GongDisabled,
+    Key,
+    Lock,
+    ArrowLeft,
+    ArrowLeftDisabled,
+    ArrowUp,
+    ArrowUpDisabled,
+    ArrowRight,
+    ArrowRightDisabled,
+    ArrowDown,
+    ArrowDownDisabled,
+    FloorSquare,
+    FloorDiamond
+  ] = sprites.getAll([
+    'PlayerWalkingUp',
+    'PlayerWalkingDown',
+    'PlayerWalkingRight',
+    'PushingRight',
+    'PushingUp',
+    'PushingDown',
+    'GongRed',
+    'PillarRed',
+    'GongBlue',
+    'PillarBlue',
+    'ChimeRed',
+    'ChimePillarRed',
+    'ChimeBlue',
+    'ChimePillarBlue',
+    'GongDisabled',
+    'Key',
+    'Lock',
+    'ArrowLeft',
+    'ArrowLeftDisabled',
+    'ArrowUp',
+    'ArrowUpDisabled',
+    'ArrowRight',
+    'ArrowRightDisabled',
+    'ArrowDown',
+    'ArrowDownDisabled',
+    'FloorSquare',
+    'FloorDiamond'
+  ])
 
   const pushableSprites = [
     sprites.get('Crate')
   ]
-
-  const GongRed = sprites.get('GongRed')
-  const PillarRed = sprites.get('PillarRed')
-  const GongBlue = sprites.get('GongBlue')
-  const PillarBlue = sprites.get('PillarBlue')
-  const ChimeRed = sprites.get('ChimeRed')
-  const ChimePillarRed = sprites.get('ChimePillarRed')
-  const ChimeBlue = sprites.get('ChimeBlue')
-  const ChimePillarBlue = sprites.get('ChimePillarBlue')
-
-  const GongDisabled = sprites.get('GongDisabled')
-  const Key = sprites.get('Key')
-  const Lock = sprites.get('Lock')
-  const ArrowLeft = sprites.get('ArrowLeft')
-  const ArrowLeftDisabled = sprites.get('ArrowLeftDisabled')
-  const ArrowUp = sprites.get('ArrowUp')
-  const ArrowUpDisabled = sprites.get('ArrowUpDisabled')
-  const ArrowRight = sprites.get('ArrowRight')
-  const ArrowRightDisabled = sprites.get('ArrowRightDisabled')
-  const ArrowDown = sprites.get('ArrowDown')
-  const ArrowDownDisabled = sprites.get('ArrowDownDisabled')
-
-  const FloorSquare = sprites.get('FloorSquare')
-  const FloorDiamond = sprites.get('FloorDiamond')
 
   const pushableWallSprites = [...pushableSprites,
     GongRed,
@@ -255,9 +281,7 @@ export function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IG
 }
 
 export function crateUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, showDialog: ShowDialogFn, overlayState: SimpleObject, curTick: number) {
-  const Hole = sprites.get('Hole')
-  const HoleStraw = sprites.get('HoleStraw')
-  const HoleCrate = sprites.get('HoleCrate')
+  const [Hole, HoleStraw, HoleCrate] = sprites.getAll(['Hole', 'HoleStraw', 'HoleCrate'])
 
   const holes = [
     Hole,

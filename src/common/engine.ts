@@ -478,6 +478,10 @@ export class DefiniteMap<V> {
     return value
   }
 
+  getAll (keys: string[]) {
+    return keys.map(key => this.get(key))
+  }
+
   entries () {
     return this.map.entries()
   }
