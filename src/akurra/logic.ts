@@ -17,9 +17,9 @@ export function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IG
     PlayerWalkingUp,
     PlayerWalkingDown,
     PlayerWalkingRight,
-    PushingRight,
-    PushingUp,
-    PushingDown,
+    PlayerPushingRight,
+    PlayerPushingUp,
+    PlayerPushingDown,
     GongRed,
     PillarRed,
     GongBlue,
@@ -45,9 +45,9 @@ export function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IG
     'PlayerWalkingUp',
     'PlayerWalkingDown',
     'PlayerWalkingRight',
-    'PushingRight',
-    'PushingUp',
-    'PushingDown',
+    'PlayerPushingRight',
+    'PlayerPushingUp',
+    'PlayerPushingDown',
     'GongRed',
     'PillarRed',
     'GongBlue',
@@ -263,10 +263,10 @@ export function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IG
       break
     case PLAYER_STATE.PUSHING:
       switch (p.dir) {
-        case PLAYER_DIR.RIGHT: o.setSprite(PushingRight); break
-        case PLAYER_DIR.UP: o.setSprite(PushingUp); break
-        case PLAYER_DIR.LEFT: o.setSprite(PushingRight); o.hFlip = true; break
-        case PLAYER_DIR.DOWN: o.setSprite(PushingDown); break
+        case PLAYER_DIR.RIGHT: o.setSprite(PlayerPushingRight); break
+        case PLAYER_DIR.UP: o.setSprite(PlayerPushingUp); break
+        case PLAYER_DIR.LEFT: o.setSprite(PlayerPushingRight); o.hFlip = true; break
+        case PLAYER_DIR.DOWN: o.setSprite(PlayerPushingDown); break
         default: throw new Error(`BUG: Invalid direction ${p.dir}`)
       }
       break
