@@ -34,7 +34,7 @@ export class GridTableOutputter implements IOutputter {
         return h('tr', null, ...row.filter(s => !!s).map(col => {
           return h('td', null, ...[...col.keys()].filter(s => !!s).map(s => {
             const snake = toSnakeCase(s)
-            return h('span', { className: snake }, `${snake} `)
+            return h('span', { className: snake.toLowerCase() }, `${snake} `)
           }))
         }))
       }))
@@ -204,6 +204,7 @@ export class GridInspector {
   }
 }
 
+
 interface BFSEdge {to: Vertex, from: Vertex}
 
 class BFS {
@@ -223,7 +224,7 @@ class BFS {
       return null
     }
 
-    const { to, from } = this.queue.shift()
+    const { to, from } = this.queue.sort((a, b) => distance(a) - distance(b)).shift()
     const edgesToRemove = new Set<Vertex[]>()
     this.edges.forEach(e => {
       if (e[0] === to) {
@@ -251,6 +252,10 @@ class BFS {
     }
     return ret
   }
+}
+
+function distance(e: {to: Vertex, from: Vertex}) {
+  return Math.abs(e.to.x - e.from.x) + Math.abs(e.to.y - e.from.y)
 }
 
 function indexOf (parent: HTMLElement, child: Element): number {

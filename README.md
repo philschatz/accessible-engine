@@ -1,24 +1,65 @@
 # Accessible Game Engine
 
+# Try it out
 
-## Run in a Windows Powershell terminal
+## Online
+
+## In a terminal 
 
 Yes, you read that right! You can play the game inside a terminal.
+
+### Windows Powershell
 
 1. Install NodeJS by either:
   - via https://nodejs.org
   - or install https://chocolatey.org/install and then run `cinst node.install`
 1. Get the source code by either:
   - `git clone https://github.com/philschatz/{this_repo_name}`
-  - run `npx {this_repo_name}` to download and run it all in one
+  - or run `npx {this_repo_name}` to download and run it all in one
 1. Install packages and run
-  - run `npm install`
-  - run `npm start`
+  1. run `npm install`
+  1. run `npm start`
 
 If your powershell is too small (it probably is) you can press Ctrl+C
 and set it to be at least 384x224.
 
+### macOS and linux
 
+There are 2 easy ways:
+
+- clone this repo, run `npm install && npm start`
+- run `npx {this_repo_name} npm start`
+
+# Features & Reasons
+
+
+## Sprites & Animations
+
+- the engine needs to know about objects, not sprites. This is so we can report when an object moved or changed
+- Animation sprites need to be grouped together so they can be ignored for non-sighted users
+- Each sprite should have a description of how it works and if it interacts with any other objects
+  - e.g. "Touching the Red Gong will cause the Red Pillar to disappear"
+
+## Time & Space
+
+- progression should be based on the user's input rather than time (flying bats)
+  - This is so that the user can pause, inspect what the state of the game is, actively choose when to advance
+- Undo should be an option because people "try out" approaches in their head and it is useful to "try out" an approach and then inspect what actually changed
+- play needs to occur on a grid so that there are fewer things to keep track of in one's head (chess board vs every pixel on a screen)
+
+## Dialogs & Inventory windows
+
+- dialogs need to be created through the engine. This is so we can print the dialog out to the user
+- overlay information like the inventory need to be drawn through the engine. This is so we can print when changes to your inventory occur
+
+## Gamepad
+
+There are many gamepads available to purchase, and it is very unreasonable to ask games to implement all controllers.
+
+However, if games canare able to request to use certain buttons (see the [Gamepad API's Standard Layout](https://w3c.github.io/gamepad/#dfn-standard-gamepad-layout)) then they can be more-easily mapped to other controllers.
+
+
+# Notes
 
 Needs to have the following properties (unlike pico-8 or puzzlescript):
 
