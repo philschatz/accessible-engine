@@ -6,6 +6,11 @@ export interface IRenderer {
   drawPixel(pos: IPosition, hex: string): void
 }
 
+// https://stackoverflow.com/a/30521308
+export function toSnakeCase (s: string) {
+  return s.replace(/\.?([A-Z]+)/g, function (x, y: string) { return ' ' + y }).replace(/^ /, '')
+}
+
 // HACK lookup table. This should be a property of the ObjectClass
 const categories = new Map<string, string>()
 categories.set('WallTopUpLeft', 'Wall')
@@ -47,22 +52,22 @@ categories.set('FloorSquare', null)
 categories.set('FloorDiamond', null)
 categories.set('Pedestal', null)
 
-categories.set('BigDoor0', 'BigDoor')
-categories.set('BigDoor1', 'BigDoor')
-categories.set('BigDoor2', 'BigDoor')
-categories.set('BigDoor3', 'BigDoor')
-categories.set('BigDoor4', 'BigDoor')
-categories.set('BigDoor5', 'BigDoor')
-categories.set('BigDoor6', 'BigDoor')
-categories.set('BigDoor7', 'BigDoor')
-categories.set('BigDoor8', 'BigDoor')
-categories.set('BigDoor9', 'BigDoor')
-categories.set('BigDoor10', 'BigDoor')
-categories.set('BigDoor11', 'BigDoor')
-categories.set('BigDoor12', 'BigDoor')
-categories.set('BigDoor13', 'BigDoor')
-categories.set('BigDoor14', 'BigDoor')
-categories.set('BigDoor15', 'BigDoor')
+categories.set('BigDoor0', 'Wall')
+categories.set('BigDoor1', 'Wall')
+categories.set('BigDoor2', 'Wall')
+categories.set('BigDoor3', 'Wall')
+categories.set('BigDoor4', 'Wall')
+categories.set('BigDoor5', 'Wall')
+categories.set('BigDoor6', 'Wall')
+categories.set('BigDoor7', 'Wall')
+categories.set('BigDoor8', 'Wall')
+categories.set('BigDoor9', 'Wall')
+categories.set('BigDoor10', 'Wall')
+categories.set('BigDoor11', 'Wall')
+categories.set('BigDoor12', 'Wall')
+categories.set('BigDoor13', 'Wall')
+categories.set('BigDoor14', 'Wall')
+categories.set('BigDoor15', 'Wall')
 
 categories.set('PlayerWalkingRight', 'PLAYER')
 categories.set('PlayerWalkingUp', 'PLAYER')
@@ -271,7 +276,7 @@ export class AudioOutputter implements IOutputter {
     }
     // only log when actual messages occurred
     if (messages.length > 0) {
-      this.logger(messages.join('.\n'))
+      this.logger(messages.map(m => toSnakeCase(m)).join('.\n'))
     }
     this.prev = current
   }

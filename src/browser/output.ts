@@ -1,5 +1,6 @@
+import * as mst from 'euclideanmst'
 import { IOutputter, Game, ObjectInstance, Camera, Size, SimpleObject, Opt, Dialog, SpriteController, IPosition } from '../common/engine'
-import { categorize } from '../common/output'
+import { categorize, toSnakeCase } from '../common/output'
 import { DoubleArray } from '../common/doubleArray'
 import { IRenderer, hexToRgb } from '../common/visual'
 import { h, patch } from './vdom'
@@ -32,7 +33,8 @@ export class GridTableOutputter implements IOutputter {
       h('tbody', null, ...model.asArray().filter(s => !!s).map(row => {
         return h('tr', null, ...row.filter(s => !!s).map(col => {
           return h('td', null, ...[...col.keys()].filter(s => !!s).map(s => {
-            return h('span', { className: s.toLowerCase() }, `${s} `)
+            const snake = toSnakeCase(s)
+            return h('span', { className: snake }, `${snake} `)
           }))
         }))
       }))
@@ -80,6 +82,9 @@ export class CanvasRenderer implements IRenderer {
   }
 }
 
+type Vert = [number, number]
+interface Vertex {x: number, y: number, name: string}
+
 export class GridInspector {
   private readonly table: HTMLTableElement
   private readonly logger: (msg: string) => void
@@ -104,6 +109,7 @@ export class GridInspector {
         case 'j': dx = -1; break
         case 'l': dx = 1; break
         case 'k': dy = 1; break
+        case 'm': return this.printTree()
         default: return
       }
 
@@ -143,6 +149,107 @@ export class GridInspector {
       x: indexOf(tr, td),
       y: indexOf(tbody, tr)
     }
+  }
+
+  printTree () {
+    const nodes = new Map<Vert, string>()
+
+    this.table.querySelectorAll('tr').forEach((tr, y) => {
+      tr.querySelectorAll('td').forEach((td, x) => {
+        td.querySelectorAll('span').forEach(span => {
+          const v: [number, number] = [x, y]
+          const name = span.textContent.trim().toLowerCase()
+
+          // Skip Wall & Water sprites
+          if (name === 'wall' || name === 'water') {
+            return
+          }
+
+          if (nodes.get(v) !== 'player') { // make sure "player" is always in the tree
+            nodes.set(v, name)
+          }
+        })
+      })
+    })
+
+    const verts = [...nodes.keys()]
+
+    const edgesWithVertIndex = mst.euclideanMST(verts, (a: Vert, b: Vert) => {
+      return Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2)
+    })
+
+    const vertexes = verts.map((v) => ({ x: v[0], y: v[1], name: nodes.get(v) }))
+    const edges = edgesWithVertIndex.map(([v1Index, v2Index]) => [vertexes[v1Index], vertexes[v2Index]])
+    const player = vertexes.find(v => v.name.toLowerCase() === 'player')
+    const bfs = new BFS(edges, player)
+    const msg = bfs.tickAll().map(({ from, to }) => {
+      const dx = to.x - from.x
+      const dy = to.y - from.y
+
+      const ret = []
+      if (dx !== 0) {
+        ret.push(`${Math.abs(dx)} ${dx < 0 ? 'LEFT' : 'RIGHT'}`)
+      }
+      if (dy !== 0) {
+        ret.push(`${Math.abs(dy)} ${dy < 0 ? 'UP' : 'DOWN'}`)
+      }
+      // say the longer distance first
+      if (Math.abs(dx) < Math.abs(dy)) {
+        ret.reverse()
+      }
+      return `${to.name} is ${ret.join(' AND ')} from ${from.name}.`
+    })
+
+    this.logger(`${msg.join(' ')}. `)
+  }
+}
+
+interface BFSEdge {to: Vertex, from: Vertex}
+
+class BFS {
+  readonly edges = new Set<Vertex[]>()
+  readonly visited = new Set<Vertex>()
+  readonly queue: Array<{to: Vertex, from: Vertex | null}>
+  constructor (edges: Vertex[][], root: Vertex) {
+    this.edges = new Set(edges)
+    this.queue = [{ to: root, from: null }]
+  }
+
+  tick (): BFSEdge | null {
+    if (this.queue.length === 0) {
+      if (this.edges.size !== 0) {
+        throw new Error(`BUG: Expected edges to run out by now but there were still ${this.edges.size} left: ${JSON.stringify([...this.edges.keys()])}`)
+      }
+      return null
+    }
+
+    const { to, from } = this.queue.shift()
+    const edgesToRemove = new Set<Vertex[]>()
+    this.edges.forEach(e => {
+      if (e[0] === to) {
+        edgesToRemove.add(e)
+        this.queue.push({ to: e[1], from: to })
+      } else if (e[1] === to) {
+        edgesToRemove.add(e)
+        this.queue.push({ to: e[0], from: to })
+      }
+    })
+
+    edgesToRemove.forEach(e => this.edges.delete(e))
+    if (from === null) {
+      return this.tick()
+    } else {
+      return { to, from }
+    }
+  }
+
+  tickAll (): BFSEdge[] {
+    const ret: BFSEdge[] = []
+    let e: BFSEdge
+    while ((e = this.tick()) !== null) {
+      ret.push(e)
+    }
+    return ret
   }
 }
 
