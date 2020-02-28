@@ -25,11 +25,14 @@ const checkActiveElement = (root: Element, current: Element | null): boolean => 
   return false
 }
 
-export class KeyGamepad implements IGamepad {
+export class Keymaster<T> {
   private readonly context: Opt<HTMLElement>
-  private readonly pressed = new Set<BUTTON_TYPE>()
-
-  constructor (context: Opt<HTMLElement>) {
+  private readonly mapper: (key: string) => T
+  private readonly pressed = new Set<T>()
+  private readonly listener: Opt<(key: T, pressed: boolean) => void>
+  constructor (mapper: (key: string) => T, listener: Opt<(key: T, pressed: boolean) => void>, context: Opt<HTMLElement>) {
+    this.mapper = mapper
+    this.listener = listener
     this.context = context
     this.onKeyDown = this.onKeyDown.bind(this)
     this.onKeyUp = this.onKeyUp.bind(this)
@@ -43,17 +46,35 @@ export class KeyGamepad implements IGamepad {
   }
 
   private onKeyDown (evt: KeyboardEvent) {
-    const button = keyMap.get(evt.key)
-    if (button && (!this.context || checkActiveElement(this.context, window.document.activeElement))) {
-      this.pressed.add(button)
+    const key = this.mapper(evt.key)
+    if (key && (!this.context || checkActiveElement(this.context, window.document.activeElement))) {
+      this.pressed.add(key)
+      if (this.listener) this.listener(key, true)
     }
   }
 
   private onKeyUp (evt: KeyboardEvent) {
-    const button = keyMap.get(evt.key)
-    if (button && (!this.context || checkActiveElement(this.context, window.document.activeElement))) {
-      this.pressed.delete(button)
+    const key = this.mapper(evt.key)
+    if (key && (!this.context || checkActiveElement(this.context, window.document.activeElement))) {
+      this.pressed.delete(key)
+      if (this.listener) this.listener(key, false)
     }
+  }
+
+  public isPressed (key: T) {
+    return this.pressed.has(key)
+  }
+}
+
+export class KeyGamepad implements IGamepad {
+  private readonly km: Keymaster<BUTTON_TYPE>
+
+  constructor (context: Opt<HTMLElement>) {
+    this.km = new Keymaster((key: string) => keyMap.get(key), null, context)
+  }
+
+  dispose () {
+    this.km.dispose()
   }
 
   tick () {
@@ -61,7 +82,7 @@ export class KeyGamepad implements IGamepad {
   }
 
   isButtonPressed (btn: BUTTON_TYPE) {
-    return this.pressed.has(btn)
+    return this.km.isPressed(btn)
   }
 
   getStickCoordinates (stick: STICK_TYPE) {

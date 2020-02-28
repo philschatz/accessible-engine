@@ -19,6 +19,21 @@
       height: 1px;
       overflow: hidden;
     }
+
+    kbd {
+      font: 11px "SFMono-Regular",Consolas,"Liberation Mono",Menlo,Courier,monospace;
+      display: inline-block;
+      padding: 3px 5px;
+      font-size: 11px;
+      line-height: 10px;
+      color: #444d56;
+      vertical-align: middle;
+      background-color: #fafbfc;
+      border: solid 1px #c6cbd1;
+      border-bottom-color: #959da5;
+      border-radius: 3px;
+      box-shadow: inset 0 -1px 0 #959da5;
+    }
   </style>
 </head>
 
@@ -29,12 +44,13 @@
     <label for="play_sprites">Visually with Sprites</label><br/>
     <input id="play_table" type="checkbox" name="play_style" value="table"/>
     <label for="play_table">In an Accessible Table (for low vision users or blind people that enjoy navigating in tables)</label><br/>
-    <input id="play_screenreader" type="checkbox" name="play_style" value="screenreader" checked="checked"/>
+    <input id="play_screenreader" type="checkbox" name="play_style" value="screenreader" checked="checked" disabled="disabled"/>
     <label for="play_screenreader">Using Audio read by a screenreader</label><br/>
     <p><strong tabindex="0" aria-controls="my_audio_messages">How to use this</strong> . Try completing the level without using the graphical option. Note what happens when you push against a wall, or when you get/use a key. Creating a sokoban-style games to be accessible only requires a minimal amount of accessible hoops to jump through; game devs can just write game code for the most part. For more on how to build accessible videogames check out the repository.</p>
   </fieldset>
   <canvas tabindex="0" id="my_canvas" width="384" height="224"></canvas>
   <div id="my_table"></div>
+  <p>Use the <kbd>I</kbd>, <kbd>J</kbd>, <kbd>K</kbd>, <kbd>L</kbd> keys to inspect around you</p>
   <ol id="my_audio" role="log" aria-live="polite" aria-atomic="false">
   </ol>
   <script src="browser.bundle.js"></script>
@@ -42,7 +58,7 @@
   <script>
     (function() {
       console.log(window.GameEngine)
-      const {MyGame, AndOutputter, AudioOutputter, CanvasRenderer, Engine, GridTableOutputter, OrGamepad, VisualOutputter, KeyGamepad } = window.GameEngine
+      const {MyGame, AndOutputter, AudioOutputter, CanvasRenderer, Engine, GridTableOutputter, OrGamepad, VisualOutputter, KeyGamepad, GridInspector } = window.GameEngine
 
       const myCanvas = document.querySelector('#my_canvas')
       const myTable = document.querySelector('#my_table')
@@ -71,6 +87,8 @@
       const inputter = new KeyGamepad() // new OrGamepad([new KeyGamepad()])
       const engine = new Engine(new MyGame(), allOutputters, inputter)
 
+      const gridInspector = new GridInspector(myTable, logger)
+
       const fn = () => {
         engine.tick()
         window.requestAnimationFrame(fn)
@@ -89,7 +107,9 @@
             allOutputters.outs.add(outputter)
           } else {
             renderer.classList.add('hidden-visually')
-            allOutputters.outs.delete(outputter)
+            if (outputter !== tableOut) { // We need tableOut for the Grid Inspector
+              allOutputters.outs.delete(outputter)
+            }
           }
           // in case we enabled the logger, scroll to the bottom
           renderer.scrollTop = renderer.scrollHeight
