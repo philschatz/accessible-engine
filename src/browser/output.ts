@@ -204,7 +204,6 @@ export class GridInspector {
   }
 }
 
-
 interface BFSEdge {to: Vertex, from: Vertex}
 
 class BFS {
@@ -254,7 +253,7 @@ class BFS {
   }
 }
 
-function distance(e: {to: Vertex, from: Vertex}) {
+function distance (e: {to: Vertex, from: Vertex}) {
   return Math.abs(e.to.x - e.from.x) + Math.abs(e.to.y - e.from.y)
 }
 

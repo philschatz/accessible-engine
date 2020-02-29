@@ -85,9 +85,11 @@ export function categorize (spriteName: string) {
 
 export type LoggerFn = (message?: any, ...optionalParams: any[]) => void
 
+interface PosAndCat {pos: IPosition, category: string}
+
 export class AudioOutputter implements IOutputter {
   private readonly logger: LoggerFn
-  prev = new Map<ObjectInstance<any, any>, {pos: IPosition, category: string}>()
+  prev = new Map<ObjectInstance<any, any>, PosAndCat>()
   prevOverlay = new Map<string, SimpleValue>()
 
   constructor (logger: LoggerFn = console.log.bind(console)) {
@@ -95,13 +97,7 @@ export class AudioOutputter implements IOutputter {
   }
 
   draw (game: Game, tiles: Array<ObjectInstance<any, any>>, camera: Camera, curTick: number, grid: Size, overlayState: SimpleObject, pendingDialog: Opt<Dialog>) {
-    const current = new Map<ObjectInstance<any, any>, {pos: IPosition, category: string}>()
-    tiles.forEach(t => {
-      const c = categorize(t.sprite._name)
-      if (c) {
-        current.set(t, { pos: t.pos, category: c })
-      }
-    })
+    const current = buildMap(tiles)
 
     const currentOverlay = new Map<string, SimpleValue>()
     for (const key in overlayState) {
@@ -128,31 +124,7 @@ export class AudioOutputter implements IOutputter {
       }
 
       messages.push('START: Initial Room Information')
-      const catPositions = new Map<string, IPosition[]>()
-      for (const v of current.values()) {
-        let p = catPositions.get(v.category)
-        if (!p) {
-          p = []
-          catPositions.set(v.category, p)
-        }
-        p.push(v.pos)
-      }
-
-      const sorted = [...catPositions.entries()].sort((a, b) => {
-        return a[1].length - b[1].length
-      })
-      for (const v of sorted) {
-        const positions = v[1]
-        const category = v[0]
-        if (positions.length === 1) {
-          messages.push(`  1 ${category} sprite`)
-        // } else if (positions.length === 2) {
-        //   messages.push(`  2 ${category} sprites @ ${positionToString(positions[0])} and @ ${positionToString(positions[1])}`)
-        } else {
-          messages.push(`  ${positions.length} ${category} sprites`)
-        }
-      }
-
+      printCounts(messages, current.values())
       messages.push('END: Initial Room Information')
     } else {
       const cur = new Set(current.keys())
@@ -214,17 +186,19 @@ export class AudioOutputter implements IOutputter {
         }
       }
 
-      const disappearedSprites = [...disappeared].map(i => this.prev.get(i).category).filter(s => !!s) // remove nulls
-      const appearedSprites = [...appeared].map(i => current.get(i).category).filter(s => !!s) // remove nulls
+      const disappearedSprites = [...disappeared].map(i => this.prev.get(i)).filter(s => !!s) // remove nulls
+      const appearedSprites = [...appeared].map(i => current.get(i)).filter(s => !!s) // remove nulls
       if (disappearedSprites.length === 1) {
-        messages.push(`1 thing disappeared: ${disappearedSprites[0]}`)
+        messages.push(`1 thing disappeared: ${disappearedSprites[0].category}`)
       } else if (disappearedSprites.length > 0) {
-        messages.push(`${disappearedSprites.length} things disappeared: ${disappearedSprites.join(', ')}`)
+        messages.push(`${disappearedSprites.length} things disappeared:`)
+        printCounts(messages, disappearedSprites)
       }
       if (appearedSprites.length === 1) {
-        messages.push(`1 thing appeared: ${appearedSprites[0]}`)
+        messages.push(`1 thing appeared: ${appearedSprites[0].category}`)
       } else if (appearedSprites.length > 0) {
-        messages.push(`${appearedSprites.length} things appeared: ${JSON.stringify(appearedSprites)}`)
+        messages.push(`${appearedSprites.length} things appeared:`)
+        printCounts(messages, appearedSprites)
       }
 
       // Do the changed for the overlay info
@@ -279,6 +253,36 @@ export class AudioOutputter implements IOutputter {
       this.logger(messages.map(m => toSnakeCase(m)).join('.\n'))
     }
     this.prev = current
+  }
+}
+
+export function buildMap (tiles: Array<ObjectInstance<any, any>>) {
+  const current = new Map<ObjectInstance<any, any>, PosAndCat>()
+  tiles.forEach(t => {
+    const c = categorize(t.sprite._name)
+    if (c) {
+      current.set(t, { pos: t.pos, category: c })
+    }
+  })
+  return current
+}
+
+export function printCounts (acc: string[], items: Iterable<PosAndCat>) {
+  const catCounts = new Map<string, number>()
+  for (const v of items) {
+    if (v.category) {
+      const c = catCounts.get(v.category)
+      catCounts.set(v.category, (c || 0) + 1)
+    }
+  }
+
+  const sorted = [...catCounts.entries()].sort((a, b) => {
+    return a[1] - b[1]
+  })
+  for (const v of sorted) {
+    const count = v[1]
+    const category = v[0]
+    acc.push(`  ${count} ${category} ${count === 1 ? 'sprite' : 'sprites'}`)
   }
 }
 
