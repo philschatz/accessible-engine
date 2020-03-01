@@ -134,71 +134,80 @@ export class AudioOutputter implements IOutputter {
       const disappeared = setDifference(prev, cur)
       const stillAround = setIntersection(prev, cur)
 
-      const moved = new Map()
-      const changed = new Map()
-      for (const i of stillAround) {
-        const p = this.prev.get(i)
-        const c = current.get(i)
-        if (p.pos.x !== c.pos.x || p.pos.y !== c.pos.y) {
-          moved.set(i, { from: p.pos, to: c.pos })
-        }
-        if (p.category !== c.category) {
-          changed.set(i, { from: p.category, to: c.category })
-        }
-      }
-
-      // Print out all the changes
-      if (moved.size > 0) {
-        const movedMessages = [...moved.entries()].map(([i, { from, to }]) => {
-          const c = categorize(i.sprite._name)
-          if (!c) { return '' }
-          const msg = [c]
-          if (to.x < from.x) {
-            msg.push('LEFT')
-          } else if (to.x > from.x) {
-            msg.push('RIGHT')
+      // If the room changes (many sprites change) then just print the new room information
+      if (disappeared.size > 50) {
+        messages.push('Many things changed. START Current Room Information:')
+        printCounts(messages, current.values())
+        messages.push('END Current Room Information.')
+      } else {
+        const moved = new Map()
+        const changed = new Map()
+        for (const i of stillAround) {
+          const p = this.prev.get(i)
+          const c = current.get(i)
+          if (p.pos.x !== c.pos.x || p.pos.y !== c.pos.y) {
+            moved.set(i, { from: p.pos, to: c.pos })
           }
-
-          if (to.y < from.y) {
-            if (msg.length > 1) { msg.push('and') }
-            msg.push('UP')
-          } else if (to.y > from.y) {
-            if (msg.length > 1) { msg.push('and') }
-            msg.push('DOWN')
+          if (p.category !== c.category) {
+            changed.set(i, { from: p.category, to: c.category })
           }
-          return msg.join(' ')
-        })
-        if (moved.size === 1) {
-          messages.push(`Moved ${movedMessages[0]}`)
-        } else {
-          messages.push(`${moved.size} things moved: ${movedMessages.join(', ')}`)
         }
-      }
-
-      if (changed.size > 0) {
-        const changedMessages = [...changed.entries()].map(([i, { from, to }]) => {
-          return `FROM ${from} TO ${to}`
-        })
-        if (changed.size === 1) {
-          messages.push(`changed ${changedMessages[0]}`)
-        } else {
-          messages.push(`${changed.size} things changed: ${changedMessages.join(', ')}`)
+  
+        // Print out all the changes
+        if (moved.size > 0) {
+          const movedMessages = [...moved.entries()].map(([i, { from, to }]) => {
+            const c = categorize(i.sprite._name)
+            if (!c) { return '' }
+            const msg = [c]
+            if (to.x < from.x) {
+              msg.push('LEFT')
+            } else if (to.x > from.x) {
+              msg.push('RIGHT')
+            }
+  
+            if (to.y < from.y) {
+              if (msg.length > 1) { msg.push('and') }
+              msg.push('UP')
+            } else if (to.y > from.y) {
+              if (msg.length > 1) { msg.push('and') }
+              msg.push('DOWN')
+            }
+            return msg.join(' ')
+          })
+          if (moved.size === 1) {
+            messages.push(`Moved ${movedMessages[0]}`)
+          } else {
+            messages.push(`${moved.size} things moved: ${movedMessages.join(', ')}`)
+          }
         }
-      }
-
-      const disappearedSprites = [...disappeared].map(i => this.prev.get(i)).filter(s => !!s) // remove nulls
-      const appearedSprites = [...appeared].map(i => current.get(i)).filter(s => !!s) // remove nulls
-      if (disappearedSprites.length === 1) {
-        messages.push(`1 thing disappeared: ${disappearedSprites[0].category}`)
-      } else if (disappearedSprites.length > 0) {
-        messages.push(`${disappearedSprites.length} things disappeared:`)
-        printCounts(messages, disappearedSprites)
-      }
-      if (appearedSprites.length === 1) {
-        messages.push(`1 thing appeared: ${appearedSprites[0].category}`)
-      } else if (appearedSprites.length > 0) {
-        messages.push(`${appearedSprites.length} things appeared:`)
-        printCounts(messages, appearedSprites)
+  
+        if (changed.size > 0) {
+          const changedMessages = [...changed.entries()].map(([i, { from, to }]) => {
+            return `FROM ${from} TO ${to}`
+          })
+          if (changed.size === 1) {
+            messages.push(`changed ${changedMessages[0]}`)
+          } else {
+            messages.push(`${changed.size} things changed: ${changedMessages.join(', ')}`)
+          }
+        }
+  
+        const disappearedSprites = [...disappeared].map(i => this.prev.get(i)).filter(s => !!s) // remove nulls
+        const appearedSprites = [...appeared].map(i => current.get(i)).filter(s => !!s) // remove nulls
+        if (disappearedSprites.length === 1) {
+          messages.push(`1 thing disappeared: ${disappearedSprites[0].category}`)
+        } else if (disappearedSprites.length > 100) {
+          messages.push(`Many things disappeared.`)
+        } else if (disappearedSprites.length > 0) {
+          messages.push(`${disappearedSprites.length} things disappeared:`)
+          printCounts(messages, disappearedSprites)
+        }
+        if (appearedSprites.length === 1) {
+          messages.push(`1 thing appeared: ${appearedSprites[0].category}`)
+        } else if (appearedSprites.length > 0) {
+          messages.push(`${appearedSprites.length} things appeared:`)
+          printCounts(messages, appearedSprites)
+        }
       }
 
       // Do the changed for the overlay info
@@ -282,7 +291,7 @@ export function printCounts (acc: string[], items: Iterable<PosAndCat>) {
   for (const v of sorted) {
     const count = v[1]
     const category = v[0]
-    acc.push(`  ${count} ${category} ${count === 1 ? 'sprite' : 'sprites'}`)
+    acc.push(`  ${count} ${category}`)
   }
 }
 

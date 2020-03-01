@@ -131,7 +131,7 @@ export class GridInspector {
       const td = this.table.querySelector(`tr:nth-child(${pos.y + 1}) > td:nth-child(${pos.x + 1})`)
       if (td) {
         const sprites = Array.from(td.querySelectorAll('span')).map(s => s.innerHTML)
-        this.logger(`Inspecting @ (${pos.x}, ${pos.y}) there is: ${sprites.join(' ') || 'NOTHING'}`)
+        this.logger(`${sprites.join(' ') || 'NOTHING'} @ (${pos.x}, ${pos.y})`)
       } else {
         this.logger('End of screen reached')
       }
