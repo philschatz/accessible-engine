@@ -1,7 +1,7 @@
 {
   "scripts": {
     "build": "tsc",
-    "bundle": "rollup --config ./rollup.config.js",
+    "bundle": "NODE_ENV=${NODE_ENV:-production} rollup --config ./rollup.config.js",
     "clean": "rm ./src/akurraImages.ts ./gameplay.log.txt ./browser.bundle.js* src/*.js src/*/*.js src/*.js.map src/*/*.js.map",
     "lint": "eslint . --fix --ext .ts,.tsx",
     "png": "node ./pngExtractor.js > ./src/akurra/images.ts",
@@ -28,6 +28,7 @@
     "eslint-plugin-standard": "^4.0.1",
     "pngjs": "^3.4.0",
     "rollup": "^1.31.1",
+    "rollup-plugin-babel-minify": "^9.1.1",
     "rollup-plugin-typescript2": "^0.26.0",
     "source-map-support": "^0.5.16",
     "typescript": "^3.7.4"
