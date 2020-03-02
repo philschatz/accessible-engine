@@ -174,7 +174,7 @@ export function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IG
           pillars.forEach(p => p.setSprite(FloorSquare))
           // wallNeighbor.setMask(null, true)
           wallNeighbor.sprite.isGrayscale = true
-          wallNeighbor.addAnimation(new SpriteInstance(GongPlayMusic, {x:0, y:0}))
+          wallNeighbor.addAnimation(new SpriteInstance(GongPlayMusic, { x: 0, y: 0 }))
         }
       }
 

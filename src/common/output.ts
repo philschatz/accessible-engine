@@ -152,7 +152,7 @@ export class AudioOutputter implements IOutputter {
             changed.set(i, { from: p.category, to: c.category })
           }
         }
-  
+
         // Print out all the changes
         if (moved.size > 0) {
           const movedMessages = [...moved.entries()].map(([i, { from, to }]) => {
@@ -164,7 +164,7 @@ export class AudioOutputter implements IOutputter {
             } else if (to.x > from.x) {
               msg.push('RIGHT')
             }
-  
+
             if (to.y < from.y) {
               if (msg.length > 1) { msg.push('and') }
               msg.push('UP')
@@ -180,7 +180,7 @@ export class AudioOutputter implements IOutputter {
             messages.push(`${moved.size} things moved: ${movedMessages.join(', ')}`)
           }
         }
-  
+
         if (changed.size > 0) {
           const changedMessages = [...changed.entries()].map(([i, { from, to }]) => {
             return `from ${from} to ${to}`
@@ -191,13 +191,13 @@ export class AudioOutputter implements IOutputter {
             messages.push(`${changed.size} things changed: ${changedMessages.join(', ')}`)
           }
         }
-  
+
         const disappearedSprites = [...disappeared].map(i => this.prev.get(i)).filter(s => !!s) // remove nulls
         const appearedSprites = [...appeared].map(i => current.get(i)).filter(s => !!s) // remove nulls
         if (disappearedSprites.length === 1) {
           messages.push(`1 thing disappeared: ${disappearedSprites[0].category}`)
         } else if (disappearedSprites.length > 100) {
-          messages.push(`Many things disappeared.`)
+          messages.push('Many things disappeared.')
         } else if (disappearedSprites.length > 0) {
           messages.push(`${disappearedSprites.length} things disappeared:`)
           printCounts(messages, disappearedSprites)

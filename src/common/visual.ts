@@ -28,7 +28,7 @@ export class VisualOutputter implements IOutputter {
         if (s.startTick === 0) { s.startTick = curTick }
         const image = s.sprite.tick(s.startTick, curTick)
         if (!image) { throw new Error('BUG: Could not find image for the sprite.') }
-        
+
         // free up any animation sprites that are done animating
         if (t.sprite !== s && s.isDone(curTick)) {
           t.animations.delete(s)
@@ -37,7 +37,7 @@ export class VisualOutputter implements IOutputter {
         const pixelPos = posAdd(t.getPixelPos(grid), s.relPos)
         const screenPos = relativeTo({ x: pixelPos.x, y: pixelPos.y }, cameraCache)
         // const screenPos = pixelPos
-  
+
         let pixels = image.pixels
         if (s.maskColor) {
           pixels = pixels.map(row => row.map(c => c === null ? null : s.maskColor))
@@ -46,7 +46,6 @@ export class VisualOutputter implements IOutputter {
           pixels = pixels.map(row => row.map(c => c === null ? null : toGrayscale(c)))
         }
         this.drawPixels(screenPos, pixels, s.hFlip, s.vFlip, s.rotation)
-  
       }
     }
 

@@ -1051,13 +1051,13 @@ function find_floor (layer: number, o: ObjectInstance<PlayerProps, any>, collisi
 
   // reverse when there is a wall in the front but no floor in the front
   let maybeShadowed = false
-  if (hasWallsInFront && (wallsBelow.length > 0 && floors.indexOf(wallsBelow[0].sprite) < 0)) {
+  if (hasWallsInFront && (wallsBelow.length > 0 && floors.indexOf(wallsBelow[0].getMainSprite()) < 0)) {
     // look for floors in the back (reverse the list)
     wallsBelow.reverse()
     maybeShadowed = true
   }
 
-  if (wallsBelow.length > 0 && floors.indexOf(wallsBelow[0].sprite) >= 0) { // only look at the floors
+  if (wallsBelow.length > 0 && floors.indexOf(wallsBelow[0].getMainSprite()) >= 0) { // only look at the floors
     // Shift the player to be above the floor
     const front = wallsBelow[0]
     switch (p.side) {
@@ -1246,7 +1246,7 @@ function draw_player_head (front: boolean, o: ObjectInstance<PlayerProps, any>) 
       xx = -p.yreal + Math.round(p.r_factor * (p.xreal / 8 - 6))
     }
 
-    o.hFlip = p.mir
+    o.flip(p.mir)
     o.moveTo({ x: xx, y: zz })
     //  sspr(8*flr(sp-32),16,8,10,xx,zz,8,10,p.mir,false)
   }

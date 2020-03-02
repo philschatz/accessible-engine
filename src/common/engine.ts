@@ -1,6 +1,5 @@
 import Rbush from 'rbush'
 import { IGamepad, BUTTON_TYPE } from './gamepad'
-import { start } from 'repl'
 
 // From https://github.com/mourner/rbush
 interface RBush<I> {
@@ -34,7 +33,7 @@ export type Opt<T> = null | T
 
 export class ObjectInstance<P, S> {
   public pos: IPosition
-  offsetPos: IPosition = {x: 0, y: 0}
+  offsetPos: IPosition = { x: 0, y: 0 }
   _zIndex: Opt<number>
 
   public static: GameObject<P, S>
@@ -89,7 +88,7 @@ export class ObjectInstance<P, S> {
     if (hFlip !== undefined) {
       this.sprite.hFlip = hFlip
     }
-    if (vFlip !== undefined){
+    if (vFlip !== undefined) {
       this.sprite.vFlip = vFlip
     }
     return this
@@ -105,11 +104,11 @@ export class ObjectInstance<P, S> {
     return this
   }
 
-  getMainSprite() {
+  getMainSprite () {
     return this.sprite.sprite
   }
 
-  addAnimation(sprite: SpriteInstance) {
+  addAnimation (sprite: SpriteInstance) {
     this.animations.add(sprite)
   }
 }
@@ -124,7 +123,7 @@ export class SpriteInstance {
   public vFlip = false
   public rotation = ROTATION_AMOUNT.NONE
 
-  constructor(sprite: Sprite, relPos: IPosition = {x:0, y:0}) {
+  constructor (sprite: Sprite, relPos: IPosition = { x: 0, y: 0 }) {
     this.sprite = sprite
     this.relPos = relPos
   }
@@ -216,7 +215,7 @@ export class Sprite {
     return new Sprite(1, false, [s])
   }
 
-  private getI(startTick: number, curTick: number) {
+  private getI (startTick: number, curTick: number) {
     return Math.round((curTick - startTick) / this.playbackRate)
   }
 

@@ -3,17 +3,17 @@ START:  Items in the  Inventory.
  item keys has value 0.
 END:  Items in the  Inventory.
 START:  Initial  Room  Information.
- 1  Next Room Arrow sprite.
- 1  PLAYER sprite.
- 1  Pillar Red sprite.
- 1  Lock sprite.
- 1  Key sprite.
- 1  Gong Red sprite.
- 1  Arrow Left sprite.
- 2  Crate sprites.
- 2  Arrow Left Disabled sprites.
- 65  Water sprites.
- 112  Wall sprites.
+ 1  Next Room Arrow.
+ 1  PLAYER.
+ 1  Pillar Red.
+ 1  Lock.
+ 1  Key.
+ 1  Gong Red.
+ 1  Arrow Left.
+ 2  Crate.
+ 2  Arrow Left Disabled.
+ 65  Water.
+ 112  Wall.
 END:  Initial  Room  Information
 Moved  PLAYER  LEFT
 Moved  PLAYER  LEFT
@@ -26,7 +26,6 @@ Moved  PLAYER  LEFT
 Moved  PLAYER  UP
 Moved  PLAYER  UP
 Moved  PLAYER  LEFT
-changed  FROM  Gong Red  TO  Gong Disabled.
 1 thing disappeared:  Pillar Red
 Moved  PLAYER  RIGHT
 Moved  PLAYER  DOWN
@@ -60,7 +59,9 @@ Moved  PLAYER  UP
 1 thing disappeared:  Lock.
  keys in inventory changed from 1 to 0
 Moved  PLAYER  UP
-3 things disappeared:  Arrow Left Disabled,  Arrow Left Disabled,  Arrow Left
+3 things disappeared:.
+ 1  Arrow Left.
+ 2  Arrow Left Disabled
 Moved  PLAYER  LEFT
 Moved  PLAYER  UP
 Moved  PLAYER  UP
