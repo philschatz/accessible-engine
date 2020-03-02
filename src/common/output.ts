@@ -156,7 +156,7 @@ export class AudioOutputter implements IOutputter {
         // Print out all the changes
         if (moved.size > 0) {
           const movedMessages = [...moved.entries()].map(([i, { from, to }]) => {
-            const c = categorize(i.sprite._name)
+            const c = categorize(i.sprite.sprite._name)
             if (!c) { return '' }
             const msg = [c]
             if (to.x < from.x) {
@@ -268,7 +268,7 @@ export class AudioOutputter implements IOutputter {
 export function buildMap (tiles: Array<ObjectInstance<any, any>>) {
   const current = new Map<ObjectInstance<any, any>, PosAndCat>()
   tiles.forEach(t => {
-    const c = categorize(t.sprite._name)
+    const c = categorize(t.getMainSprite()._name)
     if (c) {
       current.set(t, { pos: t.pos, category: c })
     }

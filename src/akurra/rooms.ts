@@ -21,8 +21,8 @@ export function loadRooms (sprites: SpriteController, instances: InstanceControl
   const Crate = instances.factory('Crate', sprites.get('Crate'), obZ, crateUpdateFn)
   const GongRed = instances.simple(sprites, 'GongRed', obZ)
   const PillarRed = instances.simple(sprites, 'PillarRed', obZ)
-  const ChimePillarBlue = instances.simple(sprites, 'ChimePillarBlue', obZ)
-  const ChimeBlue = instances.simple(sprites, 'ChimeBlue', obZ)
+  const PillarBlue = instances.simple(sprites, 'PillarBlue', obZ)
+  const GongBlue = instances.simple(sprites, 'GongBlue', obZ)
   const WallTopUpDown = instances.simple(sprites, 'WallTopUpDown', obZ)
   const Key = instances.simple(sprites, 'Key', hoverZ)
   const Land = instances.simple(sprites, 'Land', bgZ)
@@ -111,7 +111,7 @@ export function loadRooms (sprites: SpriteController, instances: InstanceControl
   // Setart each Ocean tile at a random spot so the ocean waves will crest randomly
   function waterAnim (o: ObjectInstance<any, any>) {
     const next = Math.round(rand() * 1000)
-    o.startTick = -next
+    o.sprite.startTick = -next
   }
 
   let y = 0
@@ -240,7 +240,7 @@ export function loadRooms (sprites: SpriteController, instances: InstanceControl
   i(WallVert)
   o(Key).offsetPos = { x: 0, y: -5 }
   i(Pedestal)
-  i(ChimePillarBlue)
+  i(PillarBlue)
   i(Land)
   i(GrassLeft)
   i(GrassMid)
@@ -353,7 +353,7 @@ export function loadRooms (sprites: SpriteController, instances: InstanceControl
   i(LandLeft)
   i(Land)
   i(Rock)
-  i(ChimeBlue)
+  i(GongBlue)
   i(PillarRed)
   i(Land)
   i(Hole)
@@ -473,7 +473,7 @@ export function loadRooms (sprites: SpriteController, instances: InstanceControl
   i(BigDoor1)
   i(BigDoor2)
   i(BigDoor3)
-  i(WallTopUpLeft).hFlip = true
+  i(WallTopUpLeft).flip(true)
   i(WallTopLeftRight)
   i(WallTopLeftRight)
   i(WallTopLeftRight)
@@ -500,7 +500,7 @@ export function loadRooms (sprites: SpriteController, instances: InstanceControl
   i(BigDoor5)
   i(BigDoor6)
   i(BigDoor7)
-  i(WallVert).hFlip = true
+  i(WallVert).flip(true)
   i(Wall)
   i(Wall)
   i(Wall)
@@ -527,7 +527,7 @@ export function loadRooms (sprites: SpriteController, instances: InstanceControl
   i(BigDoor9)
   i(BigDoor10)
   i(BigDoor11)
-  i(WallVert).hFlip = true
+  i(WallVert).flip(true)
   i(Wall)
   i(Wall)
   i(Wall)
@@ -535,7 +535,7 @@ export function loadRooms (sprites: SpriteController, instances: InstanceControl
   i(Wall)
   i(Wall)
   i(Wall)
-  i(WallTopUpDown).hFlip = true
+  i(WallTopUpDown).flip(true)
   i(GrassMid)
 
   // Row 3
@@ -554,7 +554,7 @@ export function loadRooms (sprites: SpriteController, instances: InstanceControl
   i(BigDoor13)
   i(BigDoor14)
   i(BigDoor15)
-  i(WallVert).hFlip = true
+  i(WallVert).flip(true)
   i(Wall)
   i(Wall)
   i(Wall)
@@ -562,7 +562,7 @@ export function loadRooms (sprites: SpriteController, instances: InstanceControl
   i(Wall)
   i(Wall)
   i(Wall)
-  i(WallTopUpLeft).hFlip = true
+  i(WallTopUpLeft).flip(true)
   i(WallTopLeftRight)
 
   // Row 4
@@ -581,7 +581,7 @@ export function loadRooms (sprites: SpriteController, instances: InstanceControl
   i(Field)
   i(Field)
   i(Field)
-  i(WallVert).hFlip = true
+  i(WallVert).flip(true)
   i(Wall)
   i(Wall)
   i(Wall)
@@ -589,7 +589,7 @@ export function loadRooms (sprites: SpriteController, instances: InstanceControl
   i(Wall)
   i(Wall)
   i(Wall)
-  i(WallVert).hFlip = true
+  i(WallVert).flip(true)
   i(Wall)
 
   // Row 5
@@ -614,9 +614,9 @@ export function loadRooms (sprites: SpriteController, instances: InstanceControl
   i(Field2)
   i(Field)
   i(FieldBottom)
-  i(FieldCorner).hFlip = true
+  i(FieldCorner).flip(true)
   i(Rock)
-  i(WallVert).hFlip = true
+  i(WallVert).flip(true)
   i(Wall)
 
   // Row 7
@@ -640,7 +640,7 @@ export function loadRooms (sprites: SpriteController, instances: InstanceControl
   i(Field)
   i(Field2)
   i(Field)
-  i(FieldCorner).hFlip = true
+  i(FieldCorner).flip(true)
   i(Land2)
   i(Land)
   i(ArrowUpDisabled)
@@ -667,7 +667,7 @@ export function loadRooms (sprites: SpriteController, instances: InstanceControl
   i(Field2)
   i(Field)
   i(FieldBottom)
-  i(FieldCorner).hFlip = true
+  i(FieldCorner).flip(true)
   i(Land)
   i(Land)
   i(Land)
@@ -677,8 +677,8 @@ export function loadRooms (sprites: SpriteController, instances: InstanceControl
 
   // Row 9
   x = xStart; y += 1
-  i(WallTopLeftRight).vFlip = true
-  i(WallTopUpLeft).vFlip = true
+  i(WallTopLeftRight).flip(undefined, true)
+  i(WallTopUpLeft).flip(undefined, true)
   i(Rock)
   i(Rock)
   i(Land)
@@ -692,7 +692,7 @@ export function loadRooms (sprites: SpriteController, instances: InstanceControl
   i(FieldBottom)
   i(FieldBottom)
   i(FieldBottom)
-  i(FieldCorner).hFlip = true
+  i(FieldCorner).flip(true)
   i(Land)
   i(Land)
   i(Land)
@@ -700,7 +700,7 @@ export function loadRooms (sprites: SpriteController, instances: InstanceControl
   i(Rock)
   i(Land)
   i(WallTopUpLeft).flip(true, true)
-  i(WallTopLeftRight).vFlip = true
+  i(WallTopLeftRight).flip(undefined, true)
 
   // Row 10
   x = xStart; y += 1
@@ -727,33 +727,33 @@ export function loadRooms (sprites: SpriteController, instances: InstanceControl
   i(Land)
   i(Lock)
   i(Land)
-  i(WallTopUpDown).hFlip = true
+  i(WallTopUpDown).flip(true)
   i(GrassMid)
 
   // Row 11
   x = xStart; y += 1
   i(GrassMid)
-  i(WallTopRightDown).vFlip = true
-  i(WallTopLeftRight).vFlip = true
-  i(WallTopLeftRight).vFlip = true
-  i(WallTopLeftRight).vFlip = true
-  i(WallTopLeftRight).vFlip = true
-  i(WallTopLeftRight).vFlip = true
-  i(WallTopLeftRight).vFlip = true
-  i(WallTopLeftRight).vFlip = true
-  i(WallTopUpLeft).vFlip = true
+  i(WallTopRightDown).flip(undefined, true)
+  i(WallTopLeftRight).flip(undefined, true)
+  i(WallTopLeftRight).flip(undefined, true)
+  i(WallTopLeftRight).flip(undefined, true)
+  i(WallTopLeftRight).flip(undefined, true)
+  i(WallTopLeftRight).flip(undefined, true)
+  i(WallTopLeftRight).flip(undefined, true)
+  i(WallTopLeftRight).flip(undefined, true)
+  i(WallTopUpLeft).flip(undefined, true)
   i(Land)
   i(Land)
   i(Land)
   i(Land)
   i(WallTopUpLeft).flip(true, true)
-  i(WallTopLeftRight).vFlip = true
-  i(WallTopLeftRight).vFlip = true
-  i(WallTopLeftRight).vFlip = true
-  i(WallTopLeftRight).vFlip = true
-  i(WallTopLeftRight).vFlip = true
-  i(WallTopLeftRight).vFlip = true
-  i(WallTopLeftRight).vFlip = true
+  i(WallTopLeftRight).flip(undefined, true)
+  i(WallTopLeftRight).flip(undefined, true)
+  i(WallTopLeftRight).flip(undefined, true)
+  i(WallTopLeftRight).flip(undefined, true)
+  i(WallTopLeftRight).flip(undefined, true)
+  i(WallTopLeftRight).flip(undefined, true)
+  i(WallTopLeftRight).flip(undefined, true)
   i(WallTopRightDown).flip(true, true)
   i(GrassMid)
 
@@ -773,7 +773,7 @@ export function loadRooms (sprites: SpriteController, instances: InstanceControl
   i(Land)
   i(Land)
   i(Land)
-  i(WallTopUpDown).hFlip = true
+  i(WallTopUpDown).flip(true)
   i(GrassMid)
   i(GrassMid)
   i(GrassMid)
@@ -805,7 +805,7 @@ export function loadRooms (sprites: SpriteController, instances: InstanceControl
   i(Land)
   i(Land)
   i(Land)
-  i(WallTopUpDown).hFlip = true
+  i(WallTopUpDown).flip(true)
   i(GrassMid)
   i(GrassMid)
   i(GrassMid)
@@ -813,7 +813,7 @@ export function loadRooms (sprites: SpriteController, instances: InstanceControl
   i(GrassMid)
   i(GrassMid)
   i(GrassMid)
-  i(GrassLeft).hFlip = true
+  i(GrassLeft).flip(true)
   i(Rock)
 
   // Row1
@@ -832,15 +832,15 @@ export function loadRooms (sprites: SpriteController, instances: InstanceControl
   i(Land)
   i(Land)
   i(Land)
-  i(WallTopUpLeft).hFlip = true
+  i(WallTopUpLeft).flip(true)
   i(WallTopLeftRight)
   i(WallTopLeftRight)
   i(WallTopLeftRight)
   i(WallTopLeftRight)
   i(WallTopLeftRight)
-  i(WallTopRightDown).hFlip = true
+  i(WallTopRightDown).flip(true)
   i(GrassMid)
-  i(GrassLeft).hFlip = true
+  i(GrassLeft).flip(true)
   i(Rock)
 
   // Row2
@@ -859,15 +859,15 @@ export function loadRooms (sprites: SpriteController, instances: InstanceControl
   i(Land)
   i(Land)
   i(Rock)
-  i(WallVert).hFlip = true
+  i(WallVert).flip(true)
   i(Wall)
   i(Wall)
   i(Wall)
   i(Wall)
   i(Wall)
-  i(WallTopUpDown).hFlip = true
+  i(WallTopUpDown).flip(true)
   i(GrassMid)
-  i(GrassLeft).hFlip = true
+  i(GrassLeft).flip(true)
   i(Bush)
 
   // Row3
@@ -890,15 +890,15 @@ export function loadRooms (sprites: SpriteController, instances: InstanceControl
   i(ArrowLeft)
   o(Land)
   i(Lock)
-  i(WallVert).hFlip = true
+  i(WallVert).flip(true)
   i(Wall)
   i(Wall)
   i(Wall)
   i(Wall)
   i(Wall)
-  i(WallTopUpDown).hFlip = true
+  i(WallTopUpDown).flip(true)
   i(GrassBottom)
-  i(GrassCorner).hFlip = true
+  i(GrassCorner).flip(true)
   i(Bush)
 
   // Row4
@@ -918,14 +918,14 @@ export function loadRooms (sprites: SpriteController, instances: InstanceControl
   i(LandBottom)
   i(LandBottom)
   i(LandBottom)
-  i(LandCorner).hFlip = true
+  i(LandCorner).flip(true)
   i(Sand)
   i(Rock)
   o(Key).offsetPos = { x: 0, y: -5 }
   i(Pedestal)
   i(Rock)
   i(Sand)
-  i(WallTopUpDown).hFlip = true
+  i(WallTopUpDown).flip(true)
   i(Bush)
   i(Bush)
   i(Bush)
@@ -953,7 +953,7 @@ export function loadRooms (sprites: SpriteController, instances: InstanceControl
   i(PillarRed)
   i(Rock)
   i(Sand)
-  i(WallTopUpDown).hFlip = true
+  i(WallTopUpDown).flip(true)
   i(TreeTop)
   i(TreeTop)
   i(TreeTop)
@@ -983,7 +983,7 @@ export function loadRooms (sprites: SpriteController, instances: InstanceControl
   i(Sand)
   i(Sand)
   i(Sand)
-  i(WallTopUpDown).hFlip = true
+  i(WallTopUpDown).flip(true)
   i(TreeBottom)
   i(TreeBottom)
   i(TreeBottom)
@@ -1011,7 +1011,7 @@ export function loadRooms (sprites: SpriteController, instances: InstanceControl
   i(Sand)
   i(Sand)
   i(Sand)
-  i(WallTopUpLeft).hFlip = true
+  i(WallTopUpLeft).flip(true)
   i(WallTopLeftRight)
   i(WallTopLeftRight)
   i(WallTopLeftRight)
@@ -1038,7 +1038,7 @@ export function loadRooms (sprites: SpriteController, instances: InstanceControl
   i(SandBottom)
   i(SandBottom)
   i(SandBottom)
-  i(WallVert).hFlip = true
+  i(WallVert).flip(true)
   i(Wall)
   i(Wall)
   i(Wall)
@@ -1065,7 +1065,7 @@ export function loadRooms (sprites: SpriteController, instances: InstanceControl
   waterAnim(i(Water))
   waterAnim(i(Water))
   waterAnim(i(Water))
-  i(WallVert).hFlip = true
+  i(WallVert).flip(true)
   i(Wall)
   i(Wall)
   i(Wall)

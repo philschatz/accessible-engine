@@ -19,7 +19,7 @@ export class GridTableOutputter implements IOutputter {
 
     tiles.forEach(t => {
       const spritenames = model.get(t.pos, new Set())
-      spritenames.add(categorize(t.sprite._name))
+      spritenames.add(categorize(t.getMainSprite()._name))
     })
 
     const overlayInfo = ['Inventory Info:']

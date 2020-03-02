@@ -1,5 +1,6 @@
 import Rbush from 'rbush'
 import { IGamepad, BUTTON_TYPE } from './gamepad'
+import { start } from 'repl'
 
 // From https://github.com/mourner/rbush
 interface RBush<I> {
@@ -33,29 +34,21 @@ export type Opt<T> = null | T
 
 export class ObjectInstance<P, S> {
   public pos: IPosition
-  offsetPos: IPosition
+  offsetPos: IPosition = {x: 0, y: 0}
   _zIndex: Opt<number>
 
   public static: GameObject<P, S>
-  sprite: Sprite
-  startTick: number = 0
-  maskColor: Opt<string>
-  isGrayscale: boolean
+  sprite: SpriteInstance
   public props: P
-  public hFlip: boolean
-  public vFlip: boolean
-  public rotation: ROTATION_AMOUNT
+
+  animations = new Set<SpriteInstance>()
 
   constructor (t: GameObject<P, S>, pos: IPosition, props: P) {
     this._zIndex = null
-    this.sprite = t.sprite
     this.static = t
     this.pos = pos
     this.props = props
-    this.hFlip = false
-    this.vFlip = false
-    this.rotation = ROTATION_AMOUNT.NONE
-    this.offsetPos = { x: 0, y: 0 }
+    this.sprite = new SpriteInstance(t.sprite)
   }
 
   destroy () {
@@ -73,15 +66,15 @@ export class ObjectInstance<P, S> {
 
   setSprite (sprite: Sprite) {
     // only change the sprite when it is different
-    if (this.sprite !== sprite) {
-      this.sprite = sprite
-      this.startTick = 0
+    if (this.sprite.sprite !== sprite) {
+      this.sprite.sprite = sprite
+      this.sprite.startTick = 0
     }
   }
 
   setMask (hexColor: Opt<string>, isGrayscale: boolean = false) {
-    this.maskColor = hexColor
-    this.isGrayscale = isGrayscale
+    this.sprite.maskColor = hexColor
+    this.sprite.isGrayscale = isGrayscale
   }
 
   zIndex () {
@@ -92,20 +85,52 @@ export class ObjectInstance<P, S> {
     return posAdd(posTimes(this.pos, grid), this.offsetPos)
   }
 
-  flip (hFlip: boolean, vFlip: boolean) {
-    this.hFlip = hFlip
-    this.vFlip = vFlip
+  flip (hFlip: boolean = undefined, vFlip: boolean = undefined) {
+    if (hFlip !== undefined) {
+      this.sprite.hFlip = hFlip
+    }
+    if (vFlip !== undefined){
+      this.sprite.vFlip = vFlip
+    }
     return this
   }
 
   rotate (amt: ROTATION_AMOUNT) {
-    this.rotation = amt
+    this.sprite.rotation = amt
     return this
   }
 
   setOffset (pixels: IPosition) {
     this.offsetPos = pixels
     return this
+  }
+
+  getMainSprite() {
+    return this.sprite.sprite
+  }
+
+  addAnimation(sprite: SpriteInstance) {
+    this.animations.add(sprite)
+  }
+}
+
+export class SpriteInstance {
+  relPos: IPosition
+  sprite: Sprite
+  startTick = 0
+  maskColor: Opt<string> = null
+  isGrayscale = false
+  public hFlip = false
+  public vFlip = false
+  public rotation = ROTATION_AMOUNT.NONE
+
+  constructor(sprite: Sprite, relPos: IPosition = {x:0, y:0}) {
+    this.sprite = sprite
+    this.relPos = relPos
+  }
+
+  isDone (curTick: number) {
+    return this.sprite.isDone(this.startTick, curTick)
   }
 }
 
@@ -191,11 +216,15 @@ export class Sprite {
     return new Sprite(1, false, [s])
   }
 
+  private getI(startTick: number, curTick: number) {
+    return Math.round((curTick - startTick) / this.playbackRate)
+  }
+
   tick (startTick: number, curTick: number) {
     if (this.images.length === 0) {
       throw new Error('BUG: Could not find sprite since there should only be one')
     }
-    const i = Math.round((curTick - startTick) / this.playbackRate)
+    const i = this.getI(startTick, curTick)
     let ret: Image
 
     if (this.loop) {
@@ -206,6 +235,10 @@ export class Sprite {
 
     if (!ret) { throw new Error(`BUG: Could not find sprite with index i=${i} . len=${this.images.length}`) }
     return ret
+  }
+
+  isDone (startTick: number, curTick: number) {
+    return !this.loop && this.getI(startTick, curTick) >= this.images.length
   }
 }
 

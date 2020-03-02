@@ -38,14 +38,14 @@
 </head>
 
 <body>
-  <fieldset>
-    <legend>Which ways would you like to play the game? Check one or more:</legend>
-    <input id="play_sprites" type="checkbox" name="play_style" value="visually" checked="checked"/>
+  <fieldset aria-hidden="true">
+    <legend>How would you like to "play" the game?</legend>
+    <input id="play_sprites" type="radio" name="play_style" value="visually" checked="checked"/>
     <label for="play_sprites">Visually with Sprites</label><br/>
-    <input id="play_table" type="checkbox" name="play_style" value="table" aria-hidden="true"/>
-    <label for="play_table">In an Accessible Table (for low vision users or blind people that enjoy navigating in tables)</label><br/>
-    <input id="play_screenreader" type="checkbox" name="play_style" value="screenreader" checked="checked" disabled="disabled"/>
-    <label for="play_screenreader">Using Audio read by a screenreader</label><br/>
+    <input id="play_table" type="radio" name="play_style" value="table" aria-hidden="true"/>
+    <label for="play_table">In a Table (to roughly show what the mental model of the level "looks like" to an unsighted player)</label><br/>
+    <input id="play_screenreader" type="radio" name="play_style" value="screenreader"/>
+    <label for="play_screenreader">Using <strong>only</strong> the text read out by a screenreader</label><br/>
     <p><strong tabindex="0" aria-controls="my_audio_messages">How to use this</strong> . Try completing the level without using the graphical option. Note what happens when you push against a wall, or when you get/use a key. Creating a sokoban-style games to be accessible only requires a minimal amount of accessible hoops to jump through; game devs can just write game code for the most part. For more on how to build accessible videogames check out the repository.</p>
   </fieldset>
   <canvas tabindex="0" id="my_canvas" width="384" height="224" aria-hidden="true" alt="graphical version of the game"></canvas>
@@ -100,6 +100,10 @@
       const playTable = document.querySelector('#play_table')
       const playScreenreader = document.querySelector('#play_screenreader')
       
+      const allHandlers = new Set()
+      function allHandler() {
+        allHandlers.forEach(h => h())
+      }
       function toggle(checkbox, renderer, outputter) {
         const fn = () => {
           if (checkbox.checked) {
@@ -114,7 +118,8 @@
           // in case we enabled the logger, scroll to the bottom
           renderer.scrollTop = renderer.scrollHeight
         }
-        checkbox.addEventListener('change', fn)
+        checkbox.addEventListener('change', allHandler)
+        allHandlers.add(fn)
         fn()
       }
       toggle(playSprites, myCanvas, visualOut)

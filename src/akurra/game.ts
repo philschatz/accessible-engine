@@ -67,13 +67,13 @@ export class MyGame implements Game {
       'Key6'
     ])))
 
-    sprites.add('GongDisabled', new Sprite(3, false, images.getAll([
-      'GongDisabled1',
-      'GongDisabled2',
-      'GongDisabled3',
-      'GongDisabled4',
-      'GongDisabled5',
-      'GongDisabled6'
+    sprites.add('GongPlayMusic', new Sprite(3, false, images.getAll([
+      'GongPlayMusic1',
+      'GongPlayMusic2',
+      'GongPlayMusic3',
+      'GongPlayMusic4',
+      'GongPlayMusic5',
+      'GongPlayMusic6'
     ])))
 
     sprites.add('PlayerWalkingRight', new Sprite(1, true, images.getAll([

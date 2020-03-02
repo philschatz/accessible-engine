@@ -23,21 +23,31 @@ export class VisualOutputter implements IOutputter {
     const cameraCache = posAdd({ x: -camera.screenPixelPos.x, y: -camera.screenPixelPos.y }, camera.topLeftPixelPos(grid))
 
     for (const t of tiles) {
-      if (t.startTick === 0) { t.startTick = curTick }
-      const image = t.sprite.tick(t.startTick, curTick)
-      if (!image) { throw new Error('BUG: Could not find image for the sprite.') }
-      const pixelPos = t.getPixelPos(grid)
-      const screenPos = relativeTo({ x: pixelPos.x, y: pixelPos.y }, cameraCache)
-      // const screenPos = pixelPos
-
-      let pixels = image.pixels
-      if (t.maskColor) {
-        pixels = pixels.map(row => row.map(c => c === null ? null : t.maskColor))
+      // Each tile has a main sprite and a set of animation sprites
+      for (const s of [t.sprite, ...t.animations]) {
+        if (s.startTick === 0) { s.startTick = curTick }
+        const image = s.sprite.tick(s.startTick, curTick)
+        if (!image) { throw new Error('BUG: Could not find image for the sprite.') }
+        
+        // free up any animation sprites that are done animating
+        if (t.sprite !== s && s.isDone(curTick)) {
+          t.animations.delete(s)
+          continue
+        }
+        const pixelPos = posAdd(t.getPixelPos(grid), s.relPos)
+        const screenPos = relativeTo({ x: pixelPos.x, y: pixelPos.y }, cameraCache)
+        // const screenPos = pixelPos
+  
+        let pixels = image.pixels
+        if (s.maskColor) {
+          pixels = pixels.map(row => row.map(c => c === null ? null : s.maskColor))
+        }
+        if (s.isGrayscale) {
+          pixels = pixels.map(row => row.map(c => c === null ? null : toGrayscale(c)))
+        }
+        this.drawPixels(screenPos, pixels, s.hFlip, s.vFlip, s.rotation)
+  
       }
-      if (t.isGrayscale) {
-        pixels = pixels.map(row => row.map(c => c === null ? null : toGrayscale(c)))
-      }
-      this.drawPixels(screenPos, pixels, t.hFlip, t.vFlip, t.rotation)
     }
 
     game.drawOverlay(this.drawPixels, this.drawText, overlayState, sprites)
