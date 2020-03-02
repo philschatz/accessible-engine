@@ -14,6 +14,8 @@ export function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IG
   camera.pos = posAdd(playerRoomPos, { x: Math.round(ROOM_SIZE.width / 2), y: Math.round(ROOM_SIZE.height / 2) })
 
   const [
+    Hole,
+    HoleStraw,
     PlayerWalkingUp,
     PlayerWalkingDown,
     PlayerWalkingRight,
@@ -38,6 +40,8 @@ export function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IG
     FloorSquare,
     FloorDiamond
   ] = sprites.getAll([
+    'Hole',
+    'HoleStraw',
     'PlayerWalkingUp',
     'PlayerWalkingDown',
     'PlayerWalkingRight',
@@ -202,6 +206,13 @@ export function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IG
     }
   } else {
     p.state = PLAYER_STATE.STOPPED // Should be walking if moving
+
+    // check if we walked off of a HoleStraw. If so it should turn into a Hole
+    const here = collisionChecker.searchPoint(oldPos)
+    const holeStraw = here.find(obj => HoleStraw === obj.getMainSprite())
+    if (holeStraw && (dx || dy)) {
+      holeStraw.setSprite(Hole)
+    }
   }
 
   // Pick up a key

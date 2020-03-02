@@ -52,6 +52,7 @@
   <div id="my_table" aria-hidden="true"></div>
   <p>Use the <kbd>I</kbd>, <kbd>J</kbd>, <kbd>K</kbd>, <kbd>L</kbd> keys to inspect around you. Press <kbd>M</kbd> to hear where items are located</p>
   <ol id="my_audio" role="log" aria-live="polite" aria-atomic="false">
+    <li style="position:absolute; left: -10000px;">Use the <kbd>I</kbd>, <kbd>J</kbd>, <kbd>K</kbd>, <kbd>L</kbd> keys to inspect around you. Press <kbd>M</kbd> to hear where items are located</li>
   </ol>
   <script src="browser.bundle.js"></script>
 
@@ -104,12 +105,12 @@
       function allHandler() {
         allHandlers.forEach(h => h())
       }
-      function toggle(checkbox, renderer, outputter) {
+      function toggle(checkbox, renderer, outputter, alwaysVisible) {
         const fn = () => {
           if (checkbox.checked) {
             renderer.classList.remove('hidden-visually')
             allOutputters.outs.add(outputter)
-          } else {
+          } else if (!alwaysVisible) {
             renderer.classList.add('hidden-visually')
             if (outputter !== tableOut) { // We need tableOut for the Grid Inspector
               allOutputters.outs.delete(outputter)
@@ -124,7 +125,7 @@
       }
       toggle(playSprites, myCanvas, visualOut)
       toggle(playTable, myTable, tableOut)
-      toggle(playScreenreader, myAudio, audioOut)
+      toggle(playScreenreader, myAudio, audioOut, true)
 
     })()
   </script>

@@ -183,7 +183,7 @@ export class AudioOutputter implements IOutputter {
   
         if (changed.size > 0) {
           const changedMessages = [...changed.entries()].map(([i, { from, to }]) => {
-            return `FROM ${from} TO ${to}`
+            return `from ${from} to ${to}`
           })
           if (changed.size === 1) {
             messages.push(`changed ${changedMessages[0]}`)
