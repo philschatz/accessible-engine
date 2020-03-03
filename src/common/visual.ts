@@ -15,7 +15,7 @@ export class VisualOutputter implements IOutputter {
     this.drawText = this.drawText.bind(this)
   }
 
-  draw (game: Game, tiles: Array<ObjectInstance<any, any>>, camera: Camera, curTick: number, grid: Size, overlayState: SimpleObject, pendingDialog: Opt<Dialog>, sprites: SpriteController) {
+  draw (game: Game, tiles: Array<ObjectInstance<any>>, camera: Camera, curTick: number, grid: Size, overlayState: SimpleObject, pendingDialog: Opt<Dialog>, sprites: SpriteController) {
     this.renderer.drawStart()
 
     game.drawBackground(tiles, camera, this.drawPixels)
@@ -137,7 +137,7 @@ export function hexToRgb (hex: string) {
 }
 
 function toGrayscale (hex: string) {
-  const rgb = hexToRgb(hex)
+  const rgb = hexToRgb(hex) ?? { r: 127, g: 127, b: 127 }
   const avg = Math.round((rgb.r + rgb.g + rgb.b) / 3)
   return rgbToHex(avg, avg, avg)
 }

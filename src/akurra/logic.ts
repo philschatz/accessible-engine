@@ -1,8 +1,9 @@
 import { ObjectInstance, SimpleObject, ShowDialogFn, Camera, SpriteController, InstanceController, CollisionChecker, IPosition, Sprite, posAdd, SpriteInstance } from '../common/engine'
 import { IGamepad, BUTTON_TYPE } from '../common/gamepad'
 import { PLAYER_DIR, PlayerProps, ROOM_SIZE, PLAYER_STATE } from './util'
+import { assertSomething } from '../common/util'
 
-export function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, showDialog: ShowDialogFn, overlayState: SimpleObject, curTick: number) {
+export function playerUpdateFn (o: ObjectInstance<PlayerProps>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, showDialog: ShowDialogFn, overlayState: SimpleObject, curTick: number) {
   camera.screenPixelPos = { x: 0, y: 16 * 2 /* for the overlay */ }
   camera.resize({
     width: ROOM_SIZE.width,
@@ -224,7 +225,7 @@ export function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IG
 
   // Unlock a lock
   const maybeLock = neighborSprites.find(obj => obj.getMainSprite() === Lock)
-  if (maybeLock && overlayState.keys > 0) {
+  if (maybeLock && assertSomething(overlayState.keys) > 0) {
     overlayState.keys = typeof overlayState.keys === 'number' ? overlayState.keys - 1 : 0
     maybeLock.setSprite(FloorDiamond)
   }
@@ -234,9 +235,9 @@ export function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IG
     const maybeArrow = neighborSprites.find(obj => obj.getMainSprite() === sprite)
     if (maybeArrow && p.dir === playerDir) {
       // loop and delete all the disabled arrowlefts
-      let cur = maybeArrow
-      while (cur) {
-        const pos = cur.pos
+      let cur: ObjectInstance<any> | undefined = maybeArrow
+      while (cur !== undefined) {
+        const pos: IPosition = cur.pos
         cur.setSprite(FloorDiamond)
         cur = collisionChecker.searchPoint(posAdd(pos, neighborPos(playerDir))).find(obj => obj.getMainSprite() === disabledSprite)
       }
@@ -277,7 +278,7 @@ export function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IG
   }
 }
 
-export function crateUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, showDialog: ShowDialogFn, overlayState: SimpleObject, curTick: number) {
+export function crateUpdateFn (o: ObjectInstance<PlayerProps>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, showDialog: ShowDialogFn, overlayState: SimpleObject, curTick: number) {
   const [Hole, HoleStraw, HoleCrate] = sprites.getAll(['Hole', 'HoleStraw', 'HoleCrate'])
 
   const holes = [

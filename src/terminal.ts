@@ -23,14 +23,14 @@ import { MyGame } from './akurra/game'
 
 import { AudioOutputter, AndOutputter } from './common/output'
 
-const keyConfig = {}
-keyConfig[BUTTON_TYPE.DPAD_UP] = ['W', 'w', '\u001B\u005B\u0041']
-keyConfig[BUTTON_TYPE.DPAD_DOWN] = ['S', 's', '\u001B\u005B\u0042']
-keyConfig[BUTTON_TYPE.DPAD_LEFT] = ['A', 'a', '\u001B\u005B\u0044']
-keyConfig[BUTTON_TYPE.DPAD_RIGHT] = ['D', 'd', '\u001B\u005B\u0043']
-keyConfig[BUTTON_TYPE.CLUSTER_DOWN] = ['X', 'x', ' ', '\u000D']
-keyConfig[BUTTON_TYPE.BUMPER_TOP_LEFT] = ['Q', 'q']
-keyConfig[BUTTON_TYPE.BUMPER_TOP_RIGHT] = ['E', 'e']
+const keyConfig = new Map<BUTTON_TYPE, string[]>()
+keyConfig.set(BUTTON_TYPE.DPAD_UP, ['W', 'w', '\u001B\u005B\u0041'])
+keyConfig.set(BUTTON_TYPE.DPAD_DOWN, ['S', 's', '\u001B\u005B\u0042'])
+keyConfig.set(BUTTON_TYPE.DPAD_LEFT, ['A', 'a', '\u001B\u005B\u0044'])
+keyConfig.set(BUTTON_TYPE.DPAD_RIGHT, ['D', 'd', '\u001B\u005B\u0043'])
+keyConfig.set(BUTTON_TYPE.CLUSTER_DOWN, ['X', 'x', ' ', '\u000D'])
+keyConfig.set(BUTTON_TYPE.BUMPER_TOP_LEFT, ['Q', 'q'])
+keyConfig.set(BUTTON_TYPE.BUMPER_TOP_RIGHT, ['E', 'e'])
 
 const err = console.error.bind(console)
 let outputter: IOutputter
@@ -59,7 +59,7 @@ const run = async () => {
   }
 }
 
-function handler (err, type) {
+function handler (err: any, type: string) {
   console.error(type)
   console.error(err)
 }

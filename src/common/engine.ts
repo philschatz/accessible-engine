@@ -31,18 +31,18 @@ export enum ROTATION_AMOUNT {
 
 export type Opt<T> = null | T
 
-export class ObjectInstance<P, S> {
+export class ObjectInstance<P> {
   public pos: IPosition
   offsetPos: IPosition = { x: 0, y: 0 }
   _zIndex: Opt<number>
 
-  public static: GameObject<P, S>
+  public static: GameObject<P>
   sprite: SpriteInstance
   public props: P
 
   animations = new Set<SpriteInstance>()
 
-  constructor (t: GameObject<P, S>, pos: IPosition, props: P) {
+  constructor (t: GameObject<P>, pos: IPosition, props: P) {
     this._zIndex = null
     this.static = t
     this.pos = pos
@@ -84,7 +84,7 @@ export class ObjectInstance<P, S> {
     return posAdd(posTimes(this.pos, grid), this.offsetPos)
   }
 
-  flip (hFlip: boolean = undefined, vFlip: boolean = undefined) {
+  flip (hFlip: boolean | undefined = undefined, vFlip: boolean | undefined = undefined) {
     if (hFlip !== undefined) {
       this.sprite.hFlip = hFlip
     }
@@ -133,30 +133,29 @@ export class SpriteInstance {
   }
 }
 
-export class GameObject<P = {}, S = {}> {
-  private readonly bush: RBush<ObjectInstance<{}, {}>>
+export class GameObject<P = {}> {
+  private readonly bush: RBush<ObjectInstance<P>>
   readonly sprite: Sprite
   readonly zIndex: Opt<number>
-  readonly instances: Set<ObjectInstance<any, any>> = new Set()
-  readonly updateFn: UpdateFn<P, S>
-  public props: S
+  readonly instances: Set<ObjectInstance<P>> = new Set()
+  readonly updateFn: UpdateFn<P>
 
-  constructor (bush: RBush<ObjectInstance<{}, {}>>, sprite: Sprite, zIndex: Opt<number>, updateFn: UpdateFn<P, S>) {
+  constructor (bush: RBush<ObjectInstance<P>>, sprite: Sprite, zIndex: Opt<number>, updateFn: UpdateFn<P>) {
     this.bush = bush
     this.sprite = sprite
     this.zIndex = zIndex
     this.updateFn = updateFn
   }
 
-  public new (pos: IPosition): ObjectInstance<any, any> {
-    const o = new ObjectInstance(this, pos, {})
+  public new (pos: IPosition, props: P): ObjectInstance<P> {
+    const o = new ObjectInstance(this, pos, props)
     this.instances.add(o)
     this.bush.insert(o)
     return o
   }
 
   public newBulk (positions: IPosition[]) {
-    const instances = positions.map(p => new ObjectInstance<any, any>(this, p, {}))
+    const instances = positions.map(p => new ObjectInstance<any>(this, p, {}))
     this.bush.load(instances)
     for (const o of instances) {
       this.instances.add(o)
@@ -164,7 +163,7 @@ export class GameObject<P = {}, S = {}> {
     return instances
   }
 
-  moveTo (o: ObjectInstance<P, S>, newPos: IPosition) {
+  moveTo (o: ObjectInstance<P>, newPos: IPosition) {
     if (!this.instances.has(o)) { throw new Error('BUG: Trying to move an object that the framework is unaware of') }
     if (Number.isNaN(newPos.x) || Number.isNaN(newPos.y)) {
       throw new Error(`Position neeeds to have numbers as their coordinates. At least one of them was not a number. (${newPos.x}, ${newPos.y})`)
@@ -177,7 +176,7 @@ export class GameObject<P = {}, S = {}> {
     this.bush.insert(o)
   }
 
-  delete (o: ObjectInstance<P, S>) {
+  delete (o: ObjectInstance<P>) {
     this.instances.delete(o)
     this.bush.remove(o)
   }
@@ -273,8 +272,8 @@ export class Image {
 
 export class CollisionChecker {
   private readonly grid: Size
-  private readonly bush: RBush<ObjectInstance<any, any>>
-  constructor (grid: Size, bush: RBush<ObjectInstance<any, any>>) {
+  private readonly bush: RBush<ObjectInstance<any>>
+  constructor (grid: Size, bush: RBush<ObjectInstance<any>>) {
     this.grid = grid
     this.bush = bush
   }
@@ -300,7 +299,7 @@ export class Engine {
   private curTick: number = 0
   private readonly game: Game
   private readonly outputter: IOutputter
-  private readonly bush: RBush<ObjectInstance<any, any>>
+  private readonly bush: RBush<ObjectInstance<any>>
   private readonly collisionChecker: CollisionChecker
   private readonly sprites: SpriteController
   private readonly instances: InstanceController
@@ -315,9 +314,9 @@ export class Engine {
 
     // The browser does not like "class MyRBush extends RBush { ... }"
     // because typescript or rollup downgrade the `class` to use ES4 prototypes
-    (this.bush as any).toBBox = function (item: ObjectInstance<any, any>) { return item.toBBox() };
-    (this.bush as any).compareMinX = function (a: ObjectInstance<any, any>, b: ObjectInstance<any, any>) { return a.pos.x - b.pos.x };
-    (this.bush as any).compareMinY = function (a: ObjectInstance<any, any>, b: ObjectInstance<any, any>) { return a.pos.y - b.pos.y }
+    (this.bush as any).toBBox = function (item: ObjectInstance<any>) { return item.toBBox() };
+    (this.bush as any).compareMinX = function (a: ObjectInstance<any>, b: ObjectInstance<any>) { return a.pos.x - b.pos.x };
+    (this.bush as any).compareMinY = function (a: ObjectInstance<any>, b: ObjectInstance<any>) { return a.pos.y - b.pos.y }
 
     this.sprites = new DefiniteMap<Sprite>()
     this.instances = new InstanceController(this.bush)
@@ -390,10 +389,10 @@ export interface SimpleObject {
 
 export interface Game {
   load(gamepad: IGamepad, sprites: SpriteController): {grid: Size, buttons: Set<BUTTON_TYPE>}
-  init(sprites: SpriteController, instances: InstanceController)
-  drawBackground(tiles: Array<ObjectInstance<any, any>>, camera: Camera, drawPixelsFn: DrawPixelsFn)
-  drawOverlay(drawPixelsFn: DrawPixelsFn, drawTextFn: DrawTextFn, additional: SimpleObject, sprites: SpriteController)
-  drawDialog(message: string, drawPixelsFn: DrawPixelsFn, drawTextFn: DrawTextFn, elapsedMs: number, target: Opt<IPosition>, additional: Opt<SimpleObject>)
+  init(sprites: SpriteController, instances: InstanceController): void
+  drawBackground(tiles: Array<ObjectInstance<any>>, camera: Camera, drawPixelsFn: DrawPixelsFn): void
+  drawOverlay(drawPixelsFn: DrawPixelsFn, drawTextFn: DrawTextFn, additional: SimpleObject, sprites: SpriteController): void
+  drawDialog(message: string, drawPixelsFn: DrawPixelsFn, drawTextFn: DrawTextFn, elapsedMs: number, target: Opt<IPosition>, additional: Opt<SimpleObject>): void
 }
 
 export class Camera {
@@ -461,13 +460,13 @@ function boxNudge (source: number, target: number, leashLength: number | null) {
 }
 
 export type ShowDialogFn = (message: string, target: Opt<IPosition>, additional: Opt<SimpleObject>) => void
-export type UpdateFn<P, S> = (o: ObjectInstance<P, S>, gamepad: IGamepad, collisionCheker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, showDialogFn: ShowDialogFn, overlayState: SimpleObject, currentTick: number) => void
+export type UpdateFn<P> = (o: ObjectInstance<P>, gamepad: IGamepad, collisionCheker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, showDialogFn: ShowDialogFn, overlayState: SimpleObject, currentTick: number) => void
 
 export class InstanceController {
-  private readonly bush: RBush<ObjectInstance<any, any>>
+  private readonly bush: RBush<ObjectInstance<any>>
   private readonly instances: Map<String, GameObject> = new Map()
 
-  constructor (bush: RBush<ObjectInstance<any, any>>) {
+  constructor (bush: RBush<ObjectInstance<any>>) {
     this.bush = bush
   }
 
@@ -475,7 +474,7 @@ export class InstanceController {
     return this.factory(name, sprites.get(name), zIndex, () => null)
   }
 
-  factory (name: String, sprite: Sprite, zIndex: Opt<number>, fnUpdate: UpdateFn<any, any>) {
+  factory (name: String, sprite: Sprite, zIndex: Opt<number>, fnUpdate: UpdateFn<any>) {
     let i = this.instances.get(name)
     if (i === undefined) {
       i = new GameObject(this.bush, sprite, zIndex, fnUpdate)
@@ -493,7 +492,7 @@ export class InstanceController {
 }
 
 export interface IOutputter {
-  draw(game: Game, tiles: Array<ObjectInstance<any, any>>, camera: Camera, curTick: number, grid: Size, overlayState: SimpleObject, pendingDialog: Opt<Dialog>, sprites: SpriteController): void
+  draw(game: Game, tiles: Array<ObjectInstance<any>>, camera: Camera, curTick: number, grid: Size, overlayState: SimpleObject, pendingDialog: Opt<Dialog>, sprites: SpriteController): void
 }
 
 export class DefiniteMap<V> {
@@ -528,16 +527,14 @@ export enum DPAD {
   DOWN = 3,
 }
 
-export function zIndexComparator (a: ObjectInstance<any, any>, b: ObjectInstance<any, any>) {
+export function zIndexComparator (a: ObjectInstance<any>, b: ObjectInstance<any>) {
   const az = a.zIndex()
   const bz = b.zIndex()
-  const aNull = az === undefined || az === null
-  const bNull = bz === undefined || bz === null
-  if (aNull && bNull) {
+  if ((az === undefined || az === null) && (bz === undefined || bz === null)) {
     return 0
-  } else if (bNull) {
+  } else if (bz === undefined || bz === null) {
     return 1
-  } else if (aNull) {
+  } else if (az === undefined || az === null) {
     return -1
   } else {
     return az - bz

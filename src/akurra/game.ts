@@ -110,7 +110,7 @@ export class MyGame implements Game {
     loadRooms(sprites, instances, playerUpdateFn, crateUpdateFn)
   }
 
-  drawBackground (tiles: Array<ObjectInstance<any, any>>, camera: Camera, drawPixelsFn: DrawPixelsFn) {
+  drawBackground (tiles: Array<ObjectInstance<any>>, camera: Camera, drawPixelsFn: DrawPixelsFn) {
     // All sprites have a background so this is not necessary
   }
 

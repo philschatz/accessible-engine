@@ -5,6 +5,7 @@ import { DoubleArray } from '../common/doubleArray'
 import { IRenderer, hexToRgb } from '../common/visual'
 import { h, patch } from './vdom'
 import { Keymaster } from './input'
+import { assertSomething, assertDefined } from '../common/util'
 
 export class GridTableOutputter implements IOutputter {
   private readonly root: HTMLElement
@@ -14,7 +15,7 @@ export class GridTableOutputter implements IOutputter {
     this.root = root
   }
 
-  draw (game: Game, tiles: Array<ObjectInstance<any, any>>, camera: Camera, curTick: number, grid: Size, overlayState: SimpleObject, pendingDialog: Opt<Dialog>, sprites: SpriteController) {
+  draw (game: Game, tiles: Array<ObjectInstance<any>>, camera: Camera, curTick: number, grid: Size, overlayState: SimpleObject, pendingDialog: Opt<Dialog>, sprites: SpriteController) {
     const model = new DoubleArray<Set<string>>()
 
     tiles.forEach(t => {
@@ -54,7 +55,7 @@ export class CanvasRenderer implements IRenderer {
   constructor (canvas: HTMLCanvasElement, pixelSize: number = 1) {
     this.pixelSize = pixelSize
     this.canvas = canvas
-    this.ctx = canvas.getContext('2d')
+    this.ctx = assertSomething(canvas.getContext('2d'))
     this.imageData = this.ctx.getImageData(0, 0, canvas.width, canvas.height)
   }
 
@@ -72,7 +73,7 @@ export class CanvasRenderer implements IRenderer {
     // this.ctx.fillStyle = hex
     // this.ctx.fillRect(pos.x * this.pixelSize, pos.y * this.pixelSize, this.pixelSize, this.pixelSize)
 
-    const rgb = hexToRgb(hex)
+    const rgb = assertSomething(hexToRgb(hex))
     const i = (pos.y * this.imageData.width + pos.x) * 4
     const data = this.imageData.data
     data[i + 0] = rgb.r
@@ -82,7 +83,7 @@ export class CanvasRenderer implements IRenderer {
   }
 }
 
-type Vert = [number, number]
+type Vert = number[] // [number, number]
 interface Vertex {x: number, y: number, name: string}
 
 export class GridInspector {
@@ -142,9 +143,9 @@ export class GridInspector {
     const players = this.table.querySelectorAll('tr td .player')
     if (players.length !== 1) { throw new Error(`BUG: Expected to always find exactly 1 player but found ${players.length}`) }
     const player = players[0]
-    const td = player.parentElement
-    const tr = td.parentElement
-    const tbody = tr.parentElement
+    const td = assertSomething(player.parentElement)
+    const tr = assertSomething(td.parentElement)
+    const tbody = assertSomething(tr.parentElement)
     return {
       x: indexOf(tr, td),
       y: indexOf(tbody, tr)
@@ -158,7 +159,7 @@ export class GridInspector {
       tr.querySelectorAll('td').forEach((td, x) => {
         td.querySelectorAll('span').forEach(span => {
           const v: [number, number] = [x, y]
-          const name = span.textContent.trim().toLowerCase()
+          const name = assertSomething(span.textContent).trim().toLowerCase()
 
           // Skip Wall & Water sprites
           if (name === 'wall' || name === 'water') {
@@ -178,9 +179,9 @@ export class GridInspector {
       return Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2)
     })
 
-    const vertexes = verts.map((v) => ({ x: v[0], y: v[1], name: nodes.get(v) }))
-    const edges = edgesWithVertIndex.map(([v1Index, v2Index]) => [vertexes[v1Index], vertexes[v2Index]])
-    const player = vertexes.find(v => v.name.toLowerCase() === 'player')
+    const vertexes = verts.map((v) => ({ x: v[0], y: v[1], name: assertDefined(nodes.get(v)) }))
+    const edges: Vertex[][] = edgesWithVertIndex.map(([v1Index, v2Index]) => [assertDefined(vertexes[v1Index]), assertDefined(vertexes[v2Index])])
+    const player = assertDefined(vertexes.find(v => assertDefined(v.name).toLowerCase() === 'player'))
     const bfs = new BFS(edges, player)
     const msg = bfs.tickAll().map(({ from, to }) => {
       const dx = to.x - from.x
@@ -209,10 +210,10 @@ interface BFSEdge {to: Vertex, from: Vertex}
 class BFS {
   readonly edges = new Set<Vertex[]>()
   readonly visited = new Set<Vertex>()
-  readonly queue: Array<{to: Vertex, from: Vertex | null}>
+  readonly queue: Array<{to: Vertex, from: Vertex}>
   constructor (edges: Vertex[][], root: Vertex) {
     this.edges = new Set(edges)
-    this.queue = [{ to: root, from: null }]
+    this.queue = [{ to: root, from: root }]
   }
 
   tick (): BFSEdge | null {
@@ -223,7 +224,7 @@ class BFS {
       return null
     }
 
-    const { to, from } = this.queue.sort((a, b) => distance(a) - distance(b)).shift()
+    const { to, from } = assertDefined(this.queue.sort((a, b) => distance(a) - distance(b)).shift())
     const edgesToRemove = new Set<Vertex[]>()
     this.edges.forEach(e => {
       if (e[0] === to) {
@@ -236,7 +237,7 @@ class BFS {
     })
 
     edgesToRemove.forEach(e => this.edges.delete(e))
-    if (from === null) {
+    if (from === to) {
       return this.tick()
     } else {
       return { to, from }
@@ -245,7 +246,7 @@ class BFS {
 
   tickAll (): BFSEdge[] {
     const ret: BFSEdge[] = []
-    let e: BFSEdge
+    let e: BFSEdge | null
     while ((e = this.tick()) !== null) {
       ret.push(e)
     }

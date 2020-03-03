@@ -1,4 +1,5 @@
 import { IOutputter, IPosition, Game, ObjectInstance, Camera, Size, SimpleObject, SimpleValue, Opt, Dialog, SpriteController } from './engine'
+import { assertDefined, filterNulls } from './util'
 
 export interface IRenderer {
   drawStart(): void
@@ -12,7 +13,7 @@ export function toSnakeCase (s: string) {
 }
 
 // HACK lookup table. This should be a property of the ObjectClass
-const categories = new Map<string, string>()
+const categories = new Map<string, string|null>()
 categories.set('WallTopUpLeft', 'Wall')
 categories.set('WallTopRightDown', 'Wall')
 categories.set('WallTopUpDown', 'Wall')
@@ -78,7 +79,7 @@ categories.set('PlayerPushingRight', 'PLAYER')
 
 export function categorize (spriteName: string) {
   if (categories.has(spriteName)) {
-    return categories.get(spriteName)
+    return assertDefined(categories.get(spriteName))
   }
   return spriteName
 }
@@ -89,14 +90,14 @@ interface PosAndCat {pos: IPosition, category: string}
 
 export class AudioOutputter implements IOutputter {
   private readonly logger: LoggerFn
-  prev = new Map<ObjectInstance<any, any>, PosAndCat>()
+  prev = new Map<ObjectInstance<any>, PosAndCat>()
   prevOverlay = new Map<string, SimpleValue>()
 
   constructor (logger: LoggerFn = console.log.bind(console)) {
     this.logger = logger
   }
 
-  draw (game: Game, tiles: Array<ObjectInstance<any, any>>, camera: Camera, curTick: number, grid: Size, overlayState: SimpleObject, pendingDialog: Opt<Dialog>) {
+  draw (game: Game, tiles: Array<ObjectInstance<any>>, camera: Camera, curTick: number, grid: Size, overlayState: SimpleObject, pendingDialog: Opt<Dialog>) {
     const current = buildMap(tiles)
 
     const currentOverlay = new Map<string, SimpleValue>()
@@ -143,8 +144,8 @@ export class AudioOutputter implements IOutputter {
         const moved = new Map()
         const changed = new Map()
         for (const i of stillAround) {
-          const p = this.prev.get(i)
-          const c = current.get(i)
+          const p = assertDefined(this.prev.get(i))
+          const c = assertDefined(current.get(i))
           if (p.pos.x !== c.pos.x || p.pos.y !== c.pos.y) {
             moved.set(i, { from: p.pos, to: c.pos })
           }
@@ -192,8 +193,8 @@ export class AudioOutputter implements IOutputter {
           }
         }
 
-        const disappearedSprites = [...disappeared].map(i => this.prev.get(i)).filter(s => !!s) // remove nulls
-        const appearedSprites = [...appeared].map(i => current.get(i)).filter(s => !!s) // remove nulls
+        const disappearedSprites = filterNulls([...disappeared].map(i => assertDefined(this.prev.get(i))))
+        const appearedSprites = filterNulls([...appeared].map(i => assertDefined(current.get(i))))
         if (disappearedSprites.length === 1) {
           messages.push(`1 thing disappeared: ${disappearedSprites[0].category}`)
         } else if (disappearedSprites.length > 100) {
@@ -265,8 +266,8 @@ export class AudioOutputter implements IOutputter {
   }
 }
 
-export function buildMap (tiles: Array<ObjectInstance<any, any>>) {
-  const current = new Map<ObjectInstance<any, any>, PosAndCat>()
+export function buildMap (tiles: Array<ObjectInstance<any>>) {
+  const current = new Map<ObjectInstance<any>, PosAndCat>()
   tiles.forEach(t => {
     const c = categorize(t.getMainSprite()._name)
     if (c) {
@@ -281,7 +282,7 @@ export function printCounts (acc: string[], items: Iterable<PosAndCat>) {
   for (const v of items) {
     if (v.category) {
       const c = catCounts.get(v.category)
-      catCounts.set(v.category, (c || 0) + 1)
+      catCounts.set(v.category, (c ?? 0) + 1)
     }
   }
 
@@ -330,7 +331,7 @@ export class AndOutputter implements IOutputter {
     this.outs = new Set(outs)
   }
 
-  draw (game: Game, tiles: Array<ObjectInstance<any, any>>, camera: Camera, curTick: number, grid: Size, overlayState: SimpleObject, pendingDialog: Opt<Dialog>, sprites: SpriteController) {
+  draw (game: Game, tiles: Array<ObjectInstance<any>>, camera: Camera, curTick: number, grid: Size, overlayState: SimpleObject, pendingDialog: Opt<Dialog>, sprites: SpriteController) {
     for (const o of this.outs) {
       o.draw(game, tiles, camera, curTick, grid, overlayState, pendingDialog, sprites)
     }

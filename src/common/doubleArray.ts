@@ -25,17 +25,19 @@ export class DoubleArray<T> {
     this.maxY = Math.max(this.maxY, pos.y)
     this.maxX = Math.max(this.maxX, pos.x)
 
-    if (!this.ary[pos.y]) {
-      const v = []
+    const row = this.ary[pos.y]
+    if (!row) {
+      const v: T[] = []
       this.ary[pos.y] = v
       v[pos.x] = def
       return def
     }
-    if (!this.ary[pos.y][pos.x]) {
-      this.ary[pos.y][pos.x] = def
+    const col = row[pos.x]
+    if (!col) {
+      row[pos.x] = def
       return def
     }
-    return this.ary[pos.y][pos.x]
+    return col
   }
 
   dim () {

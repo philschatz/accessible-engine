@@ -2,6 +2,7 @@ import { Game, Camera, SpriteController, Image, DefiniteMap, Sprite, InstanceCon
 import { setMoveTo } from './terminal/renderer'
 import { IGamepad, BUTTON_TYPE } from './common/gamepad'
 import { DoubleArray } from './common/doubleArray'
+import { assertSomething } from './common/util'
 
 const CAMERA_SIZE = {
   width: 128,
@@ -589,19 +590,19 @@ export class MyGame implements Game {
     const treeTrunkLeft = instances.simple(sprites, 'treeTrunkLeft', zDef)
     const treeTrunkRight = instances.simple(sprites, 'treeTrunkRight', zDef)
 
-    const validator = {}
-    function g (item: GameObject<any, any>, pos: IPosition, zIndex: number) {
+    const validator = new Set<string>()
+    function g (item: GameObject<any>, pos: IPosition, zIndex: number) {
       const key = `${pos.x}, ${pos.y}, ${zIndex}`
-      if (validator[key]) {
+      if (validator.has(key)) {
         throw new Error(`BUG: 2 voxels in the same spot: ${key}`)
       }
-      validator[key] = true
+      validator.add(key)
 
       // convert from grid coordinates to pixels
       const o = item.new({
         x: (pos.x - 6) * 8,
         y: pos.y * 8
-      })
+      }, {})
 
       o._zIndex = zIndex - 2
       return o
@@ -703,7 +704,7 @@ export class MyGame implements Game {
     }
   }
 
-  drawBackground (tiles: Array<ObjectInstance<any, any>>, camera: Camera, drawPixelsFn: DrawPixelsFn) {
+  drawBackground (tiles: Array<ObjectInstance<any>>, camera: Camera, drawPixelsFn: DrawPixelsFn) {
     const bbox = camera.toBBox()
     const color = '#29ADFF' // (light blue)
 
@@ -713,7 +714,7 @@ export class MyGame implements Game {
   }
 
   drawOverlay (drawPixelsFn: DrawPixelsFn, drawTextFn: DrawTextFn, fields: SimpleObject) {
-    const cubeCount = fields.cubeCount || 0
+    const cubeCount = fields.cubeCount ?? 0
     const cubeCountStr = `${cubeCount}`
     const cubeCountPos = { x: CAMERA_SIZE.width - 10 - cubeCountStr.length * 5, y: 2 }
     drawTextFn(cubeCountPos, cubeCountStr, '#000000')
@@ -821,7 +822,7 @@ interface PlayerProps {
   tick: number // just used for local testing
 }
 
-function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, showDialog: ShowDialogFn, overlayState: SimpleObject) {
+function playerUpdateFn (o: ObjectInstance<PlayerProps>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, showDialog: ShowDialogFn, overlayState: SimpleObject) {
   const floors = [
     sprites.get('treeTopLeft'),
     sprites.get('treeTopRight'),
@@ -872,7 +873,7 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
       .forEach(ob => {
         ob.props.x = from_real(ob.pos.x)
         ob.props.y = from_real(ob.pos.y)
-        ob.props.z = checkNaN(ob.zIndex())
+        ob.props.z = checkNaN(assertSomething(ob.zIndex()))
       })
 
     // the player is always in front
@@ -915,7 +916,7 @@ function playerUpdateFn (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad,
 
 let lastRender: [number, number] = [0, 0]
 
-function move_player (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, floors: Sprite[]) {
+function move_player (o: ObjectInstance<PlayerProps>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, floors: Sprite[]) {
   const p = o.props
 
   const n1 = -1 // negativeOne just to reduce tokens
@@ -998,7 +999,7 @@ function flr (n: number) {
   return Math.floor(n)
 }
 
-function pgetpos (o: ObjectInstance<PlayerProps, any>) {
+function pgetpos (o: ObjectInstance<PlayerProps>) {
   o.props.x = from_real(o.props.xreal)
   o.props.y = from_real(o.props.yreal)
   o.props.z = from_real(o.props.zreal)
@@ -1018,7 +1019,7 @@ function savelast (p: PlayerProps) {
   p.zlast = p.zreal
 }
 
-function find_floor (layer: number, o: ObjectInstance<PlayerProps, any>, collisionChecker: CollisionChecker, floors: Sprite[]) {
+function find_floor (layer: number, o: ObjectInstance<PlayerProps>, collisionChecker: CollisionChecker, floors: Sprite[]) {
   const p = o.props
   const bbox = o.toBBox()
   const x = Math.round((bbox.maxX + bbox.minX) / 2)
@@ -1083,7 +1084,7 @@ function find_floor (layer: number, o: ObjectInstance<PlayerProps, any>, collisi
   return false
 }
 
-function pzmove (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, floors: Sprite[]) {
+function pzmove (o: ObjectInstance<PlayerProps>, gamepad: IGamepad, collisionChecker: CollisionChecker, sprites: SpriteController, instances: InstanceController, camera: Camera, floors: Sprite[]) {
   const p = o.props
 
   // const n1 = -1 // negativeOne just to reduce tokens
@@ -1185,7 +1186,7 @@ function pzmove (o: ObjectInstance<PlayerProps, any>, gamepad: IGamepad, collisi
   }
 }
 
-function draw_player (front: boolean, o: ObjectInstance<any, any>, sprites: SpriteController) {
+function draw_player (front: boolean, o: ObjectInstance<any>, sprites: SpriteController) {
   const atrans = 0
   // const happy = false
 
@@ -1219,7 +1220,7 @@ function draw_player (front: boolean, o: ObjectInstance<any, any>, sprites: Spri
 
 function istalk () { return false }
 
-function draw_player_head (front: boolean, o: ObjectInstance<PlayerProps, any>) {
+function draw_player_head (front: boolean, o: ObjectInstance<PlayerProps>) {
   const p = o.props
 
   const cur_x = 0
@@ -1259,7 +1260,7 @@ function checkNaN (n: number) {
   return n
 }
 
-function rotate_world (o: ObjectInstance<PlayerProps, any>, collisionChecker: CollisionChecker) {
+function rotate_world (o: ObjectInstance<PlayerProps>, collisionChecker: CollisionChecker) {
   const p = o.props
   if (p.r_wait <= 10) {
     if (p.r_wait < 5) { p.r_factor = p.r_wait * p.r_dir / 2 } else if (p.r_wait < 10) { p.r_factor = (p.r_wait - 10) * p.r_dir / 2 } else p.r_factor = 0

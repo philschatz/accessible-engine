@@ -1,6 +1,6 @@
 import ansiEscapes from 'ansi-escapes'
 import ansiStyles from 'ansi-styles'
-import { IPosition, IPixel } from '../common/engine'
+import { IPosition } from '../common/engine'
 import { IRenderer } from '../common/visual'
 import { DoubleArray } from '../common/doubleArray'
 
@@ -8,8 +8,8 @@ const BLACK = '#000000'
 const WHITE = '#ffffff'
 
 export class DoubleTerminalRenderer implements IRenderer {
-  private readonly pixelsOnScreen = new DoubleArray<IPixel>()
-  private readonly pixelsToDraw = new DoubleArray<IPixel>()
+  private readonly pixelsOnScreen = new DoubleArray<string>()
+  private readonly pixelsToDraw = new DoubleArray<string>()
 
   drawStart () {
     this.pixelsToDraw.clear()
@@ -22,7 +22,7 @@ export class DoubleTerminalRenderer implements IRenderer {
       for (let x = 0; x < width; x++) {
         const pos = { x, y }
         const toDraw = this.pixelsToDraw.get(pos, BLACK)
-        if (this.pixelsOnScreen.get(pos, null) !== toDraw) {
+        if (this.pixelsOnScreen.get(pos, '#INVALID_COLOR') !== toDraw) {
           this._drawSinglePixel(pos, toDraw)
         }
       }
@@ -52,8 +52,8 @@ export class DoubleTerminalRenderer implements IRenderer {
 }
 
 export class TerminalRenderer implements IRenderer {
-  private readonly pixelsOnScreen = new DoubleArray<IPixel>()
-  private readonly pixelsToDraw = new DoubleArray<IPixel>()
+  private readonly pixelsOnScreen = new DoubleArray<string>()
+  private readonly pixelsToDraw = new DoubleArray<string>()
 
   drawStart () {
     this.pixelsToDraw.clear()
