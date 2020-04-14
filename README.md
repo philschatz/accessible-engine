@@ -4,11 +4,60 @@
 
 ## Online
 
-## In a terminal 
+Click to play
 
-Yes, you read that right! You can play the game inside a terminal.
+[![Play online wiht a screenreader](https://user-images.githubusercontent.com/253202/79275785-743ddb00-7e6c-11ea-8039-32cb74d5efa7.gif)
+](https://philschatz.com/game-engine/)
 
-### Windows Powershell
+**Tip:** Try plugging in an XBox or PS3/4 controller... it should work
+
+## In a terminal
+
+Yes, you read that right. You can play these games in a terminal.
+See the bottom of this README for how.
+
+You can even plug in a PS4 or XBox controller and play!
+
+
+# Features & Reasons
+
+In order to make games accesible there are a few restrictions that need to be placed on game development.
+
+See [./src/akurra/](./src/akurra/) for the first few levels of https://akurra-game.com . The code still needs a little :soap: :water: :sparkles: TLC so [./docs.md](./docs.md) is a better place to start if you are interested in how a game is built.
+
+## Sprites & Animations
+
+- the engine needs to know about objects, not sprites. This is so we can report when an object moved or changed
+- Animation sprites need to be grouped together so they can be ignored for non-sighted users
+- Optionally, each sprite should have a description of how it works and if it interacts with any other objects
+  - e.g. "Touching the Red Gong will cause the Red Pillar to disappear"
+
+## Time & Space
+
+- play needs to occur on a grid so that there are fewer things to keep track of in one's head (chess board vs every pixel on a screen)
+- progression should be based on the user's input rather than time (e.g. flying bats)
+  - This is so that the user can pause, inspect what the state of the game is, actively choose when to advance
+- Undo should be an option because people "try out" approaches in their head and it is useful to "try out" an approach and then inspect what actually changed
+
+## Dialogs & Inventory windows
+
+- dialogs need to be created through the engine. This is so we can print the dialog out to the user
+- overlay information like the inventory need to be drawn through the engine. This is so we can print when changes to your inventory occur
+
+## Gamepad
+
+There are many gamepads available to purchase, and it is very unreasonable to ask games to implement all controllers.
+
+However, if games canare able to request to use certain buttons (see the [Gamepad API's Standard Layout](https://w3c.github.io/gamepad/#dfn-standard-gamepad-layout)) then they can be more-easily mapped to other controllers.
+
+## Design Notes
+
+For more design notes on implementing your own game, see [./docs.md](./docs.md)
+
+
+# Terminal
+
+## Windows Powershell
 
 1. Install NodeJS by either:
   - via https://nodejs.org
@@ -23,108 +72,9 @@ Yes, you read that right! You can play the game inside a terminal.
 If your powershell is too small (it probably is) you can press Ctrl+C
 and set it to be at least 384x224.
 
-### macOS and linux
+## macOS and linux
 
 There are 2 easy ways:
 
 - clone this repo, run `npm install && npm start`
 - run `npx {this_repo_name} npm start`
-
-# Features & Reasons
-
-
-## Sprites & Animations
-
-- the engine needs to know about objects, not sprites. This is so we can report when an object moved or changed
-- Animation sprites need to be grouped together so they can be ignored for non-sighted users
-- Each sprite should have a description of how it works and if it interacts with any other objects
-  - e.g. "Touching the Red Gong will cause the Red Pillar to disappear"
-
-## Time & Space
-
-- progression should be based on the user's input rather than time (flying bats)
-  - This is so that the user can pause, inspect what the state of the game is, actively choose when to advance
-- Undo should be an option because people "try out" approaches in their head and it is useful to "try out" an approach and then inspect what actually changed
-- play needs to occur on a grid so that there are fewer things to keep track of in one's head (chess board vs every pixel on a screen)
-
-## Dialogs & Inventory windows
-
-- dialogs need to be created through the engine. This is so we can print the dialog out to the user
-- overlay information like the inventory need to be drawn through the engine. This is so we can print when changes to your inventory occur
-
-## Gamepad
-
-There are many gamepads available to purchase, and it is very unreasonable to ask games to implement all controllers.
-
-However, if games canare able to request to use certain buttons (see the [Gamepad API's Standard Layout](https://w3c.github.io/gamepad/#dfn-standard-gamepad-layout)) then they can be more-easily mapped to other controllers.
-
-
-# Notes
-
-Needs to have the following properties (unlike pico-8 or puzzlescript):
-
-- **Engine knows about Objects** : Objects that the engine knows about and move around instead of just sprites that are drawn
-  - Why? So we can tell the user that something moved. We can tell them when a property of the object changed (e.g. the user's health dropped or they are holding a hookshot)
-  - e.g. Baba's "FLAG IS WIN" applies to all flag objects, while (x,y)==(4,3) only applies to one of the flags
-- **Animation Sprites are grouped** : Sprites used for just animations need to be grouped so they can be ignored by a screenreader
-- **Time Travel** The game needs to move based on user input rather than time
-  - or give users a way to move time forwards and backwards (1st-class Undo)
-- The user should know which things collide with other things
-- Variant sprites should also be grouped together so the screenreader can ignore them
-
-See [./myGame.ts](./myGame.ts) for an example
-
-
-# Controllers
-
-I tried multiple gamepad libraries but they had the following problems:
-
-- [dualshock-controller](https://github.com/Kylir/node-dualshock-controller) only worked for PS4 controllers and only the fork contained the configuration for the v2 PS4 controller
-- [gamepad](https://github.com/warp/node-gamepad#node-12-support) randomly segfaulted, the DPad was reported as a joystick, and only a fork supported node 12
-- [node-gamepad](https://github.com/kaikousa/node-gamepad#dualshock4v2) only supported pressing one button at a time and only a fork contained the PS4 vs configuration
-
-
-There is a large database of game controllers but this is the [only description of the file format I have found](https://github.com/Vladar4/sdl2_nim/blob/7f3422cd5480ba0961a1f8922ed7609326215656/sdl2/private/gamecontroller.nim#L77)
-
-
-
-# Notes
-
-Zelda-like game needs:
-
-# abstraction for providing a sequence of things that happen over time (generator)
-
-- optional cancellable method (with its own animation? or is it always immediate?)
-- 
-
-# Sprites
-
-- sprite groups & their z-indexes or something so you can walk behind a tree
-- sprites that have a set of boolean flags
-- maybe some sprites can be a "vertical wall" which is useful for both Z-index calculation _and_ for hookshot/arrow shooting
-- multi-height sprites (e.g. the player is tall w/ a hat)
-
-
-# Maps
-
-- tile maps (maybe multiple tiles per square for like a bridge over land & water, Big-square sprites for like a roof)
-
-
-# Messaging
-
-- popup speech bubbles (with more than just text... maybe controller keys)
-- message windows (e.g. 1 at a time, optional title, require keypress)
-
-
-# Items
-
-- inventory
-- binding weapon(s) to keys
-
-
-# Controller
-
-- keyboard/controller is abstracted out (game registers which keys it wants to listen to)
-- multiplayer (game registers for it)
-- remapping config
-

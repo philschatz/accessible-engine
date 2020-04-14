@@ -4,10 +4,16 @@ import { loadImages } from './images'
 import { loadRooms } from './rooms'
 import { playerUpdateFn, crateUpdateFn } from './logic'
 
+/** 
+ * This example game is the first few rooms of https://www.akurra-game.com/
+ * 
+ * See ../../docs.md for details about creating a game.
+ */
 export class MyGame implements Game {
   load (gamepad: IGamepad, sprites: SpriteController) {
     const images = loadImages()
 
+    // This is just an animation... apologies for how long it is.
     sprites.add('Water', new Sprite(20, true, images.getAll([
       'Water0',
       'Water0',
