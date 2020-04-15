@@ -269,11 +269,14 @@ export class KeyboardGamepad implements IGamepad {
   tick () {
     // feed the piped keys in one tick at a time
     const key = this.pipedKeys.shift()
-    if (!key) {
+    if (!key && !process.stdin.setRawMode) {
+      console.log('Done reading piped input so exiting.')
       return process.exit(0)
     } else {
-      this.timestamp = Date.now() + 100 * 1000 // ensure that we do not hit they key interval
-      this.curPressed = key
+      if (key) {
+        this.timestamp = Date.now() + 100 * 1000 // ensure that we do not hit they key interval
+        this.curPressed = key
+      }
     }
   }
 
