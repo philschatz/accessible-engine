@@ -27,10 +27,10 @@ const checkActiveElement = (root: Element, current: Element | null): boolean => 
 
 export class Keymaster<T> {
   private readonly context: Opt<HTMLElement>
-  private readonly mapper: (key: string) => T
+  private readonly mapper: (key: string) => (T | undefined)
   private readonly pressed = new Set<T>()
   private readonly listener: Opt<(key: T, pressed: boolean) => void>
-  constructor (mapper: (key: string) => T, listener: Opt<(key: T, pressed: boolean) => void>, context: Opt<HTMLElement>) {
+  constructor (mapper: (key: string) => T | undefined, listener: Opt<(key: T, pressed: boolean) => void>, context: Opt<HTMLElement>) {
     this.mapper = mapper
     this.listener = listener
     this.context = context
@@ -90,8 +90,8 @@ export class KeyGamepad implements IGamepad {
   }
 
   // https://developer.mozilla.org/en-US/docs/Web/API/Gamepad
-  buttons: Array<{pressed: boolean, value: number}>
-  axes: number[]
-  mapping: string
-  timestamp: number
+  buttons = []
+  axes = []
+  mapping = ''
+  timestamp = 0
 }

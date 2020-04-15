@@ -4,7 +4,7 @@ import { ROOM_SIZE } from './util'
 // https://stackoverflow.com/questions/521295/seeding-the-random-number-generator-in-javascript/47593316#47593316
 var LCG = (s: number) => () => (2 ** 31 - 1 & (s = Math.imul(48271, s))) / 2 ** 31
 
-export function loadRooms (sprites: SpriteController, instances: InstanceController, playerUpdateFn: UpdateFn<any, any>, crateUpdateFn: UpdateFn<any, any>) {
+export function loadRooms (sprites: SpriteController, instances: InstanceController, playerUpdateFn: UpdateFn<any>, crateUpdateFn: UpdateFn<any>) {
   const player = instances.factory('player', sprites.get('PlayerStoppedDown'), -1000, playerUpdateFn)
 
   const bgZ = 100
@@ -91,25 +91,25 @@ export function loadRooms (sprites: SpriteController, instances: InstanceControl
   const ArrowUp = instances.simple(sprites, 'ArrowUp', obZ)
   const ArrowUpDisabled = instances.simple(sprites, 'ArrowUpDisabled', obZ)
 
-  function g (item: GameObject<any, any>, pos: IPosition) {
+  function g (item: GameObject<any>, pos: IPosition) {
     // convert from grid coordinates to pixels
-    const o = item.new(pos)
+    const o = item.new(pos, {})
     return o
   }
 
-  function i (item: GameObject<any, any>) {
+  function i (item: GameObject<any>) {
     const pos = { x: x++, y }
     return g(item, pos)
   }
 
-  function o (item: GameObject<any, any>) {
+  function o (item: GameObject<any>) {
     return g(item, { x, y })
   }
 
   const rand = LCG(2020)
 
   // Setart each Ocean tile at a random spot so the ocean waves will crest randomly
-  function waterAnim (o: ObjectInstance<any, any>) {
+  function waterAnim (o: ObjectInstance<any>) {
     const next = Math.round(rand() * 1000)
     o.sprite.startTick = -next
   }

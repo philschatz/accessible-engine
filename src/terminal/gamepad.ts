@@ -3,6 +3,7 @@ import * as HID from 'node-hid'
 import { IGamepadRoot, IGamepad, BUTTON_TYPE, STICK_TYPE } from '../common/gamepad'
 import ps3 from './ps3.json'
 import ps4 from './ps4v2.json'
+import { assertDefined, filterNulls } from '../common/util'
 
 const configs = new Map<string, Config>()
 
@@ -40,7 +41,7 @@ interface Config {
   }
 }
 
-function addConfig (c) {
+function addConfig (c: Config) {
   configs.set(`${c.vendorId}/${c.productId}`, c)
 }
 
@@ -52,22 +53,23 @@ interface IPosition {
 }
 
 class GamepadRoot implements IGamepadRoot {
-  getGamepads (): Gamepad[] {
+  getGamepads (): IGamepad[] {
     const devices = HID.devices()
     const gamepadsOrNull = devices.map(d => {
       const c = configs.get(`${d.vendorId}/${d.productId}`)
+      const path = assertDefined(d.path)
       if (c) {
-        let i = cache.get(d.path)
+        let i = cache.get(path)
         if (!i) {
-          i = new Gamepad(d.path, c)
-          cache.set(d.path, i)
+          i = new Gamepad(path, c)
+          cache.set(path, i)
         }
         return i
       } else {
         return null
       }
     })
-    return gamepadsOrNull.filter(d => d !== null)
+    return filterNulls(gamepadsOrNull)
   }
 }
 
@@ -77,7 +79,7 @@ class Gamepad implements IGamepad {
   private readonly path: string
   private readonly config: Config
   private usb: HID.HID | null
-  private lastUpdated: number
+  private lastUpdated = -1
 
   private readonly jStates = new Map<string, IPosition>()
   private readonly bStates = new Set<string>()
@@ -105,13 +107,13 @@ class Gamepad implements IGamepad {
     cache.delete(this.path)
   }
 
-  private onUsbFrame (data) {
+  private onUsbFrame (data: number[]) {
     this.processJoysticks(data)
     this.processButtons(data)
     this.lastUpdated = Date.now()
   }
 
-  private processJoysticks (data) {
+  private processJoysticks (data: number[]) {
     if (!this.config.joysticks) { return }
 
     this.config.joysticks.forEach(j => {
@@ -123,10 +125,10 @@ class Gamepad implements IGamepad {
     })
   }
 
-  private processButtons (data) {
+  private processButtons (data: number[]) {
     this.config.buttons.forEach(b => {
       const v = data[b.pin]
-      let newState
+      let newState = false
       if (b.bit !== undefined) {
         // This is used by the PS4 Controller's cluster keys
         const bitNum = 1 << b.bit
@@ -138,7 +140,7 @@ class Gamepad implements IGamepad {
         if (noDpad) {
           newState = false
         } else {
-          newState = (v & b.mask) === b.value
+          newState = (v & assertDefined(b.mask)) === b.value
         }
       } else if (b.mask) {
         // This is used by the PS4 Controller's DPAD_* keys
@@ -162,7 +164,7 @@ class Gamepad implements IGamepad {
   }
 
   getStickCoordinates (stick: STICK_TYPE) {
-    return this.jStates.get(stick) || null
+    return this.jStates.get(stick) ?? null
   }
 
   // ------------------------------------
@@ -176,12 +178,22 @@ class Gamepad implements IGamepad {
       s = this.config.standard.buttons.map(name => new Button(this.bStates, name))
       this.standardButtons = s
     }
-    return this.standardButtons
+    return s.map((b, index) => {
+      return { pressed: b.pressed, value: index }
+    })
   }
 
   get axes () {
     return this.config.standard.axes.map(([name, xy]) => {
-      return (this.jStates.get(name) || { x: 0, y: 0 })[xy]
+      const j = this.jStates.get(name)
+      if (j) {
+        switch (xy) {
+          case 'x': return j.x
+          case 'y': return j.y
+          default: throw new Error('ERROR: Invalid axis. Must be x or y')
+        }
+      }
+      return 0
     })
   }
 
@@ -216,15 +228,15 @@ const KEY_REPEAT_WITHIN = 110 // MacOS seems to repeat at 80ms (up to 102ms)
 export class KeyboardGamepad implements IGamepad {
   timestamp = Date.now()
   private curPressed: string
-  private readonly keyConfig
-  private readonly pipedKeys: string[] = []
+  private readonly keyConfig: Map<BUTTON_TYPE, string[]>
+  private readonly pipedKeys: Array<string|null> = []
 
   // Gamepad API. TODO: Actually map it (not too hard)
-  buttons: []
-  axes: []
-  mapping: 'none'
+  buttons = []
+  axes = []
+  mapping = 'none'
 
-  constructor (keyConfig) {
+  constructor (keyConfig: Map<BUTTON_TYPE, string[]>) {
     this.curPressed = ''
     this.keyConfig = keyConfig
 
@@ -256,17 +268,20 @@ export class KeyboardGamepad implements IGamepad {
 
   tick () {
     // feed the piped keys in one tick at a time
-    if (this.pipedKeys.length > 0) {
-      this.timestamp = Date.now() + 100 * 1000 // ensure that we do not hit they key interval
-      this.curPressed = this.pipedKeys.shift()
-      if (this.curPressed === null) {
-        return process.exit(0)
+    const key = this.pipedKeys.shift()
+    if (!key && !process.stdin.setRawMode) {
+      console.log('Done reading piped input so exiting.')
+      return process.exit(0)
+    } else {
+      if (key) {
+        this.timestamp = Date.now() + 100 * 1000 // ensure that we do not hit they key interval
+        this.curPressed = key
       }
     }
   }
 
   isButtonPressed (btn: BUTTON_TYPE) {
-    const c = this.keyConfig[btn]
+    const c = this.keyConfig.get(btn)
     return c ? c.indexOf(this.getCurPressed()) >= 0 : false
   }
 
@@ -288,9 +303,9 @@ export class AnyGamepad implements IGamepad {
   private pads: IGamepad[] = []
 
   // Gamepad API. TODO: Implement (not hard)
-  buttons: []
-  axes: []
-  mapping: 'none'
+  buttons = []
+  axes = []
+  mapping = 'none'
 
   constructor (pollingInterval: number) {
     this.polling = pollingInterval
@@ -313,13 +328,13 @@ export class AnyGamepad implements IGamepad {
     const farthest = new Map<number, IPosition>()
     let max = -1
     for (const pad of this.pads) {
-      const c = pad.getStickCoordinates(stick) || { x: 0, y: 0 }
+      const c = pad.getStickCoordinates(stick) ?? { x: 0, y: 0 }
       const distance = Math.abs(c.x) + Math.abs(c.y)
       max = Math.max(max, distance)
       farthest.set(distance, c)
     }
     if (max > 0) {
-      return farthest.get(max)
+      return farthest.get(max) ?? null
     }
     return { x: 0, y: 0 }
   }
