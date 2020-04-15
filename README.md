@@ -4,12 +4,12 @@
 
 ## Online
 
-Click to play
+[Click to play](https://philschatz.com/game-engine/)
 
 [![Play online wiht a screenreader](https://user-images.githubusercontent.com/253202/79275785-743ddb00-7e6c-11ea-8039-32cb74d5efa7.gif)
 ](https://philschatz.com/game-engine/)
 
-**Tip:** Try plugging in an XBox or PS3/4 controller... it should work
+**Tip:** :video_game: Try plugging in an XBox or PS3/4 controller... it should work
 
 ## In a terminal
 
@@ -23,7 +23,7 @@ You can even plug in a PS4 or XBox controller and play!
 
 In order to make games accesible there are a few restrictions that need to be placed on game development.
 
-See [./src/akurra/](./src/akurra/) for the first few levels of https://akurra-game.com . The code still needs a little :soap: :water: :sparkles: TLC so [./docs.md](./docs.md) is a better place to start if you are interested in how a game is built.
+See [./src/akurra/](./src/akurra/) for the first few levels of https://akurra-game.com . The code still needs a little :soap: :droplet: :sparkles: TLC so [./docs.md](./docs.md) is a better place to start if you are interested in how a game is built.
 
 ## Sprites & Animations
 
@@ -78,3 +78,12 @@ There are 2 easy ways:
 
 - clone this repo, run `npm install && npm start`
 - run `npx {this_repo_name} npm start`
+
+
+# Development
+
+- `yarn` or `npm install` to install the dependencies
+- `yarn start` or `npm run start` to play directly in the commandline terminal
+- `yarn test` or `npm test` to run the tests
+- `yarn bundle` or `npm run bundle` to build the JavaScript file for use in the browser
+- start a [1-liner static webserver](https://gist.github.com/willurd/5720255) to play in a browser (after running `npm run bundle`)

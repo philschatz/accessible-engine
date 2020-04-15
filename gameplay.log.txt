@@ -4,14 +4,14 @@ START:  Items in the  Inventory.
 END:  Items in the  Inventory.
 START:  Initial  Room  Information.
  1  Next Room Arrow.
- 1  PLAYER.
+ 1  Gong Red.
+ 1  Arrow Left.
  1  Pillar Red.
  1  Lock.
  1  Key.
- 1  Gong Red.
- 1  Arrow Left.
- 2  Crate.
+ 1  PLAYER.
  2  Arrow Left Disabled.
+ 2  Crate.
  65  Water.
  112  Wall.
 END:  Initial  Room  Information
@@ -66,3 +66,4 @@ Moved  PLAYER  LEFT
 Moved  PLAYER  UP
 Moved  PLAYER  UP
 Moved  PLAYER  UP
+Done reading piped input so exiting.
