@@ -95,3 +95,75 @@ export class KeyGamepad implements IGamepad {
   mapping = ''
   timestamp = 0
 }
+
+// https://w3c.github.io/gamepad/#dfn-standard-gamepad-layout
+function toStandard(btn: BUTTON_TYPE) {
+  switch (btn) {
+    case BUTTON_TYPE.CLUSTER_DOWN: return 0
+    case BUTTON_TYPE.CLUSTER_RIGHT: return 1
+    case BUTTON_TYPE.CLUSTER_LEFT: return 2
+    case BUTTON_TYPE.CLUSTER_UP: return 3
+    case BUTTON_TYPE.BUMPER_TOP_LEFT: return 4
+    case BUTTON_TYPE.BUMPER_TOP_RIGHT: return 5
+    case BUTTON_TYPE.BUMPER_BOTTOM_LEFT: return 6
+    case BUTTON_TYPE.BUMPER_BOTTOM_RIGHT: return 7
+    case BUTTON_TYPE.SELECT: return 8
+    case BUTTON_TYPE.START: return 9
+    case BUTTON_TYPE.STICK_PRESS_LEFT: return 10
+    case BUTTON_TYPE.STICK_PRESS_RIGHT: return 11
+    case BUTTON_TYPE.DPAD_UP: return 12
+    case BUTTON_TYPE.DPAD_DOWN: return 13
+    case BUTTON_TYPE.DPAD_LEFT: return 14
+    case BUTTON_TYPE.DPAD_RIGHT: return 15
+    case BUTTON_TYPE.HOME: return 16
+    default: return -1
+  }
+}
+
+export class BrowserGamepad implements IGamepad {
+
+  isConnected() {
+    for (const g of window.navigator.getGamepads()) {
+      if (g && g.connected) { return true }
+    }
+    return false
+  }
+  dispose() {}
+  tick() {}
+  isButtonPressed(btn: BUTTON_TYPE) {
+    // return true if any gamepad pressed the button
+    for (const g of window.navigator.getGamepads()) {
+      if (g) {
+        if (g.mapping !== 'standard') {
+          console.warn("Gamepad does not have a standard mapping so not using")
+        }
+        let btnIndex = toStandard(btn)
+        if (btnIndex >= 0 && g.buttons[btnIndex]?.pressed) {
+          return true
+        }
+      }
+    }
+    return false
+  }
+  getStickCoordinates(stick: STICK_TYPE) {
+    for (const g of window.navigator.getGamepads()) {
+      if (g) {
+        if (g.mapping !== 'standard') {
+          console.warn("Gamepad does not have a standard mapping so not using")
+        }
+        switch (stick) {
+          case STICK_TYPE.LEFT: return {x: g.axes[0], y: g.axes[1]}
+          case STICK_TYPE.RIGHT: return {x: g.axes[2], y: g.axes[3]}
+        }
+      }
+    }
+    return null
+  }
+
+  // https://developer.mozilla.org/en-US/docs/Web/API/Gamepad
+  buttons = []
+  axes = []
+  mapping = ''
+  timestamp = 0
+  
+}
