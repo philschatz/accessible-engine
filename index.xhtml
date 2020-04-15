@@ -48,11 +48,11 @@
     <label for="play_screenreader">Using <strong>only</strong> the text read out by a screenreader</label><br/>
     <p><strong tabindex="0" aria-controls="my_audio_messages">How to use this</strong> . Try completing the level without using the graphical option. Note what happens when you push against a wall, or when you get/use a key. Creating a sokoban-style games to be accessible only requires a minimal amount of accessible hoops to jump through; game devs can just write game code for the most part. For more on how to build accessible videogames check out the repository.</p>
   </fieldset>
-  <canvas tabindex="0" id="my_canvas" width="384" height="224" aria-hidden="true" alt="graphical version of the game"></canvas>
-  <div id="my_table" aria-hidden="true"></div>
   <p>Use the <kbd>I</kbd>, <kbd>J</kbd>, <kbd>K</kbd>, <kbd>L</kbd> keys to inspect around you.</p>
   <p>Press <kbd>M</kbd> to hear where items are located.</p>
   <p>Use the arrow keys or <kbd>W</kbd>, <kbd>A</kbd>, <kbd>S</kbd>, <kbd>D</kbd> keys to move the player.</p>
+  <canvas tabindex="0" id="my_canvas" width="384" height="224" aria-hidden="true" alt="graphical version of the game"></canvas>
+  <div id="my_table" aria-hidden="true"></div>
   <ol id="my_audio" role="log" aria-live="polite" aria-atomic="false">
     <li style="position:absolute; left: -10000px;">Use the <kbd>I</kbd>, <kbd>J</kbd>, <kbd>K</kbd>, <kbd>L</kbd> keys to inspect around you. Press <kbd>M</kbd> to hear where items are located. Use the arrow keys or <kbd>W</kbd>, <kbd>A</kbd>, <kbd>S</kbd>, <kbd>D</kbd> keys to move the player.</li>
   </ol>
@@ -131,5 +131,15 @@
 
     })()
   </script>
+
+  <script type="text/javascript">//<![CDATA[
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-48498113-4', 'philschatz.com');
+  // ]]></script>
+
 </body>
 </html>
