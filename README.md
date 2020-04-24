@@ -4,10 +4,10 @@
 
 ## Online
 
-[Click to play](https://philschatz.com/game-engine/)
+[Click to play](https://philschatz.com/accessible-engine/)
 
 [![Play online wiht a screenreader](https://user-images.githubusercontent.com/253202/79275785-743ddb00-7e6c-11ea-8039-32cb74d5efa7.gif)
-](https://philschatz.com/game-engine/)
+](https://philschatz.com/accessible-engine/)
 
 **Tip:** :video_game: Try plugging in an XBox or PS3/4 controller... it should work
 
@@ -23,7 +23,7 @@ You can even plug in a PS4 or XBox controller and play!
 
 In order to make games accesible there are a few restrictions that need to be placed on game development.
 
-See [./src/akurra/](./src/akurra/) for the first few levels of https://akurra-game.com . The code still needs a little :soap: :droplet: :sparkles: TLC so [./docs.md](./docs.md) is a better place to start if you are interested in how a game is built.
+See [./src/akurra/](./src/akurra/) for the first few levels of [Akurra](https://akurra-game.com) . The code still needs a little :soap: :droplet: :sparkles: TLC so [./docs.md](./docs.md) is a better place to start if you are interested in how a game is built.
 
 ## Sprites & Animations
 

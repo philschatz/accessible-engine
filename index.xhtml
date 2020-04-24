@@ -39,18 +39,18 @@
 
 <body>
   <fieldset aria-hidden="true">
-    <legend>How would you like to "play" the game?</legend>
+    <legend>How would you like to play the game?</legend>
     <input id="play_sprites" type="radio" name="play_style" value="visually" checked="checked"/>
     <label for="play_sprites">Visually with Sprites</label><br/>
     <input id="play_table" type="radio" name="play_style" value="table" aria-hidden="true"/>
     <label for="play_table">In a Table (to roughly show what the mental model of the level "looks like" to an unsighted player)</label><br/>
     <input id="play_screenreader" type="radio" name="play_style" value="screenreader"/>
     <label for="play_screenreader">Using <strong>only</strong> the text read out by a screenreader</label><br/>
-    <p><strong tabindex="0" aria-controls="my_audio_messages">How to use this</strong> . This is an <a href="https://github.com/philschatz/game-engine">accessbile demo</a> of the <a href="https://www.akurra-game.com" target="_window">amazing game Akurra</a>. Try completing the level without using the graphical option. Note what happens when you push against a wall, or when you get/use a key. Creating a sokoban-style games to be accessible only requires a minimal amount of accessible hoops to jump through; game devs can just write game code for the most part. For more on how to build accessible videogames check out the repository.</p>
+    <p><strong tabindex="0" aria-controls="my_audio_messages">How to use this</strong> . This is an <a href="https://github.com/philschatz/accessible-engine">accessbile demo</a> of the <a href="https://www.akurra-game.com" target="_window">amazing game Akurra</a>. Try completing the level without using the graphical option. Note what happens when you push against a wall, or when you get/use a key. Creating a sokoban-style games to be accessible only requires a minimal amount of accessible hoops to jump through; game devs can just write game code for the most part. For more on how to build accessible videogames check out <a href="https://github.com/philschatz/accessible-engine">the repository</a>.</p>
   </fieldset>
   <p>Use the <kbd>I</kbd>, <kbd>J</kbd>, <kbd>K</kbd>, <kbd>L</kbd> keys to inspect around you.</p>
   <p>Press <kbd>M</kbd> to hear where items are located.</p>
-  <p>Use the arrow keys or <kbd>W</kbd>, <kbd>A</kbd>, <kbd>S</kbd>, <kbd>D</kbd> keys to move the player.</p>
+  <p>Use the arrow keys or <kbd>W</kbd>, <kbd>A</kbd>, <kbd>S</kbd>, <kbd>D</kbd> keys to move the player. This requires a keyboard for now but phone/tablet support is coming soon.</p>
   <canvas tabindex="0" id="my_canvas" width="384" height="224" aria-hidden="true" alt="graphical version of the game"></canvas>
   <div id="my_table" aria-hidden="true"></div>
   <ol id="my_audio" role="log" aria-live="polite" aria-atomic="false">
@@ -58,7 +58,7 @@
   </ol>
 
   <div id="gamepad_connected">🎮 Gamepad is connected. Use the D-Pad to move around</div>
-  <div id="gamepad_disconnected"><strong>Tip:</strong> 🎮 Plug in an XBox or PS3/4 Gamepad to play using it</div>
+  <div id="gamepad_disconnected"><strong>Tip:</strong> 🎮 Plug in an XBox or PS3/4 Controller to play using it</div>
   <script src="browser.bundle.js"></script>
 
   <script>

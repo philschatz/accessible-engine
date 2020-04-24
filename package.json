@@ -1,4 +1,12 @@
 {
+  "name": "accessible-engine",
+  "version": "0.1.0",
+  "author": "Philip Schatz",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/philschatz/accessible-engine.git"
+  },
   "scripts": {
     "build": "tsc",
     "bundle": "NODE_ENV=${NODE_ENV:-production} rollup --config ./rollup.config.js",
