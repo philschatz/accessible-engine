@@ -4,7 +4,7 @@ import { categorize, toSnakeCase } from '../common/output'
 import { DoubleArray } from '../common/doubleArray'
 import { IRenderer, hexToRgb } from '../common/visual'
 import { h, patch } from './vdom'
-import { Keymaster } from './input'
+import { BUTTON_TYPE } from '../common/gamepad'
 import { assertSomething, assertDefined } from '../common/util'
 
 export class GridTableOutputter implements IOutputter {
@@ -89,28 +89,32 @@ interface Vertex {x: number, y: number, name: string}
 export class GridInspector {
   private readonly table: HTMLTableElement
   private readonly logger: (msg: string) => void
-  private readonly km: Keymaster<string>
   private lastPlayerPos: IPosition
   private relPos: IPosition
-  constructor (table: HTMLTableElement, logger: (msg: string) => void, keyContext: Opt<HTMLElement>) {
+  constructor (table: HTMLTableElement, logger: (msg: string) => void) {
     this.table = table
     this.logger = logger
     this.listen = this.listen.bind(this)
-    this.km = new Keymaster<string>(x => x, this.listen, keyContext)
     this.lastPlayerPos = { x: -2, y: -2 } // just invalid
     this.relPos = { x: 0, y: 0 }
   }
 
-  listen (key: string, pressed: boolean) {
+  listen (key: BUTTON_TYPE, pressed: boolean) {
     if (pressed) {
       let dx = 0
       let dy = 0
       switch (key) {
-        case 'i': dy = -1; break
-        case 'j': dx = -1; break
-        case 'l': dx = 1; break
-        case 'k': dy = 1; break
-        case 'm': return this.printTree()
+        case BUTTON_TYPE.CLUSTER_UP: dy = -1; break
+        case BUTTON_TYPE.CLUSTER_LEFT: dx = -1; break
+        case BUTTON_TYPE.CLUSTER_RIGHT: dx = 1; break
+        case BUTTON_TYPE.CLUSTER_DOWN: dy = 1; break
+        case BUTTON_TYPE.HOME:
+        case BUTTON_TYPE.SELECT:
+        case BUTTON_TYPE.BUMPER_BOTTOM_LEFT:
+        case BUTTON_TYPE.BUMPER_BOTTOM_RIGHT:
+        case BUTTON_TYPE.BUMPER_TOP_LEFT:
+        case BUTTON_TYPE.BUMPER_TOP_RIGHT:
+          return this.printTree()
         default: return
       }
 
