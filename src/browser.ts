@@ -5,7 +5,12 @@ import { MyGame } from './akurra/game'
 import { AudioOutputter, AndOutputter } from './common/output'
 import { VisualOutputter } from './common/visual'
 import { GridTableOutputter, CanvasRenderer, GridInspector } from './browser/output'
-import { KeyGamepad, BrowserGamepad } from './browser/input'
+import { KEY_MAP, Keymaster, KeyGamepad, BrowserGamepad, HtmlButtonGamepad } from './browser/input'
 
-export { Engine, MyGame, AudioOutputter, AndOutputter, OrGamepad, IGamepad, IOutputter }
-export { GridTableOutputter, CanvasRenderer, VisualOutputter, KeyGamepad, BrowserGamepad, GridInspector }
+export { Engine, IOutputter }
+export { OrGamepad, IGamepad }
+export { MyGame }
+export { AudioOutputter, AndOutputter }
+export { VisualOutputter }
+export { GridTableOutputter, CanvasRenderer, GridInspector }
+export { KEY_MAP, Keymaster, KeyGamepad, BrowserGamepad, HtmlButtonGamepad }

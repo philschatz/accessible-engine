@@ -20,10 +20,11 @@
       overflow: hidden;
     }
 
-    kbd {
+    button.key {
+      cursor: pointer;
       font: 11px "SFMono-Regular",Consolas,"Liberation Mono",Menlo,Courier,monospace;
       display: inline-block;
-      padding: 3px 5px;
+      /* padding: 3px 5px;
       font-size: 11px;
       line-height: 10px;
       color: #444d56;
@@ -32,7 +33,19 @@
       border: solid 1px #c6cbd1;
       border-bottom-color: #959da5;
       border-radius: 3px;
-      box-shadow: inset 0 -1px 0 #959da5;
+      box-shadow: inset 0 -1px 0 #959da5; */
+    }
+
+    .keys-udlr {
+      display: inline-flex;
+      flex-direction: column;
+    }
+    .keys-udlr-row1 {
+      flex-direction: row;
+      text-align: center;
+    }
+    .keys-udlr-row2 {
+      flex-direction: row;
     }
   </style>
 </head>
@@ -48,13 +61,13 @@
     <label for="play_screenreader">Using <strong>only</strong> the text read out by a screenreader</label><br/>
     <p><strong tabindex="0" aria-controls="my_audio_messages">How to use this</strong> . This is an <a href="https://github.com/philschatz/accessible-engine">accessbile demo</a> of the <a href="https://www.akurra-game.com" target="_window">amazing game Akurra</a>. Try completing the level without using the graphical option. Note what happens when you push against a wall, or when you get/use a key. Creating a sokoban-style games to be accessible only requires a minimal amount of accessible hoops to jump through; game devs can just write game code for the most part. For more on how to build accessible videogames check out <a href="https://github.com/philschatz/accessible-engine">the repository</a>.</p>
   </fieldset>
-  <p>Use the <kbd>I</kbd>, <kbd>J</kbd>, <kbd>K</kbd>, <kbd>L</kbd> keys to inspect around you.</p>
-  <p>Press <kbd>M</kbd> to hear where items are located.</p>
-  <p>Use the arrow keys or <kbd>W</kbd>, <kbd>A</kbd>, <kbd>S</kbd>, <kbd>D</kbd> keys to move the player. This requires a keyboard for now but phone/tablet support is coming soon.</p>
+  <p>Use the <span class="keys-udlr"><span class="keys-udlr-row1"><button class="key" data-letter="i">I</button></span><span class="keys-udlr-row2"><button class="key" data-letter="j">J</button>, <button class="key" data-letter="k">K</button>, <button class="key" data-letter="l">L</button></span></span> keys to inspect around you.</p>
+  <p>Press <button class="key" data-letter="m">M</button> to hear where items are located.</p>
+  <p>Use the arrow keys or <span class="keys-udlr"><span class="keys-udlr-row1"><button class="key" data-letter="w">W</button></span><span class="keys-udlr-row2"><button class="key" data-letter="a">A</button>, <button class="key" data-letter="s">S</button>, <button class="key" data-letter="d">D</button></span></span> keys to move the player up/left/down/right. If you do not have a keyboard you can <strong>long-tap</strong> the letters to move.</p>
   <canvas tabindex="0" id="my_canvas" width="384" height="224" aria-hidden="true" alt="graphical version of the game"></canvas>
   <div id="my_table" aria-hidden="true"></div>
   <ol id="my_audio" role="log" aria-live="polite" aria-atomic="false">
-    <li style="position:absolute; left: -10000px;">Use the <kbd>I</kbd>, <kbd>J</kbd>, <kbd>K</kbd>, <kbd>L</kbd> keys to inspect around you. Press <kbd>M</kbd> to hear where items are located. Use the arrow keys or <kbd>W</kbd>, <kbd>A</kbd>, <kbd>S</kbd>, <kbd>D</kbd> keys to move the player.</li>
+    <li style="position:absolute; left: -10000px;">Use the <button class="key" data-letter="i">I</button>, <button class="key" data-letter="j">J</button>, <button class="key" data-letter="k">K</button>, <button class="key" data-letter="l">L</button> keys to inspect around you. Press <button class="key" data-letter="m">M</button> to hear where items are located. Use the arrow keys or <button class="key" data-letter="w">W</button>, <button class="key" data-letter="a">A</button>, <button class="key" data-letter="s">S</button>, <button class="key" data-letter="d">D</button> keys to move the player.</li>
   </ol>
 
   <div id="gamepad_connected">🎮 Gamepad is connected. Use the D-Pad to move around</div>
@@ -64,7 +77,7 @@
   <script>
     (function() {
       console.log(window.GameEngine)
-      const {MyGame, AndOutputter, AudioOutputter, CanvasRenderer, Engine, GridTableOutputter, OrGamepad, VisualOutputter, KeyGamepad, BrowserGamepad, GridInspector } = window.GameEngine
+      const {MyGame, AndOutputter, AudioOutputter, CanvasRenderer, Engine, GridTableOutputter, OrGamepad, VisualOutputter, KEY_MAP, Keymaster, KeyGamepad, BrowserGamepad, HtmlButtonGamepad, GridInspector } = window.GameEngine
 
       const myCanvas = document.querySelector('#my_canvas')
       const myTable = document.querySelector('#my_table')
@@ -92,11 +105,13 @@
         visualOut, 
         tableOut
       ])
-      const browserGamepad = new BrowserGamepad()
-      const inputter = new OrGamepad([new KeyGamepad(), browserGamepad])
-      const engine = new Engine(new MyGame(), allOutputters, inputter)
-
       const gridInspector = new GridInspector(myTable, logger)
+      const km = new Keymaster((key) => KEY_MAP.get(key), (btn, pressed) => {
+        gridInspector.listen(btn, pressed)
+      }, null)
+      const browserGamepad = new BrowserGamepad()
+      const inputter = new OrGamepad([new KeyGamepad(km), browserGamepad, new HtmlButtonGamepad((el) => el.getAttribute('data-letter'), km)])
+      const engine = new Engine(new MyGame(), allOutputters, inputter)
 
       const fn = () => {
         engine.tick()
