@@ -70,14 +70,14 @@
     <li style="position:absolute; left: -10000px;">Use the <button class="key" data-letter="i">I</button>, <button class="key" data-letter="j">J</button>, <button class="key" data-letter="k">K</button>, <button class="key" data-letter="l">L</button> keys to inspect around you. Press <button class="key" data-letter="m">M</button> to hear where items are located. Use the arrow keys or <button class="key" data-letter="w">W</button>, <button class="key" data-letter="a">A</button>, <button class="key" data-letter="s">S</button>, <button class="key" data-letter="d">D</button> keys to move the player.</li>
   </ol>
 
-  <div id="gamepad_connected">🎮 Gamepad is connected. Use the D-Pad to move around</div>
-  <div id="gamepad_disconnected"><strong>Tip:</strong> 🎮 Plug in an XBox or PS3/4 Controller to play using it</div>
+  <div id="gamepad_connected">🎮 Gamepad is connected. Use the D-Pad to move around. Use the Right cluster of buttons to inspect around the player. Use the bumpers or Home or Start button to read out a map of everything</div>
+  <div id="gamepad_disconnected"><strong>Tip:</strong> 🎮 Plug in an XBox or PS3/4 Controller to play using it. <a target="_window" href="https://html5gamepad.com">Help</a></div>
   <script src="browser.bundle.js"></script>
 
   <script>
     (function() {
       console.log(window.GameEngine)
-      const {MyGame, AndOutputter, AudioOutputter, CanvasRenderer, Engine, GridTableOutputter, OrGamepad, VisualOutputter, KEY_MAP, Keymaster, KeyGamepad, BrowserGamepad, HtmlButtonGamepad, GridInspector } = window.GameEngine
+      const {MyGame, AndOutputter, AudioOutputter, CanvasRenderer, Engine, GridTableOutputter, OrGamepad, VisualOutputter, KEY_MAP, Keymaster, KeyGamepad, BrowserGamepad, HtmlButtonGamepad, GridInspector, GRID_INSPECTOR_BUTTONS } = window.GameEngine
 
       const myCanvas = document.querySelector('#my_canvas')
       const myTable = document.querySelector('#my_table')
@@ -116,6 +116,10 @@
       const fn = () => {
         engine.tick()
         showHideGamespadStatus()
+        // If the user pressed and of the cluster buttons then relay them to the grid inspector
+        GRID_INSPECTOR_BUTTONS.forEach(btn => {
+          gridInspector.listen(btn, browserGamepad.isButtonPressed(btn))
+        })
         window.requestAnimationFrame(fn)
       }
       fn()

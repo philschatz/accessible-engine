@@ -83,6 +83,19 @@ export class CanvasRenderer implements IRenderer {
   }
 }
 
+export const GRID_INSPECTOR_BUTTONS = [
+  BUTTON_TYPE.CLUSTER_UP,
+  BUTTON_TYPE.CLUSTER_LEFT,
+  BUTTON_TYPE.CLUSTER_RIGHT,
+  BUTTON_TYPE.CLUSTER_DOWN,
+  BUTTON_TYPE.HOME,
+  BUTTON_TYPE.SELECT,
+  BUTTON_TYPE.BUMPER_BOTTOM_LEFT,
+  BUTTON_TYPE.BUMPER_BOTTOM_RIGHT,
+  BUTTON_TYPE.BUMPER_TOP_LEFT,
+  BUTTON_TYPE.BUMPER_TOP_RIGHT
+]
+
 type Vert = number[] // [number, number]
 interface Vertex {x: number, y: number, name: string}
 
