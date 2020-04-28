@@ -1,5 +1,37 @@
 These are design notes and may be out of date.
 
+# Overview
+
+Programming an accessible game should be non-intrusive.
+This engine targets Sokoban and SNES/Gameboy-era Zelda games.
+
+As a result, there are a few "abstractions" that make accessibility easy:
+
+### the game registers which Gamepad buttons it will listen to
+
+As a result, the player can choose how the keys are mapped... to keys on a keyboard, a touch interface, or even remapping to different buttons on the gamepad (e.g. if they are single-handed or do not have a thumb)
+
+### the game does not draw dialogs directory
+
+Instead, it calls a function and passes the dialog text.
+This is so that engine can read out via a screenreader.
+
+### the game does not directly draw the overlay
+
+Instead, it updates a key-value map that describes what is in the overlay.
+
+Examples of key-value fields can be: health, hearts, current_weapon, weapons.
+
+This is done so that any changes to these fields can be read out via a screenreader.
+
+### the game creates/moves objects and does not draw pixels directly
+
+This is done for a couple of reasons:
+
+1. the engine can speak whenever an object changes
+1. the engine can ignore animations and other changes that do not actually change the state of objects in the game
+
+
 ## Game
 
 A game needs to implement 2 required functions and may implement 3 optional ones: 

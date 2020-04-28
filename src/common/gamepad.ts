@@ -62,7 +62,9 @@ export class OrGamepad implements IGamepad {
 
   isButtonPressed (btn: BUTTON_TYPE) {
     for (const pad of this.pads) {
-      if (pad.isButtonPressed(btn)) { return true }
+      if (pad.isButtonPressed(btn)) {
+        return true
+      }
     }
     return false
   }
